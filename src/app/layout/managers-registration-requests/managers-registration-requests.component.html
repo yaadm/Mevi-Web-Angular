@@ -1,0 +1,46 @@
+<div [@routerTransition]>
+	<h2 class="text-muted">מערכת ניהול<br><small>ניהול בקשות מנהלים</small></h2>
+	<div *ngFor="let user of itemsArray" class="card card-primary card-inverse form-groups">
+		<div class="card-header card-primary">
+			<table>
+				<tr>
+					<td>
+						<i class="fa fa-user fa-fw"></i> &nbsp;
+					</td>
+					<td>
+						{{user.name}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-id-card-o fa-fw"></i> &nbsp;
+					</td>
+					<td>
+						{{user.companyId}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-phone fa-fw"></i> &nbsp;
+					</td>
+					<td>
+						{{user.companyPhone}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-cc-visa fa-fw"></i>
+					</td>
+					<td>
+						{{user.paymentAccessToken ? 'אשראי מחובר' : 'אשראי לא מחובר'}}
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="card-block">
+	        <button type="submit" class="btn btn-danger" (click)="denyManagerRequest(user)">דחה בקשה</button>
+	        <button type="submit" class="btn btn-success" [routerLink]="['/payment', user.uid]">עדכן אשראי</button>
+		</div>
+	</div>
+	<app-footer-page></app-footer-page>
+</div>

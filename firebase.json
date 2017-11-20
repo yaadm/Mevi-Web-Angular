@@ -1,0 +1,35 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+    	{
+        	"source": "/unsubscribe", "function": "unsubscribe"
+	  	}, 
+	  	{
+	    	"source": "/onUserPaymentMethodCompleted", 
+	    	"function": "onUserPaymentMethodCompleted"
+	  	}, 
+	  	{
+	    	"source": "/setUserPaymentMethod", 
+	    	"function": "setUserPaymentMethod"
+	  	},
+	  	{
+	    	"source": "/rediredctUserToPayment", 
+	    	"function": "rediredctUserToPayment"
+	  	},
+	  	{
+	    	"source": "/startDailyCronTest", 
+	    	"function": "startDailyCronTest"
+	  	},
+      	{
+       		"source": "**",
+        	"destination": "/index.html"
+      	}
+    ]
+  }
+}

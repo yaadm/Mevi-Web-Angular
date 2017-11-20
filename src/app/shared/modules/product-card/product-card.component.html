@@ -1,0 +1,61 @@
+<div class="form-control in-bl" style='margin-bottom: 5px'>
+	<table style="float: right">
+		<tr>
+			<td>
+				<i class="fa fa-truck fa-5x"></i> &nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				<small>
+					<table>
+						<tr>
+							<td>
+								שם מוצר:
+							</td>
+							<td>
+								{{productItem.name}}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								כמות:
+							</td>
+							<td>
+								{{productItem.quantity}}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								גודל:
+							</td>
+							<td>
+								{{productItem.width | resolveSize}} על {{productItem.height | resolveSize}} על {{productItem.length | resolveSize}} מטר
+							</td>
+						</tr>
+						<tr>
+							<td>
+								משקל:
+							</td>
+							<td>
+								{{productItem.weight | resolveWeight}}
+							</td>
+						</tr>
+						<tr *ngIf="productItem.container || productItem.onPallets || productItem.fragile">
+							<td>
+								פרטים נוספים: &nbsp;
+							</td>
+							<td>
+								{{productItem.container ? 'קונטיינר,' : ''}}
+								{{productItem.onPallets ? 'על משטחים,' : ''}}
+								{{productItem.fragile ? 'שביר,' : ''}}
+							</td>
+						</tr>
+					</table>
+				</small>
+				<br>
+			</td>
+		</tr>
+	</table>
+	<div style="float: left" *ngIf="isEditable">
+		<button type="button" class="btn btn-danger" (click)="removeProduct(productItem)"><i class="fa fa-trash"></i></button>
+	</div>
+</div>

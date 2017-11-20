@@ -1,0 +1,87 @@
+<div class="pos-f-t fixed-top header">
+    <nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
+		<div class="navbar-toggler-right navbar-state">
+			<ul class="navbar-nav ml-auto mt-1 mt-md-0">
+                <li class="nav-item dropdown navbar-inverse" ngbDropdown *ngIf="currentUser">
+                	<i>
+	                	<button class="navbar-toggler"
+							(click)="toggleSidebar()">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+                	</i>&nbsp;&nbsp;
+                    <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                        <i class="fa fa-user"></i> {{ currentUser ? currentUser.child('name').val() : 'מתחבר...' }} <b class="caret"></b>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}</a>
+                        <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a> -->
+                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+                    </div>
+                </li>
+				<li class="nav-item" *ngIf="!currentUser">
+					<i>
+	                	<button class="navbar-toggler"
+							(click)="toggleSidebar()">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+                	</i>&nbsp;&nbsp;
+                	<button type="button" (click)="login()" class="btn btn-success mt-1" style="padding: .375rem 1rem !important; border-color: #999;">התחבר</button> 
+                </li>
+            </ul>
+		
+			<!-- <button class="navbar-toggler"
+				(click)="toggleSidebar()">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<span class="nav-item dropdown" ngbDropdown *ngIf="currentUser">
+				<a href="javascript:void(0)" class="nav-link" ngbDropdownToggle> 
+				<i class="fa fa-user"></i> {{ currentUser ? currentUser.child('name').val() : 'מתחבר...' }} <b class="caret"></b>
+				</a>
+				<i class="dropdown-menu dropdown-menu-right">
+					<a class="dropdown-item" href="javascript:void(0)"><i
+						class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}</a> <a
+						class="dropdown-item" href="javascript:void(0)"><i
+						class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}</a> <a
+						class="dropdown-item" href="javascript:void(0)"><i
+						class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a> <a
+						class="dropdown-item" (click)="logout()"><i
+						class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+				</i>
+			</span>
+			<span class="nav-item" *ngIf="!currentUser">
+				<button type="button" (click)="login()" class="btn btn-success mt-1"
+					style="padding: .375rem 1rem !important; border-color: #999; margin-left: .375rem">התחבר</button>
+			</span> -->
+		</div>
+
+
+		<div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto mt-2 mt-md-0">
+                <li class="nav-item dropdown" ngbDropdown *ngIf="currentUser">
+                    <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                        <i class="fa fa-user"></i> {{ currentUser ? currentUser.child('name').val() : 'מתחבר...' }} <b class="caret"></b>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}</a>
+                        <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a> -->
+                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+                    </div>
+                </li>
+				<li class="nav-item" *ngIf="!currentUser">
+                	<button type="button" (click)="login()" class="btn btn-success mt-1" style="padding: .375rem 1rem !important; border-color: #999; margin-left: .375rem">התחבר</button> 
+                </li>
+				<li class="nav-item">
+                    <a href="https://play.google.com/store/apps/details?id=com.objective.gettruck" class="nav-link btn mt-1" role="button" style="padding: .375rem 1rem !important; border-color: #999;">{{ 'Download Now' | translate }}</a>
+                </li> 
+            </ul>
+        </div>
+        
+        <div class="navbar-brand">
+	        <a class="navbar-brand" href="javascript:void(0)">Mevi</a>
+	        &nbsp;
+	        <img alt="logo" class="logo-image navbar-state-reverse" src="/assets/images/logo_white.png">
+        </div>
+    </nav>
+</div>

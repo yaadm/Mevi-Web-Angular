@@ -1,0 +1,11 @@
+<div [@routerTransition]>
+	<h2 class="text-muted">ההובלות הסגורות שלי</h2>
+	<div *ngIf="database.getCurrentUser() !== undefined">
+		<div *ngFor="let order of itemsArray">
+			<div *ngIf="order.orderStatus === 2">
+				<app-order-card [order]="order"></app-order-card>
+			</div>
+		</div>
+	</div>
+	<app-footer-page></app-footer-page>
+</div>

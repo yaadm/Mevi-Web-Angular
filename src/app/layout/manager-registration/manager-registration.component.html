@@ -1,0 +1,56 @@
+<div [@routerTransition]>
+	<app-page-header [heading]="'הרשמת מנהל'" [icon]="'fa-desktop'"></app-page-header>
+	<div *ngIf="database.getCurrentUser() != undefined">
+		<div *ngIf="database.getCurrentUser().child('manager').val() != true">
+			<div class="jumbotron" *ngIf="database.getCurrentUser().child('requestingManager').val() != true">
+		        <h4>הרשם כבעל משאיות</h4>
+		        
+		        <h6>אל תתן למשאיות שלך לנוח</h6>
+		        
+		        בכדי להתחיל להגיש הצעות מחיר, אנו צריכים לאמת את חשבונך. <br>
+		
+				המוטו שלנו: לא הרווחת, לא שילמת !  <br>
+				* אין דמי הרשמה!  <br>
+				* אין דמי ניהול!  <br>
+				* במידה והרווחתם, אתם תחוייבו ב 8% מסך העסקה. <br>
+				<br>
+				<div *ngIf="database.getCurrentUser() != undefined" class="form-control">
+					<br>
+					<h6>במידה והרווחת, איך אתה מעוניין לשלם ?</h6>
+					<br><br>
+					<div class="row">
+			        	<div class="col-lg-6">
+			        		<button type="submit" class="btn btn-success" [routerLink]="['/payment', database.getCurrentUser().child('uid').val()]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
+			        	</div>
+			        	<div class="col-lg-6">
+			        		<button type="submit" class="btn btn-warning"><i class="fa fa-fw fa-phone"></i>&nbsp; נציג יתקשר אלי לבקשת תשלום</button>
+			        	</div>
+			        </div>
+			        <br>
+				</div>
+		    </div>
+		    
+			<div class="jumbotron" *ngIf="database.getCurrentUser().child('requestingManager').val() === true">
+				<h4>ביקשת להרשם טלפונית</h4>
+				<h6>
+					הנציגים שלנו מעבדים כרגע את בקשתכם.. 
+					<br>
+					<small>
+						אנו ניצור עמכם קשר טלפוני ברגע שאחד הנציגים יתפנה לבקשתכם.
+						<br>
+						תודה, צוות האתר.
+					</small>
+					<br>
+					<br>
+					אם ברצונכם לבטל את הנציג הטלפוני ולשלם דרך האתר:
+				</h6>
+				<button type="submit" class="btn btn-success" [routerLink]="['/payment', database.getCurrentUser().child('uid').val()]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
+			</div>
+		</div>
+		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
+			<h4>אתה כבר מנהל...</h4>
+			<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page']"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הגש הצעות מחיר</button>
+		</div>
+	</div>
+    <app-footer-page></app-footer-page>
+</div>

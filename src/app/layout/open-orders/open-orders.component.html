@@ -1,0 +1,11 @@
+<div [@routerTransition]>
+	<h2 class="text-muted">הזמנות חדשות<br><small>הגש הצעות מחיר</small></h2>
+	<div *ngIf="database.getCurrentUser() !== undefined">
+		<div *ngFor="let order of itemsArray">
+			<div *ngIf="order.userId !== database.getCurrentUser().child('uid').val()">
+				<app-order-card [order]="order"></app-order-card>
+			</div>
+		</div>
+	</div>
+	<app-footer-page></app-footer-page>
+</div>

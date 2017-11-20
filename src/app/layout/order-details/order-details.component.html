@@ -1,0 +1,317 @@
+<div [@routerTransition]>
+	<h2 class="text-muted">{{ 'Order Details' | translate }}</h2>
+	<div *ngIf="currentOrder != undefined && database.getCurrentUser() != undefined">
+	
+		<div class="jumbotron" *ngIf="database.getCurrentUser().child('appManager').val() && false"><!-- TODO: remove false  -->
+			<h6>סטטוס הזמנה</h6>
+		</div>
+	
+		<div class="row">
+	        <div class="col-lg-8" >
+	        	<div class="jumbotron">
+	        		<img class="img-fluid mx-auto d-block form-control" style='padding: 0px' [src]="getStaticMapUrl(currentOrder)" alt="Static Map" width="100%">
+					<br>
+					<h6>העמסה</h6>
+					<div class="form-group input-group" *ngIf="currentOrder.pickupCompanyName != undefined">
+		               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.pickupCompanyName}}</div>
+					</div> 
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.pickupLocationName}}</div>
+					</div>
+					<h6>פריקה</h6>
+					<div class="form-group input-group" *ngIf="currentOrder.destinationCompanyName != undefined">
+		               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.destinationCompanyName}}</div>
+					</div>
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.destinationLocationName}}</div>
+					</div>
+					<h6>תאריך הובלה</h6>
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.pickupDate | date: 'dd/MM/yyyy'}}</div>
+					</div>
+					<h6>מזמין</h6>
+					<div class="form-group input-group" style="margin-bottom: 0px">
+		               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.userId === database.getCurrentUser().child('uid').val() || currentOrder.selectedBid === database.getCurrentUser().child('uid').val() ? currentOrder.userName : 'חסוי'}}</div>
+					</div>
+					<div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val()">
+						<div class="form-control in-bl" style='margin-bottom: 5px'>
+							<small>
+								<table>
+									<tr>
+										<td>
+											<i class="fa fa-phone fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrder.companyPhone}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-envelope fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrder.userEmail}}
+										</td>
+									</tr>
+								</table>
+							</small>
+						</div>
+					</div>
+					
+					<h6>ביטוח</h6>
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-shield fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.insurance | resolveInsurance}}</div>
+					</div>
+					<h6>סוג פריקה</h6>
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-upload fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.unloading | resolveUnloading}}</div>
+					</div>
+					<div *ngIf="currentOrder.orderType === 2">
+						<h6>משאיות</h6>
+						<div>
+							<app-truck-card [order]="currentOrder"></app-truck-card>
+			            </div>
+					</div>
+					<div *ngIf="currentOrder.orderType === 1">
+						<h6>מוצרים ({{currentOrder.cargoList.length}})</h6>
+						<div *ngFor="let product of currentOrder.cargoList">
+							<app-product-card [productItem]="product" [productsList]="currentOrder.cargoList" [isEditable]=false></app-product-card>
+			            </div>
+					</div>
+	        	</div>
+			</div>
+			
+			<div class="col-lg-4">
+				<div class="jumbotron" *ngIf="currentOrder.userId === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('uid').val() === currentOrder.selectedBid">
+					<div *ngIf="currentOrder.selectedBid != undefined">
+						<h6>ההצעה הזוכה</h6>
+						<div class="form-control in-bl" style='margin-bottom: 5px'>
+							<small>
+								<table style="width: 100%">
+									<tr>
+										<td>
+											<i class="fa fa-user fa-fw"></i> &nbsp;
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-phone fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-envelope fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}
+										</td>
+									</tr>
+									<tr>
+										<td colspan=2>
+											<hr class="ng-tns-c6-1">
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidAmount').val()}} ש"ח
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-calendar fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupDate').val() | date: 'dd/MM/yyyy'}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-clock-o fa-fw"></i>
+										</td>
+										<td>
+											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
+										</td>
+									</tr>
+								</table>
+							</small>
+						</div>
+					</div>
+					<div *ngIf="currentOrder.selectedBid === undefined">
+						<h6>הצעות מחיר</h6>
+						<div>
+							<div *ngIf="bidsArray.length <= 0s" class="form-control">
+								*** לא נמצאו הצעות מחיר
+							</div>
+							<div *ngIf="bidsArray.length > 0">
+								<div *ngFor="let bidItem of bidsArray">
+									<div class="form-control in-bl" style='margin-bottom: 5px'>
+										<small>
+											<table>
+												<tr>
+													<td>
+														<i class="fa fa-user fa-fw"></i> &nbsp;
+													</td>
+													<td>
+														חסוי
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+													</td>
+													<td>
+														{{bidItem.bidAmount}} ש"ח
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<i class="fa fa-calendar fa-fw"></i>
+													</td>
+													<td>
+														{{bidItem.pickupDate | date: 'dd/MM/yyyy'}}
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<i class="fa fa-clock-o fa-fw"></i>
+													</td>
+													<td>
+														{{bidItem.pickupTime | date: 'HH:mm'}}
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.expirationDate && bidItem.expirationDate >= 0">
+													<td>
+														<i class="fa fa-ban fa-fw"></i>
+													</td>
+													<td>
+														{{bidItem.expirationDate | date: 'dd/MM/yyyy'}}
+													</td>
+												</tr>
+												<tr>
+													<td colspan=2>
+														<br>
+														<button type="submit" class="btn btn-sm btn-success" (click)="addNewProduct()">בצע עסקה</button>
+													</td>
+												</tr>
+											</table>
+										</small>
+									</div>
+								</div>
+							</div>
+			            </div>
+					</div>
+				</div>
+				<div class="jumbotron" *ngIf="database.getCurrentUser().child('manager').val() === true && currentOrder.userId !== database.getCurrentUser().child('uid').val() && currentOrder.orderStatus === 0">
+					<h6>הצעת המחיר שלי</h6>
+					<div *ngIf="myBid != undefined">
+						<div class="form-control in-bl" style='margin-bottom: 5px'>
+							<small>
+								<table>
+									<tr>
+										<td>
+											<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+										</td>
+										<td>
+											 {{myBid.bidAmount}} ש"ח
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-calendar fa-fw"></i>
+										</td>
+										<td>
+											{{myBid.pickupDate | date: 'dd/MM/yyyy'}}
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-clock-o fa-fw"></i>
+										</td>
+										<td>
+											{{myBid.pickupTime | date: 'HH:mm'}}
+										</td>
+									</tr>
+									<tr *ngIf="myBid.expirationDate != undefined && myBid.expirationDate > 0">
+										<td>
+											<i class="fa fa-ban fa-fw"></i>
+										</td>
+										<td>
+											{{myBid.expirationDate | date: 'dd/MM/yyyy'}}
+										</td>
+									</tr>
+								</table>
+							</small>
+						</div>
+					</div>
+					<div class="form-control" *ngIf="myBid == undefined">
+						*** לא הגשת הצעת מחיר
+		            </div>
+		            <br>
+		            <h6>הגש הצעת מחיר</h6>
+		            <div class="form-control">
+		            	<small>סכום</small>
+						<input type="number" class="form-control" placeholder="סכום">
+		            	<small>תאריך הגעה</small>
+			            <input type="date" class="form-control" placeholder="תאריך">
+		            	<small>שעת הגעה</small>
+		                <input type="time" class="form-control" placeholder="שעה">
+		                <br>
+			            <button type="submit" class="btn btn-success" (click)="addNewProduct()">הגש הצעת מחיר</button>
+		            </div>
+				</div>
+				<div class="jumbotron">
+					<h6>פרטים נוספים</h6>
+					<h6><small>מזהה הזמנה</small></h6> 
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.orderId}}</div>
+					</div>
+					<h6><small>תאריך פרסום</small></h6> 
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder.publishedAt | date: 'dd/MM/yyyy'}}</div>
+					</div>
+					<h6><small>סטטוס הזמנה</small></h6> 
+	        		<div class="form-group has-success">
+	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 0">
+	                    	הזמנה חדשה
+	                    </div>
+	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 1">
+	                    	הזמנה ממתינה
+	                    </div>
+	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 2">
+	                    	הזמנה סגורה
+	                    </div>
+	                </div>
+	                <div *ngIf="currentOrder.userId === database.getCurrentUser().child('uid').val()">
+	                	<div *ngIf="currentOrder.orderStatus === 0 || currentOrder.orderStatus === 1">
+	                		<h6><small>אפשרויות הזמנה</small></h6> 
+			        		<div class="form-group form-control">
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 0">מחק מודעה</button>
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 1">בטל עסקה</button>
+			                </div>
+	                	</div>
+	                </div>
+				</div>
+			</div>
+        </div>
+    	<app-footer-page></app-footer-page>
+    </div>
+</div>

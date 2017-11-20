@@ -1,0 +1,39 @@
+<div class="form-control in-bl" style='margin-bottom: 5px'>
+	<table>
+		<tr>
+			<td>
+				<i class="fa fa-truck fa-5x"></i>
+			</td>
+			<td class="text-align-top">
+				<small>
+					<table>
+						<tr>
+							<td>
+								סוג משאית:
+							</td>
+							<td>
+								{{order.truckType | resolveTruckType}}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								סוג נגרר:
+							</td>
+							<td>
+								{{order.truckSubType | resolveTruckSubType}}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								כמות משאיות: &nbsp;
+							</td>
+							<td>
+								{{order.truckQuantity}}
+							</td>
+						</tr>
+					</table>
+				</small>
+			</td>
+		</tr>
+	</table>
+</div>

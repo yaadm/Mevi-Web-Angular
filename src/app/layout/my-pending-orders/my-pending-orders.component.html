@@ -1,0 +1,9 @@
+<div [@routerTransition]>
+	<h2 class="text-muted">{{ 'My Orders' | translate }}<br><small>הזמנות ממתינות</small></h2>
+	<div *ngFor="let order of itemsArray">
+		<div *ngIf="order.orderStatus === 1">
+			<app-order-card [order]="order"></app-order-card>
+		</div>
+	</div>
+	<app-footer-page></app-footer-page>
+</div>

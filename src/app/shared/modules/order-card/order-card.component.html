@@ -1,0 +1,40 @@
+<div class="card card-inverse card-primary">
+    <div class="card-header" style="padding: 6px">
+        <div class="row">
+            <div class="col-lg-4">
+                <img class="img-fluid mx-auto d-block form-control" style='padding: 0px' [src]="getStaticMapUrl(order)" alt="Static Map" width="100%">
+            </div>
+            <div class="col-lg-8 text-right">
+                <table>
+                       <tbody>
+                       <tr *ngIf="database.getCurrentUser() && (database.getCurrentUser().child('uid').val() == order.selectedBid || database.getCurrentUser().child('uid').val() == order.userId)">
+                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;מזמין</th>
+                           <td>{{order.userName}}</td>
+                       </tr>
+                       <tr>
+                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;העמסה</th>
+                           <td>{{order.pickupLocationName}}</td>
+                       </tr>
+                       <tr>
+                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;פריקה</th>
+                           <td>{{order.destinationLocationName}}</td>
+                       </tr>
+                       <tr>
+                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</th>
+                           <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
+                       </tr>
+                       </tbody>
+                   </table>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a [routerLink]="['/order-details', order.orderId]" class="card-inverse">
+        	<span class="float-left">
+            	<i class="fa fa-arrow-circle-left"></i>
+            </span>
+        	<span class="float-right"> {{('View Details' | translate)}}</span>
+            <div class="clearfix"></div>
+        </a>
+    </div>
+</div>
