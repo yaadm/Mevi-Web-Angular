@@ -8,6 +8,7 @@ yarn-error.log
 # dependencies
 /node_modules
 /functions/node_modules
+/appengine/lib
 
 # IDEs and editors
 /.idea
