@@ -1,0 +1,42 @@
+{
+  "rules": {
+  	"all-orders": {
+	    ".read": "auth != null",
+	    ".write": "auth != null",
+      	".indexOn": ["userId","selectedBid","orderStatus","pendingPayment"]
+    },
+    "new-orders": {
+	    ".read": true,
+	    ".write": "auth != null"
+    },
+    "cancelled-orders": {
+	    ".read": "auth != null",
+	    ".write": "auth != null"
+    },
+    "completed-orders": {
+	    ".read": "auth != null",
+	    ".write": "auth != null"
+    },
+    "deleted-orders": {
+	    ".read": "auth != null",
+	    ".write": "auth != null"
+    },
+    "users": {
+	    ".read": "auth != null",
+	    ".write": "auth != null",
+      	".indexOn": ["appManager", "manager", "companyId" , "requestingManager", "uid"]
+    },
+    "app-managers": {
+	    ".read": "auth != null",
+	    ".write": false
+    },
+    "email-inbox": {
+	    ".read": true,
+	    ".write": true
+    },
+    "payments-records": {
+	    ".read": "auth != null",
+	    ".write": "auth != null"
+    }
+  }
+}
