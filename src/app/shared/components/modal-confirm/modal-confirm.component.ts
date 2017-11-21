@@ -4,6 +4,7 @@ import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
 export interface ConfirmModel {
   title: string;
   message: string;
+  subMessage: string;
 }
 
 @Component({

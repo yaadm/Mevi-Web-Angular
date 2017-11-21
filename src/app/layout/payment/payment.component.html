@@ -1,9 +1,26 @@
 <div [@routerTransition]>
 	<h2 class="text-muted">הרשמת מנהל<br><i class="fa fa-lock fa-fw"></i><small>תשלום מאובטח</small></h2>
-	{{userId}}<br>
-	<div *ngIf="url != undefined">
-		<!-- <iframe #iframeContent src="{{url | safe}}">
-		</iframe> -->
-	</div>
+	<small>
+		<table class="form-control" *ngIf="userSnapshot">
+			<tr>
+				<td>
+					<i class="fa fa-user fa-fw"></i> &nbsp;
+				</td>
+				<td>
+					{{userSnapshot.child('name').val()}}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<i class="fa fa-envelope fa-fw"></i>
+				</td>
+				<td>
+					{{userSnapshot.child('email').val()}}
+				</td>
+			</tr>
+		</table>
+	</small>
+	<br>
+	<iframe #iframeContent class="iframeheight"></iframe>
 	<app-footer-page></app-footer-page>
 </div>

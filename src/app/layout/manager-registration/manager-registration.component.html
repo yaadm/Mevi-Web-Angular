@@ -23,7 +23,7 @@
 			        		<button type="submit" class="btn btn-success" [routerLink]="['/payment', database.getCurrentUser().child('uid').val()]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
 			        	</div>
 			        	<div class="col-lg-6">
-			        		<button type="submit" class="btn btn-warning"><i class="fa fa-fw fa-phone"></i>&nbsp; נציג יתקשר אלי לבקשת תשלום</button>
+			        		<button type="submit" class="btn btn-warning" (click)="requestPhonePayment()"><i class="fa fa-fw fa-phone"></i>&nbsp; נציג יתקשר אלי לבקשת תשלום</button>
 			        	</div>
 			        </div>
 			        <br>
@@ -35,11 +35,16 @@
 				<h6>
 					הנציגים שלנו מעבדים כרגע את בקשתכם.. 
 					<br>
+					<br>
 					<small>
 						אנו ניצור עמכם קשר טלפוני ברגע שאחד הנציגים יתפנה לבקשתכם.
 						<br>
 						תודה, צוות האתר.
 					</small>
+					<br>
+					<br>
+					<br>
+					<br>
 					<br>
 					<br>
 					אם ברצונכם לבטל את הנציג הטלפוני ולשלם דרך האתר:
@@ -49,6 +54,8 @@
 		</div>
 		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
 			<h4>אתה כבר מנהל...</h4>
+			<br>
+			<br>
 			<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page']"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הגש הצעות מחיר</button>
 		</div>
 	</div>

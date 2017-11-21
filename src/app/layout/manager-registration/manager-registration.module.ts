@@ -8,9 +8,9 @@ import { ManagerRegistrationComponent } from './manager-registration.component';
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { BootstrapModalModule } from 'ng2-bootstrap-modal';
 
 import { PageHeaderModule, FooterPageModule } from '../../shared';
-import { ModalLoadingComponent } from '../../shared/modules/modal-loading/modal-loading.component';
 import { FormsModule } from '@angular/forms';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -23,6 +23,7 @@ export function HttpLoaderFactory(http: Http) {
     CommonModule,
     NgbModule.forRoot(),
     ManagerRegistrationRoutingModule,
+    BootstrapModalModule,
     HttpModule,
     PageHeaderModule,
     FormsModule,
@@ -35,7 +36,7 @@ export function HttpLoaderFactory(http: Http) {
         }
     })
   ],
-  declarations: [ ManagerRegistrationComponent, ModalLoadingComponent ],
-  providers: [ModalLoadingComponent]
+  declarations: [ ManagerRegistrationComponent ],
+  providers: []
 })
 export class ManagerRegistrationModule { }

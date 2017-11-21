@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug, ModalInputComponent, ModalConfirmComponent } from '../../shared';
+import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { AuthListener } from '../../shared/services';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
@@ -35,6 +36,8 @@ export class ManagersRegistrationRequestsComponent implements OnInit, OnDestroy,
       this.items = this.database.subscribeToManagersRequests();
       this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
+          // fix this sh*t in the future...
+          this.itemsArray = [];
           afa.forEach(userItem => {
             this.updateItemsArray(userItem);
           });
@@ -62,10 +65,10 @@ export class ManagersRegistrationRequestsComponent implements OnInit, OnDestroy,
       });
   }
 
-  showConfirmDialog () {
-    this.dialogService.addDialog(ModalConfirmComponent, {
-      title: 'האם אתה בטוח ?',
-      message: 'מה נשמע ?'})
+  showInfoDialog (modalTitle, moadlMessage) {
+    this.dialogService.addDialog(ModalInformComponent, {
+      title: modalTitle,
+      message: moadlMessage})
       .subscribe((success) => {
           if (success) {
 
@@ -73,14 +76,28 @@ export class ManagersRegistrationRequestsComponent implements OnInit, OnDestroy,
           }
       });
   }
-
+  
   denyManagerRequest (user) {
     this.dialogService.addDialog(ModalInputComponent, {
       title: 'סיבת ביטול',
       message: 'מדוע אתה דוחה את בקשת הניהול ?'})
       .subscribe((data) => {
           if (data) {
-          } else {
+            const payload = {
+              'manager' : false,
+              'managerRequestDenialReason' : data,
+              'requestingManagerDenied' : true,
+              'requestingManager' : false
+            }
+            
+            this.database.updateUserData(user.uid, payload).then(_ => {
+              // on success
+              
+              this.showInfoDialog('הצלחה', 'המנוי נדחה');
+            }, reason => {
+              // on reject
+              this.showInfoDialog('נכשל', 'לא הצלחנו לבטל את המנוי, נא לנסות שוב מאוחר יותר');
+            });
           }
       });
   }

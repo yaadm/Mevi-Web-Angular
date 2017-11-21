@@ -8,12 +8,12 @@
 			        <small>שם העסק</small>
 		            <div class="form-group input-group">
 		                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-		                <input type="text" class="form-control" placeholder="שם העסק" value="{{database.getCurrentUser().child('name').val()}}">
+		                <input type="text" class="form-control" placeholder="שם העסק" value="{{database.getCurrentUser().child('name').val()}}" #inputCompanyName>
 		            </div>
 		        	<small>ח.פ \ עוסק מורשה</small>
 		            <div class="form-group input-group">
 		                <span class="input-group-addon"><i class="fa fa-id-badge fa-fw"></i></span>
-		                <input type="number" class="form-control" placeholder="ח.פ \ עוסק מורשה" disabled="disabled" value="{{database.getCurrentUser().child('companyId').val()}}">
+		                <input type="text" class="form-control" placeholder="ח.פ \ עוסק מורשה" disabled="disabled" value="{{database.getCurrentUser().child('companyId').val()}}">
 		            </div>
 		        	<small>אימייל</small>
 		            <div class="form-group input-group">
@@ -23,12 +23,12 @@
 		            <small>טלפון</small>
 		            <div class="form-group input-group">
 		                <span class="input-group-addon"><i class="fa fa-phone fa-fw"></i></span>
-		                <input type="text" class="form-control" placeholder="טלפון חברה" value="{{database.getCurrentUser().child('companyPhone').val()}}">
+		                <input type="text" class="form-control" placeholder="טלפון חברה" value="{{database.getCurrentUser().child('companyPhone').val()}}" #inputCompanyPhone>
 		            </div>
 		            <small>כתובת למשלוח דואר</small>
 		            <div class="form-group input-group">
 		                <span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
-		                <input type="text" class="form-control" placeholder="כתובת" value="{{database.getCurrentUser().child('companyAddress').val()}}">
+		                <input type="text" class="form-control" placeholder="כתובת" value="{{database.getCurrentUser().child('companyAddress').val()}}" #inputCompanyAddress>
 		            </div>
 		            <button class="btn btn-primary" (click)="onSubmit()">עדכן פרטי משתמש</button>
 				</div>		
@@ -38,7 +38,7 @@
 					<h4>הגדרות משתמש</h4>
 					<div class="checkbox form-control">
                         <label>
-                            <input type="checkbox" value=""> ברצוני לקבל הודעה למייל כאשר נוספת מודעה, כדי שאוכל להגיש הצעת מחיר
+                            <input type="checkbox" value="" #checkboxEmailSubscription> ברצוני לקבל הודעה למייל כאשר נוספת מודעה, כדי שאוכל להגיש הצעת מחיר
                         </label>
                     </div>
 			</div>

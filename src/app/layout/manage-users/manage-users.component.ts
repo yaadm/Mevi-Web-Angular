@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { DatabaseService, firebaseConfigDebug } from '../../shared';
+import { DatabaseService, firebaseConfigDebug, ModalInputComponent } from '../../shared';
+import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { AuthListener } from '../../shared/services';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
+import { DialogService } from 'ng2-bootstrap-modal';
 
 @Component({
   selector: 'app-manage-users-page',
@@ -16,7 +18,7 @@ import { DataSnapshot } from 'firebase/database';
 export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
   items:  Observable<AngularFireAction<DataSnapshot>[]>;
   itemsArray = [];
-  constructor(private translate: TranslateService, public database: DatabaseService) {
+  constructor(private translate: TranslateService, public database: DatabaseService, private dialogService: DialogService) {
     this.setupTranslation(translate);
     database.subscribeToAuth(this);
   }
@@ -59,6 +61,43 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
     }
   }
 
+  showInfoDialog (modalTitle, moadlMessage) {
+    this.dialogService.addDialog(ModalInformComponent, {
+      title: modalTitle,
+      message: moadlMessage})
+      .subscribe((success) => {
+          if (success) {
+
+          } else {
+          }
+      });
+  }
+  
+  denyManager (userItem) {
+    this.dialogService.addDialog(ModalInputComponent, {
+      title: 'סיבת ביטול',
+      message: 'מדוע אתה דוחה את בקשת הניהול ?'})
+      .subscribe((data) => {
+          if (data) {
+            const payload = {
+              'manager' : false,
+              'managerRequestDenialReason' : data,
+              'requestingManagerDenied' : true,
+              'requestingManager' : false
+            }
+            
+            this.database.updateUserData(userItem.uid, payload).then(_ => {
+              // on success
+              
+              this.showInfoDialog('הצלחה', 'המנוי נדחה');
+            }, reason => {
+              // on reject
+              this.showInfoDialog('נכשל', 'לא הצלחנו לבטל את המנוי, נא לנסות שוב מאוחר יותר');
+            });
+          }
+      });
+  }
+  
   private setupTranslation(translate: TranslateService) {
     translate.addLangs(['en', 'iw']);
     translate.setDefaultLang('iw');

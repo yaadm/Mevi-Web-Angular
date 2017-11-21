@@ -165,11 +165,55 @@ export class DatabaseService {
     return this.afDb.list('/users/', ref => ref.orderByChild('companyId').equalTo(companyId)).valueChanges();
   }
 
-  updateUserRegistrationData(payload): Promise<void> {
+  updateBidForOrder(orderId, payload): Promise<void> {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.object('/all-orders/' + orderId + '/bidsList/' + uid).set(payload);
+  }
+  
+  removeMyBidFromOrder(orderId): Promise<void> {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.object('/all-orders/' + orderId + '/bidsList/' + uid).remove();
+  }
+  
+  deleteOrderById(orderId): Promise<void> {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.object('/all-orders/' + orderId).remove();
+  }
+  
+  updateOrderData(orderId, payload): Promise<void> {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.object('/all-orders/' + orderId).update(payload);
+  }
+  
+  updateMyUserData(payload): Promise<void> {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.object('/users/' + uid).update(payload);
   }
 
+  updateUserData(userId, payload): Promise<void> {
+    return this.afDb.object('/users/' + userId).update(payload);
+  }
+  
+  getUserById(userId): Observable<AngularFireAction<DataSnapshot>> {
+    return this.afDb.object('/users/' + userId).snapshotChanges();
+  }
+  
+  generateOrderId(): string {
+    return this.afDb.list('/all-orders').push({}).key;
+  }
+  
+  removeOrderById(orderId: string): Promise<void> {
+    return this.afDb.object('/all-orders/' + orderId).remove();
+  }
+  
+  publishOrder(orderId: string, payload): Promise<void> {
+    return this.afDb.object('/all-orders/' + orderId).set(payload);
+  }
+  
+  sendContactUsEmail(payload): firebase.database.ThenableReference {
+    return this.afDb.list('/email-inbox/').push(payload);
+  }
+  
   unsubscribe (subscription) {
     subscription.unsubscribe();
     const index: number = this.allOrdersSubscription.indexOf(subscription);

@@ -11,7 +11,6 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { PageHeaderModule, FooterPageModule, SharedModalModuleModule } from '../../shared';
 import { BootstrapModalModule } from 'ng2-bootstrap-modal';
-import { ModalLoadingComponent } from '../../shared/modules/modal-loading/modal-loading.component';
 import { FormsModule } from '@angular/forms';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -38,7 +37,7 @@ export function HttpLoaderFactory(http: Http) {
         }
     })
   ],
-  declarations: [ RegistrationComponent, ModalLoadingComponent ],
-  providers: [ModalLoadingComponent]
+  declarations: [ RegistrationComponent ],
+  providers: []
 })
 export class RegistrationModule { }

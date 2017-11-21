@@ -207,7 +207,7 @@
 												<tr>
 													<td colspan=2>
 														<br>
-														<button type="submit" class="btn btn-sm btn-success" (click)="addNewProduct()">בצע עסקה</button>
+														<button type="submit" class="btn btn-sm btn-success" (click)="acceptBid(bidItem)">בצע עסקה</button>
 													</td>
 												</tr>
 											</table>
@@ -256,8 +256,16 @@
 											{{myBid.expirationDate | date: 'dd/MM/yyyy'}}
 										</td>
 									</tr>
+									<tr>
+										<td colspan=2>
+											<br>
+											<button type="submit" class="btn btn-sm btn-danger" (click)="removeMyBid()">מחק הצעת מחיר</button>
+										</td>
+									</tr>
 								</table>
 							</small>
+							
+							
 						</div>
 					</div>
 					<div class="form-control" *ngIf="myBid == undefined">
@@ -267,13 +275,23 @@
 		            <h6>הגש הצעת מחיר</h6>
 		            <div class="form-control">
 		            	<small>סכום</small>
-						<input type="number" class="form-control" placeholder="סכום">
+						<input type="number" class="form-control" placeholder="סכום" #bidAmount>
 		            	<small>תאריך הגעה</small>
-			            <input type="date" class="form-control" placeholder="תאריך">
+			            <input type="date" class="form-control" placeholder="תאריך" #bidDate>
 		            	<small>שעת הגעה</small>
-		                <input type="time" class="form-control" placeholder="שעה">
+		                <input type="time" class="form-control" placeholder="שעה" #bidTime>
 		                <br>
-			            <button type="submit" class="btn btn-success" (click)="addNewProduct()">הגש הצעת מחיר</button>
+		                <div class="checkbox">
+	                        <label>
+	                            <input type="checkbox" value="" #checkboxExpiration>הוסף תוקף להצעה
+	                        </label>
+	                    </div>
+	                    <div *ngIf="checkboxExpiration.checked">
+		                    <small>תוקף הצעה</small>
+			                <input type="date" class="form-control" placeholder="תאריך תפוגה" #bidExpiration>
+	                    </div>
+		                <br>
+			            <button type="submit" class="btn btn-success" (click)="publishBid()">הגש הצעת מחיר</button>
 		            </div>
 				</div>
 				<div class="jumbotron">
@@ -289,25 +307,50 @@
 		               	<div class="form-control">{{currentOrder.publishedAt | date: 'dd/MM/yyyy'}}</div>
 					</div>
 					<h6><small>סטטוס הזמנה</small></h6> 
-	        		<div class="form-group has-success">
-	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 0">
+	        		<div>
+	                    <div class="form-control form-control-success" *ngIf="currentOrder.orderStatus === 0">
 	                    	הזמנה חדשה
 	                    </div>
-	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 1">
+	                    <div class="form-control form-control-success" *ngIf="currentOrder.orderStatus === 1">
 	                    	הזמנה ממתינה
 	                    </div>
-	                    <div class="form-control form-control-success" id="inputSuccess" *ngIf="currentOrder.orderStatus === 2">
-	                    	הזמנה סגורה
+	                    <div *ngIf="currentOrder.orderStatus === 2" class="form-group has-danger">
+	                    	<br>
+	                    	<div class="form-control form-control-success" *ngIf="currentOrder.bidderCancellationReason == undefined && currentOrder.ownerCancellationReason == undefined">
+		                    	הזמנה סגורה
+		                    </div>
+		                    <div class="form-control form-control-danger" *ngIf="currentOrder.bidderCancellationReason != undefined || currentOrder.ownerCancellationReason != undefined">
+		                    	הזמנה סגורה
+		                    </div>
+	                    	<div class="form-control" *ngIf="currentOrder.ownerCancellationReason != undefined">
+	                    		<small>
+		                    	{{currentOrderSnapshot.child('userName').val()}} ביטל את ההזמנה מהסיבה הבאה: <br>
+		                    	{{currentOrder.ownerCancellationReason}}
+		                    	</small>
+		                    </div>
+	                    	<div class="form-control form-control-danger" *ngIf="currentOrder.bidderCancellationReason != undefined">
+	                    		<small>
+		                    	{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name')}} ביטל את ההזמנה מהסיבה הבאה: <br>
+		                    	{{currentOrder.bidderCancellationReason}}
+		                    	</small>
+		                    </div>
+	                    	
 	                    </div>
 	                </div>
 	                <div *ngIf="currentOrder.userId === database.getCurrentUser().child('uid').val()">
 	                	<div *ngIf="currentOrder.orderStatus === 0 || currentOrder.orderStatus === 1">
 	                		<h6><small>אפשרויות הזמנה</small></h6> 
 			        		<div class="form-group form-control">
-			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 0">מחק מודעה</button>
-			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 1">בטל עסקה</button>
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 0" (click)="deleteOrder()">מחק מודעה</button>
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 1" (click)="cancelOrderAsOwner()">בטל עסקה</button>
 			                </div>
 	                	</div>
+	                </div>
+	                <div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val()">
+	                	<h6><small>אפשרויות הזמנה</small></h6> 
+		        		<div class="form-group form-control">
+		                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 1" (click)="cancelOrderAsBidder()">בטל עסקה</button>
+		                </div>
 	                </div>
 				</div>
 			</div>

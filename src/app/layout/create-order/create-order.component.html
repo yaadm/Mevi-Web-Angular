@@ -3,11 +3,11 @@
 	<div class="jumbotron">
 		<div class="container">
         	<h5>{{'Loading Details' | translate}}</h5>
-        	<h6>שם בית העסק</h6>
+        	<!-- <h6>שם בית העסק</h6>
         	<div class="form-group input-group">
                	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
-				<input class="form-control" type="text" placeholder="שם בית העסק">
-			</div>
+				<input class="form-control" type="text" placeholder="שם בית העסק" #fromCompanyName>
+			</div> -->
 			<h6>כתובת בית העסק</h6>
 			<div class="form-group input-group" style="margin-bottom: 0px">
                 <span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
@@ -23,20 +23,20 @@
 			<br>
 			<h6>תאריך העמסה</h6>
 			<div>
-				<input class="form-control" type="date">
+				<input class="form-control" type="date" #pickupDate>
             </div>
             
 			<h6>שעת העמסה</h6>
 			<div class="form-group">
-				<input class="form-control" type="time" placeholder="שעה">
+				<input class="form-control" type="time" placeholder="שעה" #pickupTime>
 			</div>
        		<br>
         	<h4>פרטי פריקה</h4>
         	<h6>שם בית העסק</h6>
-        	<div class="form-group input-group">
+        	<!-- <div class="form-group input-group">
                	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
-				<input class="form-control" type="text" placeholder="שם בית העסק">
-			</div>
+				<input class="form-control" type="text" placeholder="שם בית העסק" #toCompanyName>
+			</div> -->
         	<h6>כתובת בית העסק</h6>
 			<div class="form-group input-group" style="margin-bottom: 0px">
                 <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
@@ -54,44 +54,44 @@
         	<h6>ביטוח</h6>
         	<div class="form-group input-group">
                 <span class="input-group-addon"><i class="fa fa-shield fa-fw"></i></span>
-                <select class="form-control">
-                    <option>ללא</option>
-                    <option>עד 50 אלף שח</option>
-                    <option>עד 100 אלף שח</option>
-                    <option>עד 500 אלף שח</option>
-                    <option>עד מליון</option>
-                    <option>יותר ממליון</option>
+                <select class="form-control" #selectionInsurance>
+                    <option [value]=0>ללא</option>
+                    <option [value]=50>עד 50 אלף שח</option>
+                    <option [value]=100>עד 100 אלף שח</option>
+                    <option [value]=500>עד 500 אלף שח</option>
+                    <option [value]=1>עד מליון</option>
+                    <option [value]=2>יותר ממליון</option>
                 </select>
             </div>
             
             <h6>סוג פריקה</h6>
         	<div class="form-group input-group">
                 <span class="input-group-addon"><i class="fa fa-upload fa-fw"></i></span>
-                <select class="form-control">
-                    <option>עצמית</option>
-                    <option>מלגזה</option>
-                    <option>עגורן</option>
-                    <option>מנוף</option>
-                    <option>דלת הידראולית</option>
-                    <option>ראמפה</option>
+                <select class="form-control" #selectionUloadingType>
+                    <option [value]=0>עצמית</option>
+                    <option [value]=1>מלגזה</option>
+                    <option [value]=2>עגורן</option>
+                    <option [value]=3>מנוף</option>
+                    <option [value]=4>דלת הידראולית</option>
+                    <option [value]=5>ראמפה</option>
                 </select>
             </div>
             
             <h6>סוג הזמנה</h6>
         	<div class="form-group input-group">
                 <span class="input-group-addon"><i class="fa fa-flag fa-fw"></i></span>
-                <select class="form-control" #selectorOrderType>
+                <select class="form-control" #selectionOrderType>
                     <option [value]=0>הזמן לפי</option>
                     <option [value]=2>משאית</option>
                     <option [value]=1>מוצרים</option>
                 </select>
             </div>
             
-            <div *ngIf="selectorOrderType.value == 2">
+            <div *ngIf="selectionOrderType.value == 2">
             	<h6>סוג משאית</h6>
 	        	<div class="form-group input-group">
                 	<span class="input-group-addon"><i class="fa fa-truck fa-fw"></i></span>
-	                <select class="form-control" #selectorOrderType>
+	                <select class="form-control" #selectorTruckType>
 	                    <option [value]=0>טריילר</option>
 	                    <option [value]=1>פול</option>
 	                    <option [value]=2>דאבל</option>
@@ -101,7 +101,7 @@
 	            <h6>סוג נגרר</h6>
 	            <div class="form-group input-group">
                 	<span class="input-group-addon"><i class="fa fa-caret-square-o-left fa-fw"></i></span>
-	                <select class="form-control" #selectorOrderType>
+	                <select class="form-control" #selectorTruckSubType>
 	                    <option [value]=0>פלטה</option>
 	                    <option [value]=1>הייבר</option>
 	                    <option [value]=2>וילונות</option>
@@ -111,11 +111,11 @@
 	            <h6>כמה משאיות ?</h6>
 	            <div class="form-group input-group">
                 	<span class="input-group-addon"><i class="fa fa-list-ol fa-fw"></i></span>
-					<input class="form-control" type="number" id="from_input_time" value="1">
+					<input class="form-control" type="number" id="from_input_time" value="1" #inputTrucksCount>
 				</div>
             </div>
             
-            <div *ngIf="selectorOrderType.value == 1">
+            <div *ngIf="selectionOrderType.value == 1">
             	<h6>הוספת מוצר</h6>
 	            <div class="form-control">
 	            	<div class="row">
@@ -254,7 +254,7 @@
             <br>
             <h6>הערות</h6>
             <fieldset class="form-group">
-                <textarea class="form-control" rows="3"></textarea>
+                <textarea class="form-control" rows="3" #inputAdditionalInfo></textarea>
             </fieldset>
             
             <button type="submit" class="btn btn-primary" (click)="publishOrder()">פרסם מודעה</button>

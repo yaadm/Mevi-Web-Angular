@@ -8,19 +8,19 @@
                 <table>
                        <tbody>
                        <tr *ngIf="database.getCurrentUser() && (database.getCurrentUser().child('uid').val() == order.selectedBid || database.getCurrentUser().child('uid').val() == order.userId)">
-                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;מזמין</th>
+                           <th scope="row" class="text-right"><i class="fa fa-user fw"></i>&nbsp;מזמין</th>
                            <td>{{order.userName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;העמסה</th>
+                           <th scope="row" class="text-right"><i class="fa fa-download fw"></i>&nbsp;העמסה</th>
                            <td>{{order.pickupLocationName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;פריקה</th>
+                           <th scope="row" class="text-right"><i class="fa fa-upload fw"></i>&nbsp;פריקה</th>
                            <td>{{order.destinationLocationName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-user"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</th>
+                           <th scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</th>
                            <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
                        </tr>
                        </tbody>

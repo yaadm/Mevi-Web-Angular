@@ -1,4 +1,4 @@
-<div [@routerTransition]>
+<div [@routerTransition] *ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('appManager').val() === true">
 	<h2 class="text-muted">מערכת ניהול<br><small>ניהול משתמשים</small></h2>
 	<div *ngFor="let user of itemsArray" class="card card-primary card-inverse form-groups">
 		<div class="card-header card-primary">
@@ -48,7 +48,7 @@
 		<div class="card-block">
 	        <button type="submit" class="btn btn-danger">הקפא משתמש</button>
 	        <span *ngIf="user.manager === true">
-	        	<button type="submit" class="btn btn-danger">בטל הרשאות מנהל</button>
+	        	<button type="submit" class="btn btn-danger" (click)="denyManager(user)">בטל הרשאות מנהל</button>
 	        </span>
 	        <button type="submit" class="btn btn-success" [routerLink]="['/payment', user.uid]">עדכן אשראי</button>
 		</div>

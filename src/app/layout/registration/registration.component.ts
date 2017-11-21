@@ -7,6 +7,7 @@ import { ModalInformComponent } from '../../shared/components/modal-inform/modal
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
 import { DialogService } from 'ng2-bootstrap-modal';
+import * as firebase from 'firebase';
 
 @Component({
   selector: 'app-registration-page',
@@ -22,7 +23,11 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   public companyIdRef: ElementRef;
   @ViewChild('companyPhone')
   public companyPhoneRef: ElementRef;
-
+  @ViewChild('companyAddress')
+  public companyAddressRef: ElementRef;
+  @ViewChild('checkboxAgreement')
+  public checkboxAgreementRef: ElementRef;
+  
   hasCompletedSuccessfully = false;
 
   constructor(private translate: TranslateService, private router: Router, private database: DatabaseService,
@@ -47,8 +52,14 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     } else if (!this.companyIdRef.nativeElement.value) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין ח.פ \ עוסק מורשה');
       return;
+    } else if (!this.companyAddressRef.nativeElement.value) {
+      this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין כתובת העסק');
+      return;
     } else if (!this.companyPhoneRef.nativeElement.value) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין טלפון להתקשרות');
+      return;
+    } else if (!this.checkboxAgreementRef.nativeElement.checked) {
+      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
       return;
     }
 
@@ -69,10 +80,11 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
           const payload = {
             'companyName': this.companyNameRef.nativeElement.value,
-            'companyId': +this.companyIdRef.nativeElement.value,
-            'companyPhone': +this.companyPhoneRef.nativeElement.value
+            'companyId': this.companyIdRef.nativeElement.value,
+            'companyPhone': this.companyPhoneRef.nativeElement.value,
+            'agreementAcceptedAt': firebase.database.ServerValue.TIMESTAMP
           }
-          this.database.updateUserRegistrationData(payload).then(_ => {
+          this.database.updateMyUserData(payload).then(_ => {
             // updated
             this.hasCompletedSuccessfully = true;
             this.router.navigate(['/home-page']);

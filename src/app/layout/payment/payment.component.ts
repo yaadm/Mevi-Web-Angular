@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef, Renderer } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug } from '../../shared';
 import { Router, ActivatedRoute, Params } from '@angular/router';
@@ -25,17 +25,25 @@ export class SafePipe implements PipeTransform {
 })
 export class PaymentComponent implements OnInit, OnDestroy, AuthListener {
   userId: string;
-  url: string;
+  userSnapshot: DataSnapshot;
   @ViewChild('iframeContent')
   public iframeContent: ElementRef;
-  constructor(private translate: TranslateService, public database: DatabaseService, private activatedRoute: ActivatedRoute) {
+  constructor(private translate: TranslateService, public database: DatabaseService, private activatedRoute: ActivatedRoute,
+    public renderer: Renderer) {
     this.userId = this.activatedRoute.snapshot.params['userId'];
     this.setupTranslation(translate);
     database.subscribeToAuth(this);
   }
 
   ngOnInit() {
-    this.url = 'https://www.mevi.co.il/rediredctUserToPayment?uid=' + this.userId;
+    try {
+      this.iframeContent.nativeElement.src = 'https://www.mevi.co.il/rediredctUserToPayment?uid=' + this.userId;
+    } catch (e) { }
+    
+    this.database.getUserById(this.userId).subscribe(
+    (afa: AngularFireAction<DataSnapshot>) => {
+        this.userSnapshot = afa.payload;
+    });
   }
 
   ngOnDestroy(): void {
