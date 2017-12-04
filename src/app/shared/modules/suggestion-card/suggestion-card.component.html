@@ -10,7 +10,7 @@
             </div>
         </div>
     </div>
-    <div  *ngIf='action'>
+    <div *ngIf='action'>
     	<div class="card-footer" *ngIf='actionRout'>
 	        <a [routerLink]='actionRout' class="card-inverse">
 	        	<span class="float-left">
@@ -26,6 +26,18 @@
 	            	<i class="fa fa-arrow-circle-left"></i>
 	            </span>
 	        	<span class="float-right"> {{action}}</span>
+	            <div class="clearfix"></div>
+	        </a>
+	    </div>
+    </div>
+    
+    <div *ngIf='!action'>
+    	<div class="card-footer">
+	        <a href="Javascript:void(0)" (click)="database.login()" class="card-inverse">
+	        	<span class="float-left">
+	            	<i class="fa fa-arrow-circle-left"></i>
+	            </span>
+	        	<span class="float-right"> התחבר</span>
 	            <div class="clearfix"></div>
 	        </a>
 	    </div>

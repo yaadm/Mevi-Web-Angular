@@ -1,7 +1,7 @@
 <div class="pos-f-t fixed-top header">
     <nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
 		<div class="navbar-toggler-right navbar-state">
-			<ul class="navbar-nav ml-auto mt-1 mt-md-0">
+			<ul class="navbar-nav ml-auto mt-1 mt-md-0 fix-header-margin">
                 <li class="nav-item dropdown navbar-inverse" ngbDropdown *ngIf="currentUser">
                 	<i>
 	                	<button class="navbar-toggler"
@@ -13,10 +13,10 @@
                         <i class="fa fa-user"></i> {{ currentUser ? currentUser.child('name').val() : 'מתחבר...' }} <b class="caret"></b>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}</a>
+                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> פרופיל</a>
                         <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}</a>
                         <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a> -->
-                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> התנתק </a>
                     </div>
                 </li>
 				<li class="nav-item" *ngIf="!currentUser">
@@ -57,16 +57,16 @@
 
 
 		<div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto mt-2 mt-md-0">
+            <ul class="navbar-nav ml-auto mt-2 mt-md-0 fix-header-margin">
                 <li class="nav-item dropdown" ngbDropdown *ngIf="currentUser">
                     <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
                         <i class="fa fa-user"></i> {{ currentUser ? currentUser.child('name').val() : 'מתחבר...' }} <b class="caret"></b>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}</a>
+                        <a class="dropdown-item" [routerLink]="['/my-profile']"><i class="fa fa-fw fa-user"></i> פרופיל</a>
                         <!-- <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}</a>
                         <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a> -->
-                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+                        <a class="dropdown-item" (click)="logout()"><i class="fa fa-fw fa-power-off"></i> התנתק </a>
                     </div>
                 </li>
 				<li class="nav-item" *ngIf="!currentUser">
@@ -79,9 +79,10 @@
         </div>
         
         <div class="navbar-brand">
-	        <a class="navbar-brand" href="javascript:void(0)">Mevi</a>
+        	<small class="navbar-state-reverse">פתרונות שינוע</small><a class="navbar-brand" [routerLink]="['/home-page']"><strong>Mevi</strong></a>
+	        
 	        &nbsp;
-	        <img alt="logo" class="logo-image navbar-state-reverse" src="/assets/images/logo_white.png">
+	        <img alt="logo" [routerLink]="['/home-page']" class="logo-image navbar-state-reverse" src="/assets/images/logo_white.png">
         </div>
     </nav>
 </div>

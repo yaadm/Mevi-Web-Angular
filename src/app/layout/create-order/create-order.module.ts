@@ -16,7 +16,7 @@ import { SuggestionCardModule } from '../../shared';
 import { AgmCoreModule } from '@agm/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { ProductCardModule, firebaseConfigDebug, FooterPageModule, SharedModalModuleModule } from '../../shared';
+import { ProductCardModule, firebaseConfigDebug, FooterPageModule, SharedModalModuleModule, PageHeaderModule } from '../../shared';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -34,6 +34,7 @@ export function HttpLoaderFactory(http: Http) {
     FooterPageModule,
     BootstrapModalModule,
     SharedModalModuleModule,
+    PageHeaderModule,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,

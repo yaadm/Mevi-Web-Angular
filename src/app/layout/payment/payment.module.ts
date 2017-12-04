@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { PaymentRoutingModule } from './payment-routing.module';
-import { PaymentComponent, SafePipe } from './payment.component';
+import { PaymentComponent } from './payment.component';
 
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -30,7 +30,7 @@ export function HttpLoaderFactory(http: Http) {
         }
     })
   ],
-  declarations: [ PaymentComponent, SafePipe ],
+  declarations: [ PaymentComponent ],
   providers: []
 })
 export class PaymentModule { }

@@ -8,7 +8,7 @@ import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { OrderCardModule, FooterPageModule } from '../../shared';
+import { OrderCardModule, FooterPageModule, PageHeaderModule } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -22,6 +22,7 @@ export function HttpLoaderFactory(http: Http) {
     HttpModule,
     OrderCardModule,
     FooterPageModule,
+    PageHeaderModule,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,

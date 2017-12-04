@@ -1,4 +1,4 @@
-import { FooterPageModule } from '../../shared';
+import { FooterPageModule, PageHeaderModule } from '../../shared';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -9,7 +9,8 @@ import { AboutUsPageComponent } from './about-us-page.component';
   imports: [
     CommonModule,
     AboutUsPageRoutingModule,
-    FooterPageModule
+    FooterPageModule,
+    PageHeaderModule
   ],
   declarations: [AboutUsPageComponent]
 })

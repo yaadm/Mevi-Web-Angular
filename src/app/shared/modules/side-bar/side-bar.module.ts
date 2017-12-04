@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OrderCardComponent, ResolveOrderStatusPipe } from './order-card.component';
+import { SideBarComponent } from './side-bar.component';
 
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -19,7 +19,7 @@ import { RouterModule } from '@angular/router';
           }
         })
     ],
-    declarations: [OrderCardComponent, ResolveOrderStatusPipe],
-    exports: [OrderCardComponent]
+    declarations: [SideBarComponent],
+    exports: [SideBarComponent]
 })
-export class OrderCardModule { }
+export class SideBarModule { }

@@ -1,9 +1,33 @@
 <div [@routerTransition]>
-	<h2 class="text-muted">{{ 'My Orders' | translate }}<br><small>{{ 'New Orders' | translate }}</small></h2>
-	<div *ngFor="let order of itemsArray">
-		<div *ngIf="order.orderStatus === 0">
-			<app-order-card [order]="order"></app-order-card>
-		</div>
+	<app-page-header [heading]="'ההזמנות החדשות שלי'" [icon]="'fa-fire'"></app-page-header>
+	<div class="row">
+        <div class="col-lg-8">
+        	<div *ngIf="itemsArray.length > 0">
+				<div *ngFor="let order of itemsArray">
+					<app-order-card [order]="order"></app-order-card>
+				</div>
+			</div>
+			<div *ngIf="itemsArray.length <= 0" class="breadcrumb ta-c">
+				<div>
+					<br>
+					<br>
+					<i class="fa fa-eye-slash fa-5x"></i>
+					<br>
+					<br>
+					<h5>לא נמצאו תוצאות</h5>
+					<br>
+					אתה יכול...
+					<br>
+					<button type="submit" class="btn btn-primary" [routerLink]="['/create-order-page']">לפרסם מודעה</button>
+					<br>
+					<br>
+					<br>
+				</div>
+			</div>
+        </div>
+        <div class="col-lg-4">
+        	<app-side-bar></app-side-bar>
+        </div>
 	</div>
 	<app-footer-page></app-footer-page>
 </div>

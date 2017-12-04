@@ -1,0 +1,34 @@
+<div *ngIf="database.getCurrentUser() != undefined">
+	<div class="breadcrumb">
+		<h6>רוצה לפרסם מודעה חדשה ?</h6>
+		<br>
+		<button type="submit" class="btn btn-primary" [routerLink]="['/create-order-page']"><i class="fa fa-edit fw"></i>&nbsp; פרסם מודעה</button>
+	</div>
+	
+	<div class="breadcrumb">
+		<h6>
+			בעל משאיות ?
+			<br>
+			<small>מצא למשאיות שלך עבודה...</small>
+		</h6>
+		<br>
+		<div *ngIf="database.getCurrentUser().child('manager').val() !== true">
+			<button type="submit" class="btn btn-warning" [routerLink]="['/manager-registration-page']"><i class="fa fa-cc-visa fw"></i>&nbsp; הרשם כבעל משאית</button>
+		</div>
+		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
+			<button type="submit" class="btn btn-warning" [routerLink]="['/open-orders-page']"><i class="fa fa-cc-visa fw"></i>&nbsp; הגש הצעות מחיר</button>
+		</div>
+	</div>
+	
+	<div class="breadcrumb" *ngIf="database.getCurrentUser().child('manager').val() === true && database.getCurrentUser().child('subscribedToMailingList').val() !== true">
+		<h6>
+			רוצה לקבל הודעה למייל ברגע שמפורסמת הזמנה חדשה ?
+			<br>
+			<small>
+				ולא תפספס עבודות בעתיד..
+			</small>
+		</h6>
+		<br>
+		<button type="submit" class="btn btn-primary" (click)="onNewOrderNotificationClick()"><i class="fa fa-newspaper-o fw"></i>&nbsp; הרשם</button>
+	</div>
+</div>

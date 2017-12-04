@@ -1,18 +1,33 @@
 <div [@routerTransition]>
-	<h2 class="text-muted">עלינו<br><small>פרטים על החברה</small></h2>
+    <app-page-header [heading]="'עלינו'" [icon]="'fa-address-book'"></app-page-header>
 	<div class="jumbotron">
-		ש.ח.ק טימבר בע"מ 
+		<h3>ש.ח.ק טימבר בע"מ</h3> 
+		<img class="img-fluid d-block form-control" style='padding: 0px; width: 500px' [src]="getStaticMapUrl(currentOrder)" alt="Static Map">
 		<br>
-		<br>
-		כתובתינו: מושב משען 29
-		<br> 
-		טלפון: 050-6589971
+		<table>
+			<tr>
+				<td>
+					<i class="fa fa-building fw"></i>
+				</td>
+				<td>
+					מושב משען 29
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<i class="fa fa-phone fw"></i>
+				</td>
+				<td>
+					050-6589971
+				</td>
+			</tr>
+		</table>
 	</div>
 	<div class="jumbotron">
 		<table>
 			<tr>
 				<td>
-					<i class="fa fa-truck fa-5x"></i> &nbsp;&nbsp;&nbsp;
+					<i class="fa fa-truck fa-5x" style="color: #0275d8"></i> &nbsp;&nbsp;&nbsp;
 				</td>
 				<td>
 					בש.ח.ק טימבר בע"מ אנו מאמינים שמשאיות חוזרות הן בזבוז של משאבים<br>

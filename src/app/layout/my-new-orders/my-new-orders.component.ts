@@ -34,6 +34,7 @@ export class MyNewOrdersComponent implements OnInit, OnDestroy, AuthListener {
       this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
+            
             this.updateItemsArray(order);
           });
         });
@@ -41,11 +42,18 @@ export class MyNewOrdersComponent implements OnInit, OnDestroy, AuthListener {
   }
 
   updateItemsArray (order) {
-    const index = this.itemsArray.indexOf(order, 0);
-    if (index !== -1) {
-      this.itemsArray[index] = order;
+    if (order.orderStatus === 0) {
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray[index] = order;
+      } else {
+        this.itemsArray.push(order);
+      }
     } else {
-      this.itemsArray.push(order);
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray.splice(index, 1);
+      }
     }
   }
 

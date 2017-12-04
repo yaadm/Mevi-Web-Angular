@@ -53,10 +53,32 @@
 			</div>
 		</div>
 		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
-			<h4>אתה כבר מנהל...</h4>
+			<br>
+			<br>
+			<br>
+			<h4>מזל טוב ! אתה מעכשיו מנהל משאיות !</h4>
+			<table>
+				<tr>
+					<td>
+						<i class="fa fa-truck fa-5x" style="color: #0275d8;"></i> &nbsp; &nbsp; &nbsp;
+					</td>
+					<td>
+						אל ללתן למשאיות שלך לנוח..
+						<br>
+						מצא להם עבודה והתחל להרוויח כסף !
+					</td>
+				</tr>
+			</table>
 			<br>
 			<br>
 			<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page']"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הגש הצעות מחיר</button>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
 		</div>
 	</div>
     <app-footer-page></app-footer-page>

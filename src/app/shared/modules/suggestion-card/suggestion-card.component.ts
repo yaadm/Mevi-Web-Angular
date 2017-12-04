@@ -1,3 +1,4 @@
+import { DatabaseService } from '../../services';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -16,7 +17,7 @@ export class SuggestionCardComponent implements OnInit {
     @Input() actionLink: string;
     @Output() event: EventEmitter<any> = new EventEmitter();
 
-    constructor(private translate: TranslateService) { }
+    constructor(private translate: TranslateService, public database: DatabaseService) { }
 
     ngOnInit() {}
 }

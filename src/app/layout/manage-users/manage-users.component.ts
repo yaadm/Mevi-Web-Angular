@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug, ModalInputComponent } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
@@ -18,6 +18,14 @@ import { DialogService } from 'ng2-bootstrap-modal';
 export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
   items:  Observable<AngularFireAction<DataSnapshot>[]>;
   itemsArray = [];
+  visibilityMap: string[] = [];
+  
+  @ViewChild('inputCompanyId')
+  public inputCompanyIdRef: ElementRef;
+  
+  @ViewChild('inputCompanyName')
+  public inputCompanyNameRef: ElementRef;
+  
   constructor(private translate: TranslateService, public database: DatabaseService, private dialogService: DialogService) {
     this.setupTranslation(translate);
     database.subscribeToAuth(this);
@@ -60,7 +68,65 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
       this.itemsArray.push(userItem);
     }
   }
+  
+  searchById () {
+    
+    const searchStr = this.inputCompanyIdRef.nativeElement.value;
+    
+    if (searchStr) {
+      
+      this.itemsArray.forEach(user => {
+        
+        if (user.companyId && user.companyId.indexOf(searchStr) !== -1) {
+          
+          const index = this.visibilityMap.indexOf(user.uid);
+          if (index !== -1) {
+            this.visibilityMap.splice(index, 1);
+          }
+        } else {
+          
+          this.visibilityMap.push(user.uid);
+        }
+      });
+      
+    } else {
+      
+      this.resetAllVisibility();
+    }
+    
+  }
+  
+  searchByName () {
+    
+    const searchStr = this.inputCompanyNameRef.nativeElement.value;
+    
+    if (searchStr) {
+      
+      this.itemsArray.forEach(user => {
+        
+        if (user.companyId && user.name.toLowerCase().indexOf(searchStr.toLowerCase()) !== -1) {
+          
+          const index = this.visibilityMap.indexOf(user.uid);
+          if (index !== -1) {
+            this.visibilityMap.splice(index, 1);
+          }
+        } else {
+          
+          this.visibilityMap.push(user.uid);
+        }
+      });
+      
+    } else {
+      
+      this.resetAllVisibility();
+    }
+    
+  }
 
+  resetAllVisibility () {
+    this.visibilityMap.splice(0, this.visibilityMap.length);
+  }
+  
   showInfoDialog (modalTitle, moadlMessage) {
     this.dialogService.addDialog(ModalInformComponent, {
       title: modalTitle,

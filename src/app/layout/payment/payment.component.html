@@ -1,26 +1,31 @@
 <div [@routerTransition]>
-	<h2 class="text-muted">הרשמת מנהל<br><i class="fa fa-lock fa-fw"></i><small>תשלום מאובטח</small></h2>
-	<small>
-		<table class="form-control" *ngIf="userSnapshot">
-			<tr>
-				<td>
-					<i class="fa fa-user fa-fw"></i> &nbsp;
-				</td>
-				<td>
-					{{userSnapshot.child('name').val()}}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<i class="fa fa-envelope fa-fw"></i>
-				</td>
-				<td>
-					{{userSnapshot.child('email').val()}}
-				</td>
-			</tr>
-		</table>
-	</small>
-	<br>
-	<iframe #iframeContent class="iframeheight"></iframe>
+	<div>
+		<h2 class="text-muted">הרשמת מנהל<br><i class="fa fa-lock fa-fw"></i><small>תשלום מאובטח</small></h2>
+		<small>
+			<table class="form-control" *ngIf="userSnapshot">
+				<tr>
+					<td>
+						<i class="fa fa-user fa-fw"></i> &nbsp;
+					</td>
+					<td>
+						{{userSnapshot.child('name').val()}}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-envelope fa-fw"></i>
+					</td>
+					<td>
+						{{userSnapshot.child('email').val()}}
+					</td>
+				</tr>
+			</table>
+		</small>
+		<br>
+		<iframe class="iframeheight" #iframeContent></iframe>
+	</div>
+	<div *ngIf="!userId">
+		<h1>לא נבחר משתמש</h1>
+	</div>
 	<app-footer-page></app-footer-page>
 </div>

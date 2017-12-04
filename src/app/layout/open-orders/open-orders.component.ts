@@ -43,11 +43,20 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   }
 
   updateItemsArray (order) {
-    const index = this.itemsArray.indexOf(order, 0);
-    if (index !== -1) {
-      this.itemsArray[index] = order;
+    
+    const myUid = this.database.getCurrentUser().child('uid').val();
+    if (order.userId !== myUid) {
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray[index] = order;
+      } else {
+        this.itemsArray.push(order);
+      }
     } else {
-      this.itemsArray.push(order);
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray.splice(index, 1);
+      }
     }
   }
 

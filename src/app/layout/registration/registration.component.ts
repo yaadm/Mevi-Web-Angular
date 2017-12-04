@@ -29,7 +29,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   public checkboxAgreementRef: ElementRef;
   
   hasCompletedSuccessfully = false;
-
+  loading = false;
   constructor(private translate: TranslateService, private router: Router, private database: DatabaseService,
     private dialogService: DialogService) {
     this.setupTranslation(translate);
@@ -63,8 +63,10 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.loading = true;
     const companyIdExistsSubscription = this.database.subscribeToIsCompanyIdExists(this.companyIdRef.nativeElement.value).subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
+          
           companyIdExistsSubscription.unsubscribe();
 
           if (afa.length > 0) {
@@ -73,6 +75,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             const myUid = this.database.currentUser.child('uid').val();
 
             if (foundUid !== myUid) {
+              
+              this.loading = false;
               this.showInformationDialog('החברה כבר רשומה', 'הח.פ \ עוסק מורשה שהזנת כבר קיים במערכת עם אימייל אחר');
               return;
             }
@@ -81,6 +85,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
           const payload = {
             'companyName': this.companyNameRef.nativeElement.value,
             'companyId': this.companyIdRef.nativeElement.value,
+            'companyAddress': this.companyAddressRef.nativeElement.value,
             'companyPhone': this.companyPhoneRef.nativeElement.value,
             'agreementAcceptedAt': firebase.database.ServerValue.TIMESTAMP
           }
@@ -88,7 +93,12 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             // updated
             this.hasCompletedSuccessfully = true;
             this.router.navigate(['/home-page']);
+          }, reason => {
+            this.loading = false;
           });
+      }, error => {
+        // error occurred
+        this.loading = false;
       });
   }
 

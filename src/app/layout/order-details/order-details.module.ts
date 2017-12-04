@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, JsonPipe } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 import { OrderDetailsRoutingModule } from './order-details-routing.module';
 import { OrderDetailsComponent, ResolveInsurancePipe, ResolveUnloadingPipe } from './order-details.component';
@@ -7,10 +8,11 @@ import { OrderDetailsComponent, ResolveInsurancePipe, ResolveUnloadingPipe } fro
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import {Router, ActivatedRoute, Params} from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { AgmCoreModule } from '@agm/core';
 
-import { SuggestionCardModule, ProductCardModule, TruckCardModule, FooterPageModule, SharedModalModuleModule } from '../../shared';
+import { SuggestionCardModule, ProductCardModule, TruckCardModule, FooterPageModule, SharedModalModuleModule, PageHeaderModule, firebaseConfigDebug } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -26,14 +28,20 @@ export function HttpLoaderFactory(http: Http) {
     TruckCardModule,
     SuggestionCardModule,
     BootstrapModalModule,
+    PageHeaderModule,
     SharedModalModuleModule,
     FooterPageModule,
+    HttpClientModule,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,
             useFactory: HttpLoaderFactory,
             deps: [Http]
         }
+    }),
+    AgmCoreModule.forRoot({
+      apiKey: firebaseConfigDebug.apiKey,
+      libraries: ['places']
     })
   ],
   declarations: [ OrderDetailsComponent, ResolveInsurancePipe, ResolveUnloadingPipe ],

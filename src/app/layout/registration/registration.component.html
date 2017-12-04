@@ -4,31 +4,29 @@
 	<div class="jumbotron">
         <h4>{{'Company Details' | translate}}</h4>
         <p style='white-space: pre-wrap;'>{{'Registration Details' | translate}}</p>
-        <form (ngSubmit)="onSubmit()">
-            <div class="form-group input-group">
-                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-                <input type="text" class="form-control" placeholder="{{'Company Name' | translate}}" #companyName>
-            </div>
-            <div class="form-group input-group">
-                <span class="input-group-addon"><i class="fa fa-id-badge fa-fw"></i></span>
-                <input type="text" class="form-control" placeholder="{{'Company Id' | translate}}" #companyId>
-            </div>
-            <div class="form-group input-group">
-                <span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
-                <input type="text" class="form-control" placeholder="כתובת העסק" #companyAddress>
-            </div>
-            <div class="form-group input-group">
-                <span class="input-group-addon"><i class="fa fa-phone fa-fw"></i></span>
-                <input type="text" class="form-control" placeholder="{{'Company Phone' | translate}}" #companyPhone>
-            </div>
-            <div class="checkbox form-control">
-                <label>
-                    <input type="checkbox" value="" #checkboxAgreement> קראתי ואני מסכים ל<a [routerLink]="['/tos-page']">תנאי השימוש</a> ו<a [routerLink]="['/pp-page']">מדיניות פרטיות</a>
-                </label>
-            </div>
-            <br>
-            <button type="submit" class="btn btn-secondary">{{'Register' | translate}}</button>
-        </form>
+        <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+            <input type="text" class="form-control" placeholder="{{'Company Name' | translate}}" #companyName>
+        </div>
+        <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-id-badge fa-fw"></i></span>
+            <input type="text" class="form-control" placeholder="{{'Company Id' | translate}}" #companyId>
+        </div>
+        <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
+            <input type="text" class="form-control" placeholder="כתובת העסק" #companyAddress>
+        </div>
+        <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-phone fa-fw"></i></span>
+            <input type="text" class="form-control" placeholder="{{'Company Phone' | translate}}" #companyPhone>
+        </div>
+        <div class="checkbox form-control">
+            <label>
+                <input type="checkbox" value="" #checkboxAgreement> קראתי ואני מסכים ל<a [routerLink]="['/tos-page']">תנאי השימוש</a> ו<a [routerLink]="['/pp-page']">מדיניות פרטיות</a>
+            </label>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-secondary" (click)="onSubmit()" [attr.disabled]="loading ? '' : null">{{'Register' | translate}}</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i>
     </div>
     <app-footer-page></app-footer-page>
 </div>

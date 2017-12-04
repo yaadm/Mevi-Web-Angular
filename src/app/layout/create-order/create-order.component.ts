@@ -19,12 +19,14 @@ import { Router } from '@angular/router';
 })
 export class CreateOrderComponent implements OnInit {
 
+  loading = false;
+  
   public fromLatitude: number;
   public fromLongitude: number;
-  public fromZoom: number;
+  public fromZoom = 12;
   public toLatitude: number;
   public toLongitude: number;
-  public toZoom: number;
+  public toZoom = 12;
   public searchControl: FormControl;
   private geoCoder;
   model: any;
@@ -126,13 +128,13 @@ export class CreateOrderComponent implements OnInit {
       // set current position
       this.setCurrentPosition();
 
-      const autocomplete = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement, {
+      const autocompleteFrom = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement, {
         types: ['address']
       });
-      autocomplete.addListener('place_changed', () => {
+      autocompleteFrom.addListener('place_changed', () => {
         this.ngZone.run(() => {
           // get the place result
-          const place: google.maps.places.PlaceResult = autocomplete.getPlace();
+          const place: google.maps.places.PlaceResult = autocompleteFrom.getPlace();
 
           // verify result
           if (place.geometry === undefined || place.geometry === null) {
@@ -143,6 +145,26 @@ export class CreateOrderComponent implements OnInit {
           this.fromLatitude = place.geometry.location.lat();
           this.fromLongitude = place.geometry.location.lng();
           this.fromZoom = 12;
+        });
+      });
+      
+      const autocompleteTo = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement, {
+        types: ['address']
+      });
+      autocompleteTo.addListener('place_changed', () => {
+        this.ngZone.run(() => {
+          // get the place result
+          const place: google.maps.places.PlaceResult = autocompleteTo.getPlace();
+
+          // verify result
+          if (place.geometry === undefined || place.geometry === null) {
+            return;
+          }
+
+          // set latitude, longitude and zoom
+          this.toLatitude = place.geometry.location.lat();
+          this.toLongitude = place.geometry.location.lng();
+          this.toZoom = 12;
         });
       });
     });
@@ -366,6 +388,8 @@ export class CreateOrderComponent implements OnInit {
               return;
             }
             
+            this.loading = true;
+            
             console.log('new Order Id = ' + newOrderId);
             payload.orderId = newOrderId;
             
@@ -373,6 +397,9 @@ export class CreateOrderComponent implements OnInit {
               // updated
               
               this.router.navigate(['/order-details', newOrderId]);
+            }, reason => {
+              // error
+              this.loading = false;
             });
           } else {
           }

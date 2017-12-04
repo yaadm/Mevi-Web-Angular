@@ -95,6 +95,7 @@ export class DatabaseService {
 
   logout() {
     this.unsubscribeFromAll();
+    firebase.database().goOffline();
     localStorage.removeItem('isLoggedin');
     this.afAuth.auth.signOut();
   }
@@ -165,6 +166,10 @@ export class DatabaseService {
     return this.afDb.list('/users/', ref => ref.orderByChild('companyId').equalTo(companyId)).valueChanges();
   }
 
+  getLatestStatisticsObject(): AngularFireObject<{}> {
+    return this.afDb.object('/statistics/latest');
+  }
+  
   updateBidForOrder(orderId, payload): Promise<void> {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.object('/all-orders/' + orderId + '/bidsList/' + uid).set(payload);
@@ -211,7 +216,18 @@ export class DatabaseService {
   }
   
   sendContactUsEmail(payload): firebase.database.ThenableReference {
-    return this.afDb.list('/email-inbox/').push(payload);
+    return firebase.database().ref('/email-inbox/').push(payload);
+    
+    /**
+     * With AngularFire2 if the user is not logged in, the query will fail, even if the permissions in DB are true.
+     */
+    
+    // return this.afDb.list('/email-inbox/').push(payload);
+  }
+  
+  enableNotificationOnNewOrders () {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.object('/users/' + uid).update({'subscribedToMailingList' : true});
   }
   
   unsubscribe (subscription) {

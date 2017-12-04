@@ -8,6 +8,8 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class PageHeaderComponent {
     @Input() heading: string;
+    @Input() parentName: string;
+    @Input() parentRouterLink: string;
     @Input() icon: string;
 
     constructor(private translate: TranslateService) {

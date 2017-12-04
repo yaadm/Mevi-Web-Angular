@@ -11,11 +11,23 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class HomeComponent implements OnInit {
 
+  public doughnutChartLabels: string[] = ['הזמנות פתוחות', 'עסקאות ממתינות', 'עסקאות שהולשמו'];
+  public doughnutChartData: number[] = [];
+  statistics: any;
+  
   constructor(private translate: TranslateService, public database: DatabaseService) {
     this.setupTranslation(translate);
   }
 
   ngOnInit() {
+    this.database.getLatestStatisticsObject().query.once('value').then(dataSnapshot => {
+      
+      this.doughnutChartData[0] = dataSnapshot.child('openOrdersCount').val();
+      this.doughnutChartData[1] = dataSnapshot.child('pendingOrdersCount').val();
+      this.doughnutChartData[2] = dataSnapshot.child('completedOrdersCount').val();
+      
+      this.statistics = dataSnapshot;
+    });
   }
 
   private setupTranslation(translate: TranslateService) {

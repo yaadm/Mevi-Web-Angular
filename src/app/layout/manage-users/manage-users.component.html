@@ -1,56 +1,79 @@
 <div [@routerTransition] *ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('appManager').val() === true">
 	<h2 class="text-muted">מערכת ניהול<br><small>ניהול משתמשים</small></h2>
-	<div *ngFor="let user of itemsArray" class="card card-primary card-inverse form-groups">
-		<div class="card-header card-primary">
-			<table>
-				<tr>
-					<td>
-						<i class="fa fa-user fa-fw"></i> &nbsp;
-					</td>
-					<td>
-						{{user.name}}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<i class="fa fa-id-card-o fa-fw"></i> &nbsp;
-					</td>
-					<td>
-						{{user.companyId}}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<i class="fa fa-phone fa-fw"></i> &nbsp;
-					</td>
-					<td>
-						{{user.companyPhone}}
-					</td>
-				</tr>
-				<tr *ngIf="user.manager === true">
-					<td>
-						<i class="fa fa-user-secret fa-fw"></i>
-					</td>
-					<td>
-						מנהל משאיות
-					</td>
-				</tr>
-				<tr *ngIf="user.manager === true">
-					<td>
-						<i class="fa fa-cc-visa fa-fw"></i>
-					</td>
-					<td>
-						{{user.paymentAccessToken ? 'אשראי מחובר' : 'אשראי לא מחובר'}}
-					</td>
-				</tr>
-			</table>
+	<div>
+		<h6>חיפוש משתמשים</h6>
+		<div class="jumbotron" style="padding: 15px;">
+			<div class="form-group input-group">
+                <input type="text" class="form-control" placeholder="ח.פ \ עוסק מורשה" #inputCompanyId>
+                <span class="input-group-btn"><button class="btn btn-secondary" type="button" (click)="searchById()"><i class="fa fa-search"></i></button></span>
+            </div>
+            <div class="form-group input-group">
+                <input type="text" class="form-control" placeholder="שם עסק" #inputCompanyName>
+                <span class="input-group-btn"><button class="btn btn-secondary" type="button" (click)="searchByName()"><i class="fa fa-search"></i></button></span>
+            </div>
 		</div>
-		<div class="card-block">
-	        <button type="submit" class="btn btn-danger">הקפא משתמש</button>
-	        <span *ngIf="user.manager === true">
-	        	<button type="submit" class="btn btn-danger" (click)="denyManager(user)">בטל הרשאות מנהל</button>
-	        </span>
-	        <button type="submit" class="btn btn-success" [routerLink]="['/payment', user.uid]">עדכן אשראי</button>
+	</div>
+	<div *ngFor="let user of itemsArray">
+		<div *ngIf="visibilityMap.indexOf(user.uid) === -1" class="card card-primary card-inverse form-groups">
+			<div class="card-header card-primary">
+				<table>
+					<tr>
+						<td>
+							<i class="fa fa-user fa-fw"></i> &nbsp;
+						</td>
+						<td>
+							{{user.name}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-id-card-o fa-fw"></i> &nbsp;
+						</td>
+						<td>
+							{{user.uid}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-id-card-o fa-fw"></i> &nbsp;
+						</td>
+						<td>
+							{{user.companyId}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-phone fa-fw"></i> &nbsp;
+						</td>
+						<td>
+							{{user.companyPhone}}
+						</td>
+					</tr>
+					<tr *ngIf="user.manager === true">
+						<td>
+							<i class="fa fa-user-secret fa-fw"></i>
+						</td>
+						<td>
+							מנהל משאיות
+						</td>
+					</tr>
+					<tr *ngIf="user.manager === true">
+						<td>
+							<i class="fa fa-cc-visa fa-fw"></i>
+						</td>
+						<td>
+							{{user.paymentAccessToken ? 'אשראי מחובר' : 'אשראי לא מחובר'}}
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="card-block">
+		        <button type="submit" class="btn btn-danger">הקפא משתמש</button>
+		        <span *ngIf="user.manager === true">
+		        	<button type="submit" class="btn btn-danger" (click)="denyManager(user)">בטל הרשאות מנהל</button>
+		        </span>
+		        <button type="submit" class="btn btn-success" [routerLink]="['/payment', user.uid]">עדכן אשראי</button>
+			</div>
 		</div>
 	</div>
 	<app-footer-page></app-footer-page>

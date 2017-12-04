@@ -1,11 +1,28 @@
 <div [@routerTransition]>
-	<h2 class="text-muted">הזמנות חדשות<br><small>הגש הצעות מחיר</small></h2>
-	<div *ngIf="database.getCurrentUser() !== undefined">
-		<div *ngFor="let order of itemsArray">
-			<div *ngIf="order.userId !== database.getCurrentUser().child('uid').val()">
-				<app-order-card [order]="order"></app-order-card>
+	<app-page-header [heading]="'הגש הצעות מחיר'" [icon]="'fa-user'"></app-page-header>
+	<div class="row">
+        <div class="col-lg-8">
+        	<div *ngIf="itemsArray.length > 0">
+        		<div *ngFor="let order of itemsArray">
+					<app-order-card [order]="order"></app-order-card>
+				</div>
+        	</div>
+        	<div *ngIf="itemsArray.length <= 0" class="breadcrumb ta-c">
+				<br>
+				<br>
+				<i class="fa fa-eye-slash fa-5x"></i>
+				<br>
+				<br>
+				<h5>לא נמצאו תוצאות</h5>
+				<br>
+				<br>
+				<br>
 			</div>
-		</div>
+       	</div>
+        <div class="col-lg-4">
+        	<app-side-bar></app-side-bar>
+        </div>
 	</div>
+	
 	<app-footer-page></app-footer-page>
 </div>

@@ -37,6 +37,10 @@
     "payments-records": {
 	    ".read": "auth != null",
 	    ".write": "auth != null"
+    },
+    "statistics": {
+	    ".read": "true",
+	    ".write": "auth != null"
     }
   }
 }

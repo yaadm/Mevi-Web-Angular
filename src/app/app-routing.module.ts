@@ -13,6 +13,7 @@ const routes: Routes = [
       canActivate: [AuthGuard]
     },
     { path: 'signup', loadChildren: './signup/signup.module#SignupModule' },
+    { path: 'payment-success', loadChildren: './payment-success/payment-success.module#PaymentSuccessModule' },
     { path: 'not-found', loadChildren: './not-found/not-found.module#NotFoundModule' },
     { path: '**', redirectTo: 'not-found' }
 ];

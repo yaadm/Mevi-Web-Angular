@@ -8,20 +8,29 @@
                 <table>
                        <tbody>
                        <tr *ngIf="database.getCurrentUser() && (database.getCurrentUser().child('uid').val() == order.selectedBid || database.getCurrentUser().child('uid').val() == order.userId)">
-                           <th scope="row" class="text-right"><i class="fa fa-user fw"></i>&nbsp;מזמין</th>
+                           <td scope="row" class="text-right"><i class="fa fa-user fw"></i>&nbsp;מזמין</td>
                            <td>{{order.userName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-download fw"></i>&nbsp;העמסה</th>
+                           <td scope="row" class="text-right"><i class="fa fa-download fw"></i>&nbsp;העמסה</td>
                            <td>{{order.pickupLocationName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-upload fw"></i>&nbsp;פריקה</th>
+                           <td scope="row" class="text-right"><i class="fa fa-upload fw"></i>&nbsp;פריקה</td>
                            <td>{{order.destinationLocationName}}</td>
                        </tr>
                        <tr>
-                           <th scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</th>
+                           <td scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</td>
                            <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
+                       </tr>
+                       <tr *ngIf="order.orderStatus === 2">
+                           <td scope="row" class="text-right"><i class="fa fa-fire fw"></i>&nbsp;סטטוס&nbsp;&nbsp;</td>
+                           <td *ngIf="order.ownerCancellationReason != undefined || order.bidderCancellationReason != undefined">
+                           		<span>ההזמנה בוטלה</span>
+                           </td>
+                           <td *ngIf="order.ownerCancellationReason == undefined && order.bidderCancellationReason == undefined">
+                           		<span>ההזמנה בוצעה בהצלחה</span>
+                           </td>
                        </tr>
                        </tbody>
                    </table>

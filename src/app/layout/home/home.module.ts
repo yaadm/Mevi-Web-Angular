@@ -7,8 +7,9 @@ import { HomeComponent } from './home.component';
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ChartsModule as Ng2Charts } from 'ng2-charts';
 
-import { SuggestionCardModule, FooterPageModule } from '../../shared';
+import { SuggestionCardModule, FooterPageModule, PageHeaderModule } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -22,6 +23,8 @@ export function HttpLoaderFactory(http: Http) {
     HttpModule,
     SuggestionCardModule,
     FooterPageModule,
+    PageHeaderModule,
+    Ng2Charts,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,

@@ -43,11 +43,18 @@ export class MyPendingOrdersComponent implements OnInit, OnDestroy, AuthListener
   }
 
   updateItemsArray (order) {
-    const index = this.itemsArray.indexOf(order, 0);
-    if (index !== -1) {
-      this.itemsArray[index] = order;
+    if (order.orderStatus === 1) {
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray[index] = order;
+      } else {
+        this.itemsArray.push(order);
+      }
     } else {
-      this.itemsArray.push(order);
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray.splice(index, 1);
+      }
     }
   }
 

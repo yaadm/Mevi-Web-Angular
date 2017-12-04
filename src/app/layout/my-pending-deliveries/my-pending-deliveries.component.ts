@@ -34,6 +34,7 @@ export class MyPendingDeliveriesComponent implements OnInit, OnDestroy, AuthList
       this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
+            
             this.updateItemsArray(order);
           });
         });
@@ -43,11 +44,18 @@ export class MyPendingDeliveriesComponent implements OnInit, OnDestroy, AuthList
   }
 
   updateItemsArray (order) {
-    const index = this.itemsArray.indexOf(order, 0);
-    if (index !== -1) {
-      this.itemsArray[index] = order;
+    if (order.orderStatus === 1) {
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray[index] = order;
+      } else {
+        this.itemsArray.push(order);
+      }
     } else {
-      this.itemsArray.push(order);
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray.splice(index, 1);
+      }
     }
   }
 

@@ -1,11 +1,33 @@
 <div [@routerTransition]>
-	<h2 class="text-muted">ההובלות הממתינות שלי</h2>
-	<div *ngIf="database.getCurrentUser() !== undefined">
-		<div *ngFor="let order of itemsArray">
-			<div *ngIf="order.orderStatus === 1">
-				<app-order-card [order]="order"></app-order-card>
+	<app-page-header [heading]="'ההובלות הממתינות שלי'" [icon]="'fa-truck'"></app-page-header>
+	<div class="row">
+        <div class="col-lg-8">
+			<div *ngIf="itemsArray.length > 0">
+				<div *ngFor="let order of itemsArray">
+					<app-order-card [order]="order"></app-order-card>
+				</div>
 			</div>
-		</div>
-	</div>
+			<div *ngIf="itemsArray.length <= 0" class="breadcrumb ta-c">
+				<div>
+					<br>
+					<br>
+					<i class="fa fa-eye-slash fa-5x"></i>
+					<br>
+					<br>
+					<h5>לא נמצאו תוצאות</h5>
+					<br>
+					אתה יכול...
+					<br>
+					<button type="submit" class="btn btn-primary" [routerLink]="['/open-orders-page']">להגיש הצעות מחיר</button>
+					<br>
+					<br>
+					<br>
+				</div>
+			</div>
+        </div>
+        <div class="col-lg-4">
+        	<app-side-bar></app-side-bar>
+        </div>
+    </div>
 	<app-footer-page></app-footer-page>
 </div>

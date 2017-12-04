@@ -1,4 +1,4 @@
-import { FooterPageModule, SharedModalModuleModule } from '../../shared';
+import { FooterPageModule, SharedModalModuleModule, PageHeaderModule } from '../../shared';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
     ContactUsPageRoutingModule,
     FooterPageModule,
     BootstrapModalModule,
+    PageHeaderModule,
     SharedModalModuleModule,
     FormsModule
   ],

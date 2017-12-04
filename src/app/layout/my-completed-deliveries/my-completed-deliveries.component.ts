@@ -34,7 +34,9 @@ export class MyCompletedDeliveriesComponent implements OnInit, OnDestroy, AuthLi
       this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
-            this.updateItemsArray(order);
+            
+              this.updateItemsArray(order);
+            
           });
         });
     } else {
@@ -43,11 +45,19 @@ export class MyCompletedDeliveriesComponent implements OnInit, OnDestroy, AuthLi
   }
 
   updateItemsArray (order) {
-    const index = this.itemsArray.indexOf(order, 0);
-    if (index !== -1) {
-      this.itemsArray[index] = order;
+    
+    if (order.orderStatus === 2) {
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray[index] = order;
+      } else {
+        this.itemsArray.push(order);
+      }
     } else {
-      this.itemsArray.push(order);
+      const index = this.itemsArray.indexOf(order, 0);
+      if (index !== -1) {
+        this.itemsArray.splice(index, 1);
+      }
     }
   }
 

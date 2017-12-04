@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, PipeTransform, Pipe, ViewChild, ElementRef } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { TranslateService } from '@ngx-translate/core';
+import {} from '@types/googlemaps';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { DatabaseService, firebaseConfigDebug } from '../../shared';
@@ -8,10 +9,12 @@ import { ModalConfirmComponent } from '../../shared/components/modal-confirm/mod
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { ModalInputComponent } from '../../shared/components/modal-input/modal-input.component';
 import { AuthListener } from '../../shared/services';
+import { MapsAPILoader } from '@agm/core';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
 import * as firebase from 'firebase';
 import { DialogService } from 'ng2-bootstrap-modal';
+import { HttpClient } from '@angular/common/http';
 
 @Pipe({name: 'resolveInsurance'})
 export class ResolveInsurancePipe implements PipeTransform {
@@ -70,6 +73,12 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   bidsArray: Array<any>;
   myBid: any;
   today = new Date().getTime();
+  distance: string;
+  duration: string;
+  
+  loadingSetBid = false;
+  loadingDeleteBid = false;
+  loadingAcceptBid = false;
   
   @ViewChild('bidAmount')
   public bidAmountRef: ElementRef;
@@ -83,7 +92,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   public checkboxExpirationRef: ElementRef;
   
   constructor(private translate: TranslateService, private activatedRoute: ActivatedRoute, public database: DatabaseService, 
-      private router: Router, private dialogService: DialogService) {
+      private router: Router, private dialogService: DialogService, private mapsAPILoader: MapsAPILoader) {
     this.setupTranslation(translate);
     this.orderId = this.activatedRoute.snapshot.params['orderId'];
     if (this.orderId) {
@@ -127,6 +136,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
               this.bidsArray.push(itemPayload);
             }
           });
+          
         });
       this.database.addSubscription(this.orderSubscription);
     } else {
@@ -180,12 +190,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
               bidder
           };
           
+          this.loadingSetBid = true;
           this.database.updateBidForOrder(this.orderId, payload).then(_ => {
             // success
             this.resetMakeBidForm();
             this.showInfoMessage('הצלחה', 'הצעת המחיר הוגשה בהצלחה');
           }, reason => {
             // error
+            this.loadingSetBid = false;
             console.log('failure reason: ' + reason);
             this.showInfoMessage('נכשל', 'הגשת הצעת המחיר נכשלה, נא לנסות שוב מאוחר יותר');
           });
@@ -215,12 +227,15 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
             'orderStatus' : 1 // ORDER_STATUS_PENDING
           }
           
+          this.loadingAcceptBid = true;
           this.database.updateOrderData(this.orderId, payload).then(_ => {
             // success;
+            this.loadingAcceptBid = false;
             this.showInfoMessage('הצלחה', 'סגרתם עיסקה !');
           }, reason => {
             // failure
             console.log('failure reason: ' + reason);
+            this.loadingAcceptBid = false;
             this.showInfoMessage('נכשל', 'סגירת העסקה נכשלה, נא לנסות שוב מאוחר יותר');
           });
         }
@@ -250,7 +265,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   cancelOrderAsOwner () {
     this.dialogService.addDialog(ModalInputComponent, { 
       title: 'ביטול עסקה', 
-      message: 'מדוע הינך מעוניין לבטל את העסקה עם ' + this.currentOrderSnapshot.child('bidsList').child(this.currentOrder.selectedBid).child('bidder').child('name').val() })
+      message: 'מדוע הינך מעוניין לבטל את העסקה עם ' + this.currentOrderSnapshot.child('bidsList').child(this.currentOrder.selectedBid).child('bidder').child('name').val() + ' ?' })
       .subscribe((input) => {
         
         if (input) {
@@ -276,7 +291,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   cancelOrderAsBidder () {
     this.dialogService.addDialog(ModalInputComponent, { 
       title: 'ביטול עסקה', 
-      message: 'מדוע הינך מעוניין לבטל את העסקה עם ' + this.currentOrderSnapshot.child('bidsList').child(this.currentOrder.selectedBid).child('bidder').child('name').val() })
+      message: 'מדוע הינך מעוניין לבטל את העסקה עם ' + this.currentOrder.userName + ' ?' })
       .subscribe((input) => {
         
         if (input) {
@@ -306,12 +321,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       .subscribe((isConfirmed) => {
         
         if (isConfirmed) {
-          
+          this.loadingDeleteBid = true;
           this.database.removeMyBidFromOrder(this.orderId).then(_ => {
             // success;
+            this.loadingDeleteBid = false;
             this.showInfoMessage('הצלחה', 'הצעת המחיר נמחקה !');
           }, reason => {
             // failure
+            this.loadingDeleteBid = false;
             console.log('failure reason: ' + reason);
             this.showInfoMessage('נכשל', 'מחיקת הצעת מחיר נכשלה, נא לנסות שוב מאוחר יותר');
           });
@@ -347,6 +364,36 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       console.log(e.message);
     }
     return undefined;
+  }
+  
+  updateDistanceView() {
+    
+    this.mapsAPILoader.load().then(() => {
+      
+      const origin = new google.maps.LatLng(this.currentOrder.pickupLat, this.currentOrder.pickupLng);
+      const destination = new google.maps.LatLng(this.currentOrder.destinationLat, this.currentOrder.destinationLng);
+      
+      const service = new google.maps.DistanceMatrixService;
+      
+      service.getDistanceMatrix(
+      {
+          origins: [origin],
+          destinations: [destination],
+          travelMode: google.maps.TravelMode.DRIVING,
+          unitSystem: google.maps.UnitSystem.METRIC
+      }, (response, status) => {
+        
+        try {
+          
+          this.distance = response.rows[0].elements[0].distance.text;
+          this.duration = response.rows[0].elements[0].duration.text;
+        } catch (error) {
+          this.distance = 'לא ידוע';
+          this.duration = 'לא ידוע';
+        }
+            
+      });
+    });
   }
   
   private setupTranslation(translate: TranslateService) {

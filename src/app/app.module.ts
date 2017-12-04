@@ -13,6 +13,7 @@ import { DatabaseService, firebaseConfigDebug } from './shared';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 export const firebaseConfig = {
     apiKey: 'AIzaSyC7OHQrPLQP0DpQ5ZpBMJM4NW2H4E55Oo8',
@@ -39,6 +40,7 @@ export function HttpLoaderFactory(http: Http) {
         FormsModule,
         HttpModule,
         AppRoutingModule,
+        HttpClientModule,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
@@ -52,7 +54,8 @@ export function HttpLoaderFactory(http: Http) {
     ],
     providers: [
       AuthGuard,
-      DatabaseService
+      DatabaseService,
+      HttpClient
     ],
     bootstrap: [AppComponent]
 })

@@ -19,6 +19,7 @@ const gmailEmail = encodeURIComponent(functions.config().gmail.email);
 const gmailPassword = encodeURIComponent(functions.config().gmail.password);
 const mailTransport = nodemailer.createTransport(
     `smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
+const GoogleDistanceApi = require('google-distance-api');
 
 exports.onCreateUser = functions.auth.user().onCreate(event => {
 	
@@ -69,13 +70,16 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 	    //send push to managers
 	    promises.push(sendNotificationToManagers("action_new_post", order));
 	    
+	    promises.push(updateDistanceForOrder(order));
+	    
+	    
 	    return Promise.all(promises);
 	} else if(event.data.previous.exists() && event.data.exists()){
 		// order Edited
 		
 		console.log('order changed.');
 		
-		const orderId = event.params.orderId;
+		/*const orderId = event.params.orderId;
 		const orderStatus = event.data.child('orderStatus').val();
 		const prevOrderStatus = event.data.previous.child('orderStatus').val();
 		
@@ -103,15 +107,47 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 				var promises = [];
 				
 				//add to cancelled orders
-				/*promises.push(admin.database().ref('/cancelled-orders/' + event.params.orderId).set(event.data.val()));
+				promises.push(admin.database().ref('/cancelled-orders/' + event.params.orderId).set(event.data.val()));
 				
-				promises.push(admin.database().ref('/all-orders/' + event.params.orderId).remove());*/
+				promises.push(admin.database().ref('/all-orders/' + event.params.orderId).remove());
 				
 				return Promise.all(promises);
 			}
-		}
+		}*/
 	}
 });
+
+function updateDistanceForOrder (order) {
+	
+	const originsStr = order.child('pickupLat').val() + ',' + order.child('pickupLng').val();
+	const destinationsStr = order.child('destinationLat').val() + ',' + order.child('destinationLng').val();
+	
+	const options = {
+	  key: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo',
+	  origins: [originsStr],
+	  destinations: [destinationsStr],
+	  language: 'iw'
+	}
+	GoogleDistanceApi.distance(options, (err, data) => {
+	    if(err) {
+	        return console.log(err);
+	    }
+	 
+	    console.log(data);
+	    
+	    try {
+	    	const payload = {
+    	    	'distance' : data[0].distance,
+    	    	'duration' : data[0].duration
+    	    }
+	    	    
+    	    return admin.database().ref('/all-orders/' + order.child('orderId').val()).update(payload);
+	    } catch (error) {
+	    	console.log(error);
+	    }
+	    
+	});
+}
 
 exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId}').onWrite(event => {
 
@@ -292,7 +328,7 @@ function sendNotificationsToUserById(userId, action, data) {
 		          const error = result.error;
 		          if (error) {
 		        	  console.log('Notification to user: ' + userId + ' Failed !');
-		        	  console.error('Failure sending notification to', tokens[index], error);
+		        	  //console.error('Failure sending notification to', userId, error);
 		            // Cleanup the tokens who are not registered anymore.
 		            if (error.code === 'messaging/invalid-registration-token' ||
 		                error.code === 'messaging/registration-token-not-registered') {
@@ -333,7 +369,7 @@ function sendEmailToUser(user, action, data) {
 		
 		var subject = 'קיבלת הצעת מחיר חדשה !';
 		mailOptions.subject = subject;
-		var message = name + ' שלום,<br>קיבלת הצעת מחיר חדשה<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+		var message = name + ' שלום,<br>קיבלת הצעת מחיר חדשה<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 		var body = generateEmail(subject, message, '', '', uid);
 	    mailOptions.html = body;
 	    
@@ -341,7 +377,7 @@ function sendEmailToUser(user, action, data) {
 		
 		var subject = 'זכית בהצעת מחיר !';
 		mailOptions.subject = subject;
-		var message = name + ' שלום,<br>זכית בהצעת המחיר !<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+		var message = name + ' שלום,<br>זכית בהצעת המחיר !<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 		var body = generateEmail(subject, message, '', '', uid);
 	    mailOptions.html = body;
 	    
@@ -373,7 +409,7 @@ function sendEmailToUser(user, action, data) {
 		
 		var subject = 'פורסמה בקשת הובלה חדשה';
 		mailOptions.subject = subject;
-		var message = name + ' שלום,<br>פורסמה בקשת הובלה חדשה<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+		var message = name + ' שלום,<br>פורסמה בקשת הובלה חדשה<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 		var body = generateEmail(subject, message, '', '', uid);
 	    mailOptions.html = body;
 		
@@ -543,7 +579,7 @@ function sendPushToUsers(users, action, data) {
           if (error) {
         	  
         	  console.log('Notification to user: ' + usersSnapshot[index].child('uid').val() + ' Failed !');
-        	  console.error('Failure sending notification to', notificationTokens[index], error);
+        	  //console.error('Failure sending notification to', notificationTokens[index], error);
             // Cleanup the tokens who are not registered anymore.
             if (error.code === 'messaging/invalid-registration-token' ||
                 error.code === 'messaging/registration-token-not-registered') {
@@ -879,11 +915,24 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 		const payload = {
 				'paymentAccessToken' : AccessToken,
 				'manager' : true,
-				'requestingManager' : false
+				'requestingManager' : false,
+				'paymentAccessTokenDate' : admin.database.ServerValue.TIMESTAMP
 		};
 		
 		return admin.database().ref('users').child(uid).update(payload).then(function () {
 			
+			return res.status(200).send(`<!doctype html>
+				    <head>
+				      <title>הצלחה</title>
+				    </head>
+				    <body>
+				      <h1 style="margin: 50px;">חשבון המנהל נוצר בהצלחה !</h1>
+				    </body>
+				  </html>`);
+			
+		}, function (reason) {
+			
+			//failed
 			const redirectUrl = "https://mevi.co.il";
 			return res.redirect(redirectUrl);
 			
@@ -902,39 +951,6 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 	}
 });
 
-exports.setUserPaymentMethod = functions.https.onRequest((req, res) => {
-	
-	const uid = req.query.uid;
-	console.log("unsubscribed uid: " + uid);
-
-	const payload = {
-		'subscribedToMailingList' : false
-	}
-	
-	return admin.database().ref('users').child(uid).update(payload).then(function () {
-		
-		res.status(200).send(`<!doctype html>
-		    <head>
-		      <title>Time</title>
-		    </head>
-		    <body>
-		      הוסרת מרשימת התפוצה בהצלחה !
-		    </body>
-		  </html>`);
-		
-	}).catch(function (err) {
-		
-		res.status(200).send(`<!doctype html>
-			    <head>
-			      <title>Time</title>
-			    </head>
-			    <body>
-			      * הוסרת מרשימת התפוצה בהצלחה !
-			    </body>
-			  </html>`);
-	});
-});
-
 exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 	console.log("rediredctUserToPayment called");
 	
@@ -950,13 +966,13 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 					  "GroupPrivateToken": "872f1891-d4f8-4a44-b566-dfb26e99401e",
 					  "Items": [
 					    {
-					      "CatalogNumber": "sdf",
+					      "CatalogNumber": "1",
 					      "UnitPrice": 1,
 					      "Quantity": 1,
-					      "Description": "df"
+					      "Description": "1"
 					    }
 					  ],
-					  "RedirectURL": "https://mevi.co.il/managerregistration.html",
+					  "RedirectURL": "https://mevi.co.il/payment-success",
 					  "IPNURL": "https://mevi.co.il/onUserPaymentMethodCompleted?uid=" + uid,
 					  "HideItemList": true,
 					  "Currency": 1,
@@ -1004,7 +1020,9 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 
 exports.startDailyCronTest = functions.https.onRequest((req, res) => {
 	
-	dailyCron();
+	paymentCron();
+	
+	statisticsCron();
 	
 	const redirectUrl = "https://mevi.co.il";
 	return res.redirect(redirectUrl);
@@ -1017,13 +1035,60 @@ exports.startDailyCronTest = functions.https.onRequest((req, res) => {
 const mPaymentPercentage = 0.08;  // 8%
 
 exports.daily_job = functions.pubsub.topic('daily-tick').onPublish((event) => {
+	console.log("daily cron strated.");
 	
-	dailyCron();
+	paymentCron();
 });
 
-function dailyCron(){
+exports.daily_job_delayed = functions.pubsub.topic('daily-tick-delayed').onPublish((event) => {
+	console.log("daily delayed cron strated.");
 	
-	console.log("Daily cron strated.");
+	statisticsCron();
+});
+
+function statisticsCron(){
+
+	console.log("Statistics cron strated.");
+	//statistics
+	return admin.database().ref('/all-orders').once('value').then(ordersSnapshot => {
+		
+		let openOrdersCount = 0;
+		let pendingnOrdersCount = 0;
+		let completedOrdersCount = 0;
+		
+		ordersSnapshot.forEach(function(childSnapshot) {
+			
+			if(childSnapshot.child('orderStatus').val() === 0){
+				openOrdersCount++;
+			} else if(childSnapshot.child('orderStatus').val() === 1){
+				pendingnOrdersCount++;
+			} else if(childSnapshot.child('orderStatus').val() === 2){
+				completedOrdersCount++;
+			}
+			
+		});
+		
+		const today = new Date().getTime();
+		
+		const payload = {
+			'openOrdersCount' : openOrdersCount,
+			'pendingOrdersCount' : pendingnOrdersCount,
+			'completedOrdersCount' : completedOrdersCount,
+			'date' : today
+		}
+		
+		const promises = [];
+		
+		promises.push(admin.database().ref('/statistics').child('history').push(payload));
+		promises.push(admin.database().ref('/statistics').child('latest').set(payload));
+		
+		return Promise.all(promises);
+	});
+}
+
+function paymentCron(){
+	
+	console.log("payment cron strated.");
 
 	// get all pending orders
 	return admin.database().ref('/all-orders').orderByChild('orderStatus').equalTo(ORDER_STATUS_PENDING).once('value').then(pendingOrdersSnapshot => {
