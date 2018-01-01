@@ -18,9 +18,15 @@
 					<br>
 					<h6>במידה והרווחת, איך אתה מעוניין לשלם ?</h6>
 					<br><br>
+					<div class="checkbox form-control">
+			            <label>
+			                <input type="checkbox" value="" #checkboxAgreement> קראתי ואני מסכים ל<a [routerLink]="['/tos-page']">תנאי השימוש</a> ו<a [routerLink]="['/pp-page']">מדיניות פרטיות</a>
+			            </label>
+			        </div>
+			        <br><br>
 					<div class="row">
-			        	<div class="col-lg-6">
-			        		<button type="submit" class="btn btn-success" [routerLink]="['/payment', database.getCurrentUser().child('uid').val()]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
+			        	<div class="col-lg-6" style="margin-top: 8px; margin-bottom: 8px;">
+			        		<button type="submit" class="btn btn-success" (click)="requestOnlinePayment()"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
 			        	</div>
 			        	<div class="col-lg-6">
 			        		<button type="submit" class="btn btn-warning" (click)="requestPhonePayment()"><i class="fa fa-fw fa-phone"></i>&nbsp; נציג יתקשר אלי לבקשת תשלום</button>

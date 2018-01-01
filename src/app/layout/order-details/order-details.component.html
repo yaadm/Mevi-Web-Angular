@@ -86,6 +86,13 @@
 							<app-product-card [productItem]="product" [productsList]="currentOrder.cargoList" [isEditable]=false></app-product-card>
 			            </div>
 					</div>
+					<div *ngIf="currentOrder.note">
+						<h6>הערות</h6>
+						<div class="form-control" style="white-space: pre-line;">
+							{{currentOrder.note}}
+							<br>
+						</div>
+					</div>
 	        	</div>
 			</div>
 			
@@ -94,13 +101,13 @@
 				<div class="breadcrumb" *ngIf="currentOrder.duration">
 					<h6>זמן נסיעה משוער</h6>
 					<span>
-						{{currentOrder.duration}}
+						<i class="fa fa-clock-o fa-fw"></i> &nbsp; {{currentOrder.duration}}
 					</span>
 					<br>
 					<br>
 					<h6>מרחק נסיעה</h6>
 					<span>
-						{{currentOrder.distance}}
+						<i class="fa fa-arrows-h fa-fw"></i> &nbsp; {{currentOrder.distance}}
 					</span>
 				</div>
 				
@@ -163,6 +170,44 @@
 											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
 										</td>
 									</tr>
+									<tr>
+										<td colspan=2>
+											<hr class="ng-tns-c6-1">
+											<u>אפשרויות תשלום</u>
+										</td>
+									</tr>
+									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCash').val()">
+										<td>
+											<i class="fa fa-money fa-fw"></i>
+										</td>
+										<td>
+											מזומן
+										</td>
+									</tr>
+									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCredit').val()">
+										<td>
+											<i class="fa fa-credit-card fa-fw"></i>
+										</td>
+										<td>
+											אשראי
+										</td>
+									</tr>
+									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentWire').val()">
+										<td>
+											<i class="fa fa-exchange fa-fw"></i>
+										</td>
+										<td>
+											העברה בנקאית
+										</td>
+									</tr>
+									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCheck').val()">
+										<td>
+											<i class="fa fa-id-card-o fa-fw"></i>
+										</td>
+										<td>
+											צק
+										</td>
+									</tr>
 								</table>
 							</small>
 						</div>
@@ -170,8 +215,12 @@
 					<div *ngIf="currentOrder.selectedBid === undefined">
 						<h6>הצעות מחיר</h6>
 						<div>
-							<div *ngIf="bidsArray.length <= 0s" class="form-control">
-								<small>עדיין אין הצעות מחיר...</small>
+							<div *ngIf="bidsArray.length <= 0" class="form-control">
+								<small>
+									עדיין אין הצעות מחיר...
+									<br>
+									<small><i class="fa fa-envelope fw"></i> &nbsp; יישלח אליך אימייל ברגע שתקבל הצעת מחיר חדשה</small>
+								</small>
 							</div>
 							<div *ngIf="bidsArray.length > 0">
 								<div *ngFor="let bidItem of bidsArray">
@@ -216,6 +265,44 @@
 													</td>
 													<td>
 														{{bidItem.expirationDate | date: 'dd/MM/yyyy'}}
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.possiblePaymentMethods">
+													<td colspan="2">
+														<br>
+														<u>אפשרויות תשלום</u>
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCash">
+													<td>
+														<i class="fa fa-check-square-o fw color-secondary"></i>
+													</td>
+													<td>
+														<i class="fa fa-money fw"></i>&nbsp; מזומן
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCredit">
+													<td>
+														<i class="fa fa-check-square-o fw color-secondary"></i>
+													</td>
+													<td>
+														<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentWire">
+													<td>
+														<i class="fa fa-check-square-o fw color-secondary"></i>
+													</td>
+													<td>
+														<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+													</td>
+												</tr>
+												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCheck">
+													<td>
+														<i class="fa fa-check-square-o fw color-secondary"></i>
+													</td>
+													<td>
+														<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
 													</td>
 												</tr>
 												<tr>
@@ -270,6 +357,44 @@
 											{{myBid.expirationDate | date: 'dd/MM/yyyy'}}
 										</td>
 									</tr>
+									<tr *ngIf="myBid.possiblePaymentMethods">
+										<td colspan="2">
+											<br>
+											<u>אפשרויות קבלת תשלום</u>
+										</td>
+									</tr>
+									<tr *ngIf="myBid.possiblePaymentMethods.paymentCash">
+										<td>
+											<i class="fa fa-check-square-o fw color-secondary"></i>
+										</td>
+										<td>
+											<i class="fa fa-money fw"></i>&nbsp; מזומן
+										</td>
+									</tr>
+									<tr *ngIf="myBid.possiblePaymentMethods.paymentCredit">
+										<td>
+											<i class="fa fa-check-square-o fw color-secondary"></i>
+										</td>
+										<td>
+											<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+										</td>
+									</tr>
+									<tr *ngIf="myBid.possiblePaymentMethods.paymentWire">
+										<td>
+											<i class="fa fa-check-square-o fw color-secondary"></i>
+										</td>
+										<td>
+											<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+										</td>
+									</tr>
+									<tr *ngIf="myBid.possiblePaymentMethods.paymentCheck">
+										<td>
+											<i class="fa fa-check-square-o fw color-secondary"></i>
+										</td>
+										<td>
+											<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
+										</td>
+									</tr>
 									<tr>
 										<td colspan=2>
 											<br>
@@ -304,7 +429,46 @@
 		                    <small>תוקף הצעה</small>
 			                <input type="date" class="form-control" placeholder="תאריך תפוגה" #bidExpiration>
 	                    </div>
+	                    <br>
+	                    אופן קבלת תשלום
+	                    <div class="form-control">
+			           		<div *ngIf="currentOrderSnapshot.child('possiblePaymentMethods').child('paymentCash').val()">
+					            <div class="checkbox">
+			                        <label>
+			                            <input type="checkbox" value="" #checkboxPaymentCash>&nbsp;<i class="fa fa-money fw"></i>&nbsp; מזומן 
+			                        </label>
+			                    </div>
+			           		</div>
+			           		<div *ngIf="currentOrderSnapshot.child('possiblePaymentMethods').child('paymentCredit').val()">
+					            <div class="checkbox">
+			                        <label>
+			                            <input type="checkbox" value="" #checkboxPaymentCredit>&nbsp;<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+			                        </label>
+			                    </div>
+			           		</div>
+			           		<div *ngIf="currentOrderSnapshot.child('possiblePaymentMethods').child('paymentWire').val()">
+					            <div class="checkbox">
+			                        <label>
+			                            <input type="checkbox" value="" #checkboxPaymentWire>&nbsp;<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+			                        </label>
+			                    </div>
+			           		</div>
+			           		<div *ngIf="currentOrderSnapshot.child('possiblePaymentMethods').child('paymentCheck').val()">
+					            <div class="checkbox">
+			                        <label>
+			                            <input type="checkbox" value="" #checkboxPaymentCheck>&nbsp;<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
+			                        </label>
+			                    </div>
+			           		</div>
+			           		<small>* חובה לבחור לפחות אחת</small>
+	                    </div>
 		                <br>
+		                <div class="checkbox form-control">
+				            <label>
+				                <input type="checkbox" value="" #checkboxAgreement> קראתי ואני מסכים ל<a [routerLink]="['/tos-page']">תנאי השימוש</a> ו<a [routerLink]="['/pp-page']">מדיניות פרטיות</a>
+				            </label>
+				        </div>
+				        <br>
 			            <button type="submit" class="btn btn-success" (click)="publishBid()" [attr.disabled]="loadingSetBid ? '' : null">הגש הצעת מחיר</button>  &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingSetBid"></i>
 		            </div>
 				</div>

@@ -2,30 +2,30 @@
 	<table>
 		<tr>
 			<td>
-				<i class="fa fa-truck fa-5x"></i>
+				<i class="fa fa-truck fa-4x" style="margin-left: 2rem"></i>
 			</td>
-			<td class="text-align-top">
+			<td class="text-align-center">
 				<small>
 					<table>
 						<tr>
-							<td>
-								סוג משאית:
+							<td style="font-weight: bold;">
+								סוג משאית
 							</td>
 							<td>
 								{{order.truckType | resolveTruckType}}
 							</td>
 						</tr>
 						<tr>
-							<td>
-								סוג נגרר:
+							<td style="font-weight: bold;">
+								סוג נגרר
 							</td>
 							<td>
 								{{order.truckSubType | resolveTruckSubType}}
 							</td>
 						</tr>
 						<tr>
-							<td>
-								כמות משאיות: &nbsp;
+							<td style="font-weight: bold;">
+								כמות משאיות &nbsp;
 							</td>
 							<td>
 								{{order.truckQuantity}}

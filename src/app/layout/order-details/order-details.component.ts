@@ -80,6 +80,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   loadingDeleteBid = false;
   loadingAcceptBid = false;
   
+  @ViewChild('checkboxAgreement')
+  public checkboxAgreementRef: ElementRef;
   @ViewChild('bidAmount')
   public bidAmountRef: ElementRef;
   @ViewChild('bidDate')
@@ -90,6 +92,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   public bidExpirationRef: ElementRef;
   @ViewChild('checkboxExpiration')
   public checkboxExpirationRef: ElementRef;
+  @ViewChild('checkboxPaymentCash')
+  public checkboxPaymentCashRef: ElementRef;
+  @ViewChild('checkboxPaymentCredit')
+  public checkboxPaymentCreditRef: ElementRef;
+  @ViewChild('checkboxPaymentWire')
+  public checkboxPaymentWireRef: ElementRef;
+  @ViewChild('checkboxPaymentCheck')
+  public checkboxPaymentCheckRef: ElementRef;
   
   constructor(private translate: TranslateService, private activatedRoute: ActivatedRoute, public database: DatabaseService, 
       private router: Router, private dialogService: DialogService, private mapsAPILoader: MapsAPILoader) {
@@ -132,7 +142,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
             const itemPayload = item.val();
 
             // remove expired bids
-            if (itemPayload.expirationDate === undefined || itemPayload.expirationDate > now) {
+            if (itemPayload.expirationDate === undefined || itemPayload.expirationDate === 0 || itemPayload.expirationDate > now) {
               this.bidsArray.push(itemPayload);
             }
           });
@@ -147,7 +157,15 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       this.currentOrder = undefined;
     }
   }
-
+  
+  isAnyPaymentMethodChecked () {
+    
+    return (this.checkboxPaymentCashRef && this.checkboxPaymentCashRef.nativeElement.checked) || 
+      (this.checkboxPaymentCreditRef && this.checkboxPaymentCreditRef.nativeElement.checked) ||
+      (this.checkboxPaymentWireRef && this.checkboxPaymentWireRef.nativeElement.checked) || 
+      (this.checkboxPaymentCheckRef && this.checkboxPaymentCheckRef.nativeElement.checked);
+  }
+  
   publishBid () {
     
     if (!this.bidAmountRef.nativeElement.value || this.bidAmountRef.nativeElement.value <= 0) {
@@ -161,6 +179,12 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       return;
     } else if (this.checkboxExpirationRef.nativeElement.checked && !this.bidExpirationRef.nativeElement.value) {
       this.showInfoMessage('שגיאה', 'חובה להזין תאריך תפוגה');
+      return;
+    } else if (!this.isAnyPaymentMethodChecked()) {
+      this.showInfoMessage('לא הזנת שדה חובה', 'חובה לבחור אופן קבלת תשלום');
+      return;
+    } else if (!this.checkboxAgreementRef.nativeElement.checked) {
+      this.showInfoMessage('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
       return;
     }
     
@@ -178,7 +202,16 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
           if (this.checkboxExpirationRef.nativeElement.checked) {
             expirationDate = new Date(this.bidExpirationRef.nativeElement.value).getTime();
           }
+          
           console.log('exp: ' + expirationDate);
+          
+          const possiblePaymentMethods = {
+            'paymentCash': (this.checkboxPaymentCashRef && this.checkboxPaymentCashRef.nativeElement.checked) ? true : false,
+            'paymentCredit': (this.checkboxPaymentCreditRef && this.checkboxPaymentCreditRef.nativeElement.checked) ? true : false,
+            'paymentWire': (this.checkboxPaymentWireRef && this.checkboxPaymentWireRef.nativeElement.checked) ? true : false,
+            'paymentCheck': (this.checkboxPaymentCheckRef && this.checkboxPaymentCheckRef.nativeElement.checked) ? true : false
+          }
+          
           const payload = {
               'orderId' : this.orderId,
               'bidAmount' : parseInt(this.bidAmountRef.nativeElement.value, 10),
@@ -187,12 +220,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
               'bidCreationDate' : firebase.database.ServerValue.TIMESTAMP,
               'expirationDate': expirationDate,
               'bidId' : this.database.getCurrentUser().child('uid').val(),
+              'possiblePaymentMethods' : possiblePaymentMethods,
               bidder
           };
           
           this.loadingSetBid = true;
           this.database.updateBidForOrder(this.orderId, payload).then(_ => {
             // success
+            this.loadingSetBid = false;
             this.resetMakeBidForm();
             this.showInfoMessage('הצלחה', 'הצעת המחיר הוגשה בהצלחה');
           }, reason => {
@@ -210,13 +245,34 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
     this.bidDateRef.nativeElement.value = '';
     this.bidTimeRef.nativeElement.value = '';
     this.checkboxExpirationRef.nativeElement.checked = false; // will make bidExpirationRef to reset too.
+    this.checkboxAgreementRef.nativeElement.checked = false;
+    try {
+      this.checkboxPaymentCashRef.nativeElement.checked = false;
+    } catch (e) {
+      // TODO handle exception
+    }
+    try {
+      this.checkboxPaymentCreditRef.nativeElement.checked = false;
+    } catch (e) {
+      // TODO handle exception
+    }
+    try {
+      this.checkboxPaymentWireRef.nativeElement.checked = false;
+    } catch (e) {
+      // TODO handle exception
+    }
+    try {
+      this.checkboxPaymentCheckRef.nativeElement.checked = false;
+    } catch (e) {
+      // TODO handle exception
+    }
   }
   
   acceptBid (bidItem) {
     
     this.dialogService.addDialog(ModalConfirmComponent, { 
       title: 'סגירת עסקה', 
-      message: 'לסגור עסקה על סך: ' + bidItem.bidAmount + ' ש"ח ?' })
+      message: 'לסגור עסקה על סך: ' + bidItem.bidAmount + ' ש"ח ?\n' })
       .subscribe((isConfirmed) => {
         
         if (isConfirmed) {

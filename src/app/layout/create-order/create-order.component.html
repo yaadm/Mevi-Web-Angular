@@ -1,7 +1,7 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'הזמנה חדשה'" [icon]="'fa-edit'"></app-page-header>
 	<div class="breadcrumb">
-       	<h5>{{'Loading Details' | translate}}</h5>
+       	<h4>{{'Loading Details' | translate}}</h4>
        	<!-- <h6>שם בית העסק</h6>
        	<div class="form-group input-group">
               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
@@ -24,15 +24,16 @@
 		<div>
 			<input class="form-control" type="date" #pickupDate>
            </div>
-           
+        <br>
 		<h6>שעת העמסה</h6>
 		<div class="form-group">
 			<input class="form-control" type="time" placeholder="שעה" #pickupTime>
 		</div>
-      		<br>
+	</div>
+    <div class="breadcrumb">
        	<h4>פרטי פריקה</h4>
-       	<h6>שם בית העסק</h6>
-       	<!-- <div class="form-group input-group">
+       	<!-- <h6>שם בית העסק</h6>
+       	<div class="form-group input-group">
               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
 			<input class="form-control" type="text" placeholder="שם בית העסק" #toCompanyName>
 		</div> -->
@@ -48,7 +49,8 @@
 			<agm-marker [latitude]="toLatitude" [longitude]="toLongitude" [markerDraggable]="true" (dragEnd)="toMarkerDragEnd($event)"></agm-marker>
 		</agm-map>
 		
-		<br>
+	</div>
+    <div class="breadcrumb">
 		<h4>פרטי ההובלה</h4>
        	<h6>ביטוח</h6>
        	<div class="form-group input-group">
@@ -197,7 +199,7 @@
             			<h6><small>אורך</small></h6>
 			            <div class="form-group input-group">
 		                	<span class="input-group-addon"><i class="fa fa-expand fa-fw"></i></span>
-			                <select class="form-control" #selectorLength (change)="onOrderTypeChanged(selectorOrderType.value)">
+			                <select class="form-control" #selectorLength>
 			                    <option [value]=1 selected="selected">עד מטר</option>
 			                    <option [value]=2>עד 2 מטר</option>
 			                    <option [value]=3>עד 3 מטר</option>
@@ -214,7 +216,7 @@
             			<h6><small>משקל</small></h6>
 			            <div class="form-group input-group">
 		                	<span class="input-group-addon"><i class="fa fa-exclamation-circle fa-fw"></i></span>
-			                <select class="form-control" #selectorWeight (change)="onOrderTypeChanged(selectorOrderType.value)">
+			                <select class="form-control" #selectorWeight>
 			                    <option [value]=10 selected="selected">עד 10 קילו</option>
 			                    <option [value]=20>עד 20 קילו</option>
 			                    <option [value]=50>עד 50 קילו</option>
@@ -248,9 +250,45 @@
             </div>
            </div>
            
-           
-           
-           <br>
+	</div>
+	<div class="breadcrumb">
+		<h4>פרטי תשלום למוביל</h4>
+		<h6>באילו דרכים תוכל לשלם למוביל ?</h6>
+		<br>
+			<div class="row">
+           		<div class="col-lg-3">
+		            <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="" #checkboxPaymentCash>&nbsp;<i class="fa fa-money fw"></i>&nbsp; מזומן 
+                        </label>
+                    </div>
+           		</div>
+           		<div class="col-lg-3">
+		            <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="" #checkboxPaymentCredit>&nbsp;<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+                        </label>
+                    </div>
+           		</div>
+           		<div class="col-lg-3">
+		            <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="" #checkboxPaymentWire>&nbsp;<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+                        </label>
+                    </div>
+           		</div>
+           		<div class="col-lg-3">
+		            <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="" #checkboxPaymentCheck>&nbsp;<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
+                        </label>
+                    </div>
+           		</div>
+           	</div>
+        <br>
+      	<small>* חובה לבחור לפחות אחת מהאפשרויות</small>
+	</div>
+    <div class="breadcrumb">
            <h6>הערות</h6>
            <fieldset class="form-group">
                <textarea class="form-control" rows="3" #inputAdditionalInfo></textarea>

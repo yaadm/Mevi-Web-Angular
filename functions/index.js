@@ -115,6 +115,8 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 			}
 		}*/
 	}
+	
+	return true;
 });
 
 function updateDistanceForOrder (order) {
@@ -128,25 +130,31 @@ function updateDistanceForOrder (order) {
 	  destinations: [destinationsStr],
 	  language: 'iw'
 	}
-	GoogleDistanceApi.distance(options, (err, data) => {
-	    if(err) {
-	        return console.log(err);
-	    }
-	 
-	    console.log(data);
-	    
-	    try {
-	    	const payload = {
-    	    	'distance' : data[0].distance,
-    	    	'duration' : data[0].duration
-    	    }
-	    	    
-    	    return admin.database().ref('/all-orders/' + order.child('orderId').val()).update(payload);
-	    } catch (error) {
-	    	console.log(error);
-	    }
-	    
-	});
+	
+	try {
+		GoogleDistanceApi.distance(options, (err, data) => {
+		    if(err) {
+		        return console.log(err);
+		    }
+		 
+		    console.log(data);
+		    
+		    try {
+		    	const payload = {
+	    	    	'distance' : data[0].distance,
+	    	    	'duration' : data[0].duration
+	    	    }
+		    	    
+	    	    return admin.database().ref('/all-orders/' + order.child('orderId').val()).update(payload);
+		    } catch (error) {
+		    	// console.log(error);
+				console.log('could not calculate distance');
+		    }
+		});
+	} catch (error) {
+		// console.log(error);
+		console.log('could not calculate distance');
+	}
 }
 
 exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId}').onWrite(event => {
@@ -869,16 +877,7 @@ exports.unsubscribe = functions.https.onRequest((req, res) => {
 		const redirectUrl = "https://mevi.co.il/user-unsubscribed";
 		return res.redirect(redirectUrl);
 		
-		/*res.status(200).send(`<!doctype html>
-		    <head>
-		      <title>Time</title>
-		    </head>
-		    <body>
-		      הוסרת מרשימת התפוצה בהצלחה !
-		    </body>
-		  </html>`);*/
-		
-	}).catch(function (err) {
+	}, function (err) {
 		
 		return res.status(200).send(`<!doctype html>
 			    <head>
@@ -894,17 +893,15 @@ exports.unsubscribe = functions.https.onRequest((req, res) => {
 exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 	console.log("onUserPaymentMethodCompleted called");
 	
-	
 	const uid = req.query.uid;
 
 	if(!uid){
 		
 		console.log("onUserPaymentMethodCompleted uid is null");
 		
-		return;
+		return false;
 	} else {
 		console.log("onUserPaymentMethodCompleted uid: " + uid);
-		
 	}
 	
 	var AccessToken = req.body.TransactionToken;
@@ -936,19 +933,14 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 			const redirectUrl = "https://mevi.co.il";
 			return res.redirect(redirectUrl);
 			
-		}).catch(function (err) {
-			
-			console.log("onUserPaymentMethodCompleted error for user: " + uid + " with AccessToken: " + AccessToken);
-			console.log("onUserPaymentMethodCompleted database error: " + err);
-			
-			const redirectUrl = "https://mevi.co.il";
-			return res.redirect(redirectUrl);
 		});
 		
 	} else {
 		
 		console.log("onUserPaymentMethodCompleted AccessToken is null");
 	}
+	
+	return true;
 });
 
 exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
@@ -1038,12 +1030,15 @@ exports.daily_job = functions.pubsub.topic('daily-tick').onPublish((event) => {
 	console.log("daily cron strated.");
 	
 	paymentCron();
+	return true;
 });
 
 exports.daily_job_delayed = functions.pubsub.topic('daily-tick-delayed').onPublish((event) => {
 	console.log("daily delayed cron strated.");
 	
 	statisticsCron();
+	
+	return true;
 });
 
 function statisticsCron(){
@@ -1267,7 +1262,7 @@ function paymentCron(){
 										
 										//TODO: change manager = false if the user's payment has failed !
 										
-										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "]");
+										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - Status Code: " + response.statusCode);
 										try {
 											console.log(JSON.stringify(body));
 										} catch (e) {
@@ -1303,3 +1298,5 @@ function paymentCron(){
 	});
 	
 }
+
+

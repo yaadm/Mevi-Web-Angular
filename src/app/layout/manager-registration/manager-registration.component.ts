@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DatabaseService } from '../../shared';
+import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { DialogService } from 'ng2-bootstrap-modal';
 
 @Component({
@@ -12,6 +13,8 @@ import { DialogService } from 'ng2-bootstrap-modal';
   animations: [routerTransition()]
 })
 export class ManagerRegistrationComponent implements OnInit, OnDestroy {
+  @ViewChild('checkboxAgreement')
+  public checkboxAgreementRef: ElementRef;
   constructor(private translate: TranslateService, private router: Router, public database: DatabaseService,
       private dialogService: DialogService) {
     this.setupTranslation(translate);
@@ -25,6 +28,11 @@ export class ManagerRegistrationComponent implements OnInit, OnDestroy {
 
   requestPhonePayment() {
     
+    if (!this.checkboxAgreementRef.nativeElement.checked) {
+      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
+      return;
+    }
+    
     const payload = {
       'requestingManager': true
     }
@@ -33,6 +41,26 @@ export class ManagerRegistrationComponent implements OnInit, OnDestroy {
     }, reason => {
       // failure
     });
+  }
+  
+  requestOnlinePayment() {
+    if (!this.checkboxAgreementRef.nativeElement.checked) {
+      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
+      return;
+    }
+    
+    this.router.navigate(['/payment', this.database.getCurrentUser().child('uid').val()]);
+  }
+  
+  showInformationDialog(modaltitle, modalmessage) {
+    this.dialogService.addDialog(ModalInformComponent, {
+      title: modaltitle,
+      message: modalmessage})
+      .subscribe((isConfirmed) => {
+          if (isConfirmed) {
+          } else {
+          }
+      });
   }
   
   private setupTranslation(translate: TranslateService) {

@@ -1,45 +1,70 @@
 <div [@routerTransition]>
-		<div class="row">
-		    <div class="col-xl-12">
-		        <h3 class="page-header">
-		            <strong>Mevi</strong><small> - פתרונות שינוע</small>
-		        </h3>
-		        <ol class="breadcrumb">
-		            <li class="breadcrumb-item">
-		                <i class="fa fa-home"></i> <a href="Javascript:void(0)" [routerLink]="['/home-page']">{{'Home' | translate}}</a>
-		            </li>
-		        </ol>
-		    </div>
+	<div class="row">
+		<div class="col-xl-12">
+			<h3 class="page-header">
+				<strong>Mevi</strong><small> - פתרונות שינוע</small>
+			</h3>
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><i class="fa fa-home"></i> <a
+					href="Javascript:void(0)" [routerLink]="['/home-page']">{{'Home'
+						| translate}}</a></li>
+			</ol>
 		</div>
-		<div class="row">
-	        <div class="col-lg-4">
-	            <app-suggestion-card [actionRout]="['/create-order-page']" [bgClass]="'card-success'" [icon]="'fa-truck'" [header]="'Get bids for your deliveries' | translate" [text]="'Need to transport goods ? \nHere, you can gets bids for your orders ensuring the best price possible' | translate"  [action]="this.database.getCurrentUser() ? ('Publish order' | translate) : ''"></app-suggestion-card>
-	        </div>
-	        <div class="col-lg-4" *ngIf="database.getCurrentUser() == undefined || (database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() !== true)">
-	       		<app-suggestion-card [actionRout]="['/manager-registration-page']" [bgClass]="'card-danger'" [icon]="'fa-cc-visa'" [header]="'Find jobs for your trucks' | translate" [text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"  [action]="this.database.getCurrentUser() ? ('Register as manager' | translate) : ''"></app-suggestion-card>
-	        </div>
-	        <div class="col-lg-4" *ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() === true">
-	       		<app-suggestion-card [actionRout]="['/open-orders-page']" [bgClass]="'card-danger'" [icon]="'fa-cc-visa'" [header]="'Find jobs for your trucks' | translate" [text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"  [action]="'הגש הצעות מחיר'"></app-suggestion-card>
-	        </div>
-	        <div class="col-lg-4">
-	            <app-suggestion-card [actionLink]="'https://play.google.com/store/apps/details?id=com.objective.gettruck'" [bgClass]="'card-warning'" [icon]="'fa-android'" [header]="'עכשיו גם לאנדרואיד'" [text]="'אנו שמחים להביא לכם את השירות שלנו גם לאנדרואיד\nבאפליקציה תוכלו לקבל הודעות בזמן אמת ולהשאר עם יד על הדופק'"  [action]="'הורד את האפליקציה'"></app-suggestion-card>
-	        </div>
-	    </div>
-	    <div class="row" *ngIf="statistics != undefined">
-	        <div class="col-lg-4">
-	        	<div class="card mb-3">
-	                <div class="card-header">
-	                    נתוני מערכת נכון לתאריך: {{statistics.child('date').val() | date: 'dd/MM/yyyy'}}
-	                </div>
-	                <div class="card-block">
-	                    <canvas baseChart height="180px" [data]="doughnutChartData" [labels]="doughnutChartLabels" [chartType]="'doughnut'" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+	</div>
+	<div class="row">
+		<div class="col-lg-9">
+			<div class="row">
+				<div class="col-lg-6">
+					<app-suggestion-card [actionRout]="['/create-order-page']"
+						[bgClass]="'card-success'" [icon]="'fa-truck'"
+						[header]="'Get bids for your deliveries' | translate"
+						[text]="'Need to transport goods ? \nHere, you can gets bids for your orders ensuring the best price possible' | translate"
+						[action]="this.database.getCurrentUser() ? ('Publish order' | translate) : ''"></app-suggestion-card>
+				</div>
+
+				<div class="col-lg-6"
+					*ngIf="database.getCurrentUser() == undefined || (database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() !== true)">
+					<app-suggestion-card [actionRout]="['/manager-registration-page']"
+						[bgClass]="'card-danger'" [icon]="'fa-cc-visa'"
+						[header]="'Find jobs for your trucks' | translate"
+						[text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"
+						[action]="this.database.getCurrentUser() ? ('Register as manager' | translate) : ''"></app-suggestion-card>
+				</div>
+				<div class="col-lg-6"
+					*ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() === true">
+					<app-suggestion-card [actionRout]="['/open-orders-page']"
+						[bgClass]="'card-danger'" [icon]="'fa-cc-visa'"
+						[header]="'Find jobs for your trucks' | translate"
+						[text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"
+						[action]="'הגש הצעות מחיר'"></app-suggestion-card>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<app-suggestion-card
+						[actionLink]="'https://play.google.com/store/apps/details?id=com.objective.gettruck'"
+						[bgClass]="'card-warning'" [icon]="'fa-android'"
+						[header]="'עכשיו גם לאנדרואיד'"
+						[text]="'אנו שמחים להביא לכם את השירות שלנו גם לאנדרואיד\nבאפליקציה תוכלו לקבל הודעות בזמן אמת ולהשאר עם יד על הדופק'"
+						[action]="'הורד את האפליקציה'"></app-suggestion-card>
+				</div>
+			</div>
+
+		</div>
+		<div class="col-lg-3">
+			<div *ngIf="statistics != undefined">
+				<div class="card mb-3">
+					<div class="card-header">נתוני מערכת נכון לתאריך:
+						{{statistics.child('date').val() | date: 'dd/MM/yyyy'}}</div>
+					<div class="card-block">
+						<canvas baseChart height="180px" [data]="doughnutChartData"
+							[labels]="doughnutChartLabels" [chartType]="'doughnut'">
 	                    </canvas>
-	                </div>
-	            </div>
-	        </div>
-	        <div class="col-lg-8">
-	        </div>
-	    </div>
-	    
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<app-footer-page></app-footer-page>
 </div>
+

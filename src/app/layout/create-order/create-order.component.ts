@@ -95,6 +95,18 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild('selectorWeight')
   public selectorWeightRef: ElementRef;
 
+  @ViewChild('checkboxPaymentCash')
+  public checkboxPaymentCashRef: ElementRef;
+  
+  @ViewChild('checkboxPaymentCredit')
+  public checkboxPaymentCreditRef: ElementRef;
+  
+  @ViewChild('checkboxPaymentWire')
+  public checkboxPaymentWireRef: ElementRef;
+  
+  @ViewChild('checkboxPaymentCheck')
+  public checkboxPaymentCheckRef: ElementRef;
+  
   @ViewChild('inputAdditionalInfo')
   public inputAdditionalInfoRef: ElementRef;
 
@@ -283,6 +295,14 @@ export class CreateOrderComponent implements OnInit {
     this.selectorWeightRef.nativeElement.value = 10;
   }
 
+  isAnyPaymentMethodChecked () {
+    
+    return this.checkboxPaymentCashRef.nativeElement.checked || 
+      this.checkboxPaymentCreditRef.nativeElement.checked ||
+      this.checkboxPaymentWireRef.nativeElement.checked || 
+      this.checkboxPaymentCheckRef.nativeElement.checked;
+  }
+  
   public publishOrder () {
 
     if (!this.fromSearchElementRef.nativeElement.value) {
@@ -312,8 +332,18 @@ export class CreateOrderComponent implements OnInit {
     } else if (!this.selectionOrderTypeRef.nativeElement.value || this.selectionOrderTypeRef.nativeElement.value <= 0) {
       this.showInfoMessage('חובה לבחור סוג הזמנה');
       return;
+    } else if (!this.isAnyPaymentMethodChecked()) {
+      this.showInfoMessage('חובה לבחור סוג תשלום אפשרי לחברת ההובלות');
+      return;
     }
 
+    const possiblePaymentMethods = {
+      'paymentCash': this.checkboxPaymentCashRef.nativeElement.checked,
+      'paymentCredit': this.checkboxPaymentCreditRef.nativeElement.checked,
+      'paymentWire': this.checkboxPaymentWireRef.nativeElement.checked,
+      'paymentCheck': this.checkboxPaymentCheckRef.nativeElement.checked
+    }
+    
     const payload = {
       'orderStatus' : 0,
       'publishedAt' : firebase.database.ServerValue.TIMESTAMP,
@@ -335,6 +365,8 @@ export class CreateOrderComponent implements OnInit {
       'destinationLng' : this.toLongitude,
       'destinationLocationName' : this.toSearchElementRef.nativeElement.value,
       'destinationBusinessName' : this.toSearchElementRef.nativeElement.value,
+      
+      'possiblePaymentMethods': possiblePaymentMethods,
       
       'note' : this.inputAdditionalInfoRef.nativeElement.value,
       'insurance' : this.parseInt(this.selectionInsuranceRef.nativeElement.value),
