@@ -58,6 +58,10 @@
             </li>
         </div>
         
+        <a [routerLink]="['/my-calendar']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined && currentUser.child('companyId').val()">
+            <i class="fa fa-calendar fa-fw"></i>&nbsp;היומן שלי
+        </a>
+        
         <a [routerLink]="['/about-us-page']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-address-book"></i>&nbsp;{{ 'About Us' | translate }}
         </a>

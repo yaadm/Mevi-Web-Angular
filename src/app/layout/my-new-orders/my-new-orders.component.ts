@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { DatabaseService, firebaseConfigDebug } from '../../shared';
+import { DatabaseService } from '../../shared';
 import { AuthListener } from '../../shared/services';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';

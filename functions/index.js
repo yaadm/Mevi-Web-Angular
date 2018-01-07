@@ -17,8 +17,7 @@ const nodemailer = require('nodemailer');
 var request = require('request');
 const gmailEmail = encodeURIComponent(functions.config().gmail.email);
 const gmailPassword = encodeURIComponent(functions.config().gmail.password);
-const mailTransport = nodemailer.createTransport(
-    `smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
+const mailTransport = nodemailer.createTransport(`smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
 const GoogleDistanceApi = require('google-distance-api');
 
 exports.onCreateUser = functions.auth.user().onCreate(event => {
@@ -48,7 +47,11 @@ exports.onCreateUser = functions.auth.user().onCreate(event => {
 });
 
 exports.onDeleteUser = functions.auth.user().onDelete(event => {
-	  //TODO: remove all user data ?
+	
+	const user = event.data; // The Firebase user.
+	const uid = user.uid;
+	
+	return admin.database().ref('/users/' + uid).remove();
 });
 
 exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite(event => {
@@ -1030,6 +1033,7 @@ exports.daily_job = functions.pubsub.topic('daily-tick').onPublish((event) => {
 	console.log("daily cron strated.");
 	
 	paymentCron();
+	
 	return true;
 });
 

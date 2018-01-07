@@ -135,6 +135,16 @@ export class DatabaseService {
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).valueChanges();
   }
 
+  getMyOrders(): Promise<any>  {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).query.once('value');
+  }
+  
+  getMyDeliveries(): Promise<any>  {
+    const uid = this.currentUser.child('uid').val();
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).query.once('value');
+  }
+  
   subscribeToOpenedOrders(): Observable<AngularFireAction<DataSnapshot>[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('orderStatus').equalTo(0)).valueChanges();

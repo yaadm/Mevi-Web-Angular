@@ -83,7 +83,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
           }
 
           const payload = {
-            'companyName': this.companyNameRef.nativeElement.value,
+            'name': this.companyNameRef.nativeElement.value,
             'companyId': this.companyIdRef.nativeElement.value,
             'companyAddress': this.companyAddressRef.nativeElement.value,
             'companyPhone': this.companyPhoneRef.nativeElement.value,

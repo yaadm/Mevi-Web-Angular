@@ -27,6 +27,7 @@ const routes: Routes = [
             { path: 'user-profile/:userId', loadChildren: './user-profile/user-profile.module#UserProfileModule' },
             { path: 'my-profile', loadChildren: './my-profile/my-profile.module#MyProfileModule' },
             { path: 'user-unsubscribed', loadChildren: './user-unsubscribed/user-unsubscribed.module#UserUnsubscribedModule' },
+            { path: 'my-calendar', loadChildren: './my-calendar/my-calendar.module#MyCalendarModule' },
 
             { path: 'dashboard', loadChildren: './dashboard/dashboard.module#DashboardModule' },
             { path: 'charts', loadChildren: './charts/charts.module#ChartsModule' },
