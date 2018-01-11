@@ -1,13 +1,58 @@
 <div [@routerTransition]>
 	<app-page-header [heading]="'הגש הצעות מחיר'" [icon]="'fa-user'"></app-page-header>
+	<div>
+		<h6>חיפוש הזמנות</h6>
+		<div class="jumbotron" style="padding: 15px;">
+			<div class="row">
+	        	<div class="col-lg-11">
+	        		<div class="row">
+			        	<div class="col-lg-3">
+			        		<span style="font-weight: 500">מאיזור</span>
+			        		<br>
+							<select class="form-control" #selectionAreaFrom>
+				                   <option [value]=0>הכל</option>
+				                   <option [value]=1>צפון</option>
+				                   <option [value]=2>מרכז</option>
+				                   <option [value]=3>דרום</option>
+				               </select>
+			        	</div>
+			        	<div class="col-lg-3">
+			        		<span style="font-weight: 500">לאיזור</span>
+			        		<br>
+							<select class="form-control" #selectionAreaTo>
+				                   <option [value]=0>הכל</option>
+				                   <option [value]=1>צפון</option>
+				                   <option [value]=2>מרכז</option>
+				                   <option [value]=3>דרום</option>
+				               </select>
+			        	</div>
+			        	<div class="col-lg-3">
+			        		<span style="font-weight: 500">מתאריך</span>
+			        		<br>
+			        		<input class="form-control" type="date" #startingDate style="padding-bottom: .4rem; padding-top: .4rem;">
+			        	</div>
+			        	<div class="col-lg-3">
+			        		<span style="font-weight: 500">עד תאריך</span>
+			        		<br>
+			        		<input class="form-control" type="date" #endingDate style="padding-bottom: .4rem; padding-top: .4rem;">
+			        	</div>
+		        	</div>
+	        	</div>
+	        	<div class="col-lg-1">
+	        		<br>
+                	<button class="btn btn-secondary" type="button" (click)="onSearch()"><i class="fa fa-search"></i></button>
+	        	</div>
+        	</div>
+		</div>
+	</div>
 	<div class="row">
         <div class="col-lg-8">
-        	<div *ngIf="itemsArray.length > 0">
-        		<div *ngFor="let order of itemsArray">
+        	<div *ngIf="filteredItemsArray.length > 0">
+        		<div *ngFor="let order of filteredItemsArray">
 					<app-order-card [order]="order"></app-order-card>
 				</div>
         	</div>
-        	<div *ngIf="itemsArray.length <= 0" class="breadcrumb ta-c">
+        	<div *ngIf="filteredItemsArray.length <= 0" class="breadcrumb ta-c">
 				<br>
 				<br>
 				<i class="fa fa-eye-slash fa-5x"></i>

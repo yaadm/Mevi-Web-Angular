@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug } from '../../shared';
 import { AuthListener } from '../../shared/services';
@@ -16,11 +16,134 @@ import { DataSnapshot } from 'firebase/database';
 export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   items:  Observable<AngularFireAction<DataSnapshot>[]>;
   itemsArray = [];
+  filteredItemsArray = [];
+  
+  @ViewChild('selectionAreaFrom')
+  public selectionAreaFromRef: ElementRef;
+    
+  @ViewChild('selectionAreaTo')
+  public selectionAreaToRef: ElementRef;
+  
+  @ViewChild('startingDate')
+  public startingDateRef: ElementRef;
+  
+  @ViewChild('endingDate')
+  public endingDateRef: ElementRef;
+  
   constructor(private translate: TranslateService, public database: DatabaseService) {
     this.setupTranslation(translate);
     database.subscribeToAuth(this);
   }
+  
+  onSearch() {
+    
+    this.filterOrders();
+  }
 
+  filterOrders() {
+    
+    const northLat = 32.41;
+    const southLat = 31.86;
+    
+    const areaFrom = this.selectionAreaFromRef.nativeElement.value;
+    const areaTo = this.selectionAreaToRef.nativeElement.value;
+    const startingDateTime = this.startingDateRef.nativeElement.value;
+    const endingDateTime = this.endingDateRef.nativeElement.value;
+    
+    this.filteredItemsArray = this.itemsArray.filter(order => {
+      
+      if (areaFrom > 0) {
+        // has area filter
+        
+        if (areaFrom === '1') {
+          // north
+          
+          if (order.pickupLat < northLat) {
+            // if its not north
+            
+            return false;
+          }
+        } else if (areaFrom === '2') {
+          // center
+          if (order.pickupLat > northLat || order.pickupLat < southLat) {
+            // if its not north
+            
+            return false;
+          }
+        } else if (areaFrom === '3') {
+          // south
+          
+          if (order.pickupLat > southLat) {
+            // if its not north
+            
+            return false;
+          }
+        }
+      }
+      
+      if (areaTo > 0) {
+        // has area filter
+        
+        if (areaTo === '1') {
+          // north
+          
+          if (order.destinationLat < northLat) {
+            // if its not north
+            
+            return false;
+          }
+        } else if (areaTo === '2') {
+          // center
+          if (order.destinationLat > northLat || order.destinationLat < southLat) {
+            // if its not north
+            
+            return false;
+          }
+        } else if (areaTo === '3') {
+          // south
+          
+          if (order.destinationLat > southLat) {
+            // if its not north
+            
+            return false;
+          }
+        }
+      }
+      
+      if (startingDateTime !== undefined) {
+        // has starting date
+        const startingDate = new Date(startingDateTime);
+        startingDate.setHours(0, 0, 0, 0);
+        const pickupDate = new Date(order.pickupDate);
+        pickupDate.setHours(0, 0, 0, 0);
+        
+        if (pickupDate < startingDate) {
+          // pickup date before starting date
+          
+          return false;
+        }
+        
+      }
+      
+      if (endingDateTime !== undefined) {
+        // has ending date
+        const endingDate = new Date(endingDateTime);
+        endingDate.setHours(0, 0, 0, 0);
+        const pickupDate = new Date(order.pickupDate);
+        pickupDate.setHours(0, 0, 0, 0);
+        
+        if (pickupDate > endingDate) {
+          // pickup date after ending date
+          
+          return false;
+        }
+      }
+      
+      return true;
+      
+    });
+  }
+  
   ngOnInit() {
   }
 
@@ -35,6 +158,7 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
             this.updateItemsArray(order);
+            this.filterOrders();
           });
         });
     } else {

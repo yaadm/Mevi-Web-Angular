@@ -19,17 +19,17 @@ export class HomeComponent implements OnInit {
   constructor(private translate: TranslateService, public database: DatabaseService) {
     this.setupTranslation(translate);
     this.sliders.push({
-          imagePath: 'assets/images/slider1.jpg',
-          label: 'First slide label',
-          text: 'Nulla vitae elit libero, a pharetra augue mollis interdum.'
+          imagePath: 'assets/images/slider3.jpg',
+          label: 'קבל הצעות מחיר להובלות שלך',
+          text: 'כאן תוכל לקבל הצעות מחיר ולהבטיח מחיר הוגן.'
       }, {
           imagePath: 'assets/images/slider2.jpg',
-          label: 'Second slide label',
-          text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+          label: 'מצא עבודה למשאיות שלך',
+          text: 'מצא להם עבודה והתחל להרוויח כסף !'
       }, {
-          imagePath: 'assets/images/slider3.jpg',
-          label: 'Third slide label',
-          text: 'Praesent commodo cursus magna, vel scelerisque nisl consectetur.'
+          imagePath: 'assets/images/slider1.jpg',
+          label: 'עכשיו גם לאנדרואיד',
+          text: 'באפליקציה תוכלו לקבל הודעות בזמן אמת ולהשאר עם יד על הדופק'
       });
   }
 

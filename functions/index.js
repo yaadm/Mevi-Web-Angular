@@ -20,6 +20,15 @@ const gmailPassword = encodeURIComponent(functions.config().gmail.password);
 const mailTransport = nodemailer.createTransport(`smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
 const GoogleDistanceApi = require('google-distance-api');
 
+const tempUnknownAccessTokenSaving = "d8a0e2a5-0fff-4aee-8e63-7c69f9ce09c1";
+const tempUnknownAccessTokenPayment = "bdbca16d-4090-4e20-9c81-d7fe3f3c826c";
+
+
+const urlForSavingReq = "https://icredit.rivhit.co.il/API/PaymentPageRequest.svc/GetUrl"; // DUBUG: https://testicredit.rivhit.co.il/API/PaymentPageRequest.svc/GetUrl
+const urlForPaymentReq = "https://icredit.rivhit.co.il/API/PaymentPageRequest.svc/SaleChargeToken"; // DEBUG: https://testicredit.rivhit.co.il/API/PaymentPageRequest.svc/SaleChargeToken
+const accessTokenTerminalSaving = "d8a0e2a5-0fff-4aee-8e63-7c69f9ce09c1"; // DebugKey: 872f1891-d4f8-4a44-b566-dfb26e99401e
+const accessTokenTerminalPayment  = "bdbca16d-4090-4e20-9c81-d7fe3f3c826c"; // DebugKey: 872f1891-d4f8-4a44-b566-dfb26e99401e
+
 exports.onCreateUser = functions.auth.user().onCreate(event => {
 	
 	const user = event.data; // The Firebase user.
@@ -343,7 +352,7 @@ function sendNotificationsToUserById(userId, action, data) {
 		            // Cleanup the tokens who are not registered anymore.
 		            if (error.code === 'messaging/invalid-registration-token' ||
 		                error.code === 'messaging/registration-token-not-registered') {
-		            	tokensToRemove.push(user.child('notificationTokens').remove());
+		            	tokensToRemove.push(user.ref.child('notificationTokens').remove());
 		            }
 		          } else {
 		        	  console.log('Notification sent to user:' + userId);
@@ -955,22 +964,23 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 	try{
 		
 		var options = {
-				uri : 'https://testicredit.rivhit.co.il/API/PaymentPageRequest.svc/GetUrl',
+				uri : urlForSavingReq,
 				method : 'POST',
 				json : {
-					  "GroupPrivateToken": "872f1891-d4f8-4a44-b566-dfb26e99401e",
+					  "GroupPrivateToken": accessTokenTerminalSaving,
 					  "Items": [
 					    {
 					      "CatalogNumber": "1",
 					      "UnitPrice": 1,
 					      "Quantity": 1,
-					      "Description": "1"
+					      "Description": "Mevi - הרשמה לאתר ללא עלות - החשבון שלך לא חוייב !"
 					    }
 					  ],
 					  "RedirectURL": "https://mevi.co.il/payment-success",
 					  "IPNURL": "https://mevi.co.il/onUserPaymentMethodCompleted?uid=" + uid,
 					  "HideItemList": true,
 					  "Currency": 1,
+					  "SendMail": false,
 					  "Country": "false",
 					  "SaleType":3 // it means it will not charge the account !
 				}
@@ -988,7 +998,7 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 				if(!redirectUrl){
 					console.log("failed to receive redirect url for payment (null)");
 					
-					return res.redirect('/UserHomePage');
+					return res.redirect;
 					
 				} else {
 					
@@ -1213,10 +1223,10 @@ function paymentCron(){
 							// TODO: if we fail to charge, send email to app managers, with the info of the user and mark them as failedToCharge = true;
 							
 							var options = {
-									uri : 'https://testicredit.rivhit.co.il/API/PaymentPageRequest.svc/SaleChargeToken',
+									uri : urlForPaymentReq,
 									method : 'POST',
 									json : {
-										  "GroupPrivateToken": "872f1891-d4f8-4a44-b566-dfb26e99401e",
+										  "GroupPrivateToken": accessTokenTerminalPayment,
 										  "CreditcardToken": paymentAccessToken, 
 										  "Items": [
 										    {
@@ -1230,7 +1240,7 @@ function paymentCron(){
 										  /*"IPNURL": "  https://your ipn url for callback.php",
 										  "RedirectURL": "  https://google.com",*/
 										  "EmailAddress": emailAddress,
-										  "CustomerLastName": "",
+										  "CustomerLastName": name,
 										  "CustomerFirstName": name,
 										  "PhoneNumber": phone,
 										  "Currency": 1,
@@ -1240,38 +1250,92 @@ function paymentCron(){
 									}
 								};
 							
+							console.log("payment request params: " + JSON.stringify(options));
+							
 							try{
 								
 								//console.log("sending payment request...");
 								
 								request(options, function(error, response, body) {
 									
+									try {
+										console.log("error" + JSON.stringify(error));
+									} catch (e) {
+										
+									}
+									
+									try {
+										console.log("body" + JSON.stringify(body));
+									} catch (e) {
+										
+									}
+									
+									try {
+										console.log("response" + JSON.stringify(response));
+									} catch (e) {
+										
+									}
+									
 									var payload = undefined;
 									
-									if (!error && response.statusCode == 200) {
+									if (!error && response && response.statusCode == 200) {
 										
-										/**
-										 * user Charged successfully ! 
-										 */
+										let status = -1;
 										
-										payload = {
-											'pendingPayment' : false,
-											'paymentDate' : admin.database.ServerValue.TIMESTAMP,
-											'paymentAmountInNIS' : paymentAmount
+										status = body.Status;
+										
+										console.log("Status received: " + status);
+										
+										if(status === 0) {
+											
+											/**
+											 * user Charged successfully ! 
+											 */
+											
+											const saleToken = body.SaleToken;
+											const receiptLink = body.ReceiptLink;
+											
+											payload = {
+												'pendingPayment' : false,
+												'paymentDate' : admin.database.ServerValue.TIMESTAMP,
+												'saleToken' : saleToken,
+												'ReceiptLink' : receiptLink,
+												'paymentAmountInNIS' : paymentAmount
+											}
+											
+											console.log("Success: account [" + uid + "] was charged [" + paymentAmount + " NIS] for order [" + key + "]");
+											
+										} else {
+											
+											let clientMessage = body.ClientMessage;
+											let debugMessage = body.DebugMessage;
+											
+											if(clientMessage == undefined || clientMessage == null){
+												clientMessage = "none";
+											}
+											
+											if(debugMessage == undefined || debugMessage == null){
+												debugMessage = "none";
+											}
+
+											console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - ICredit Status: " + status + " ,DebugMessage: " + debugMessage);
+											
+											payload = {
+													'pendingPayment' : true,
+													'failedToCharge' : true,
+													'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
+													'failedToChargeReason' : error, //TODO: change to actual errors from external API
+													"ClientMessage": clientMessage,
+												    "DebugMessage": debugMessage,
+											}
 										}
 										
-										console.log("Success: account [" + uid + "] was charged [" + paymentAmount + " NIS] for order [" + key + "]");
 										
 									} else {
 										
 										//TODO: change manager = false if the user's payment has failed !
 										
-										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - Status Code: " + response.statusCode);
-										try {
-											console.log(JSON.stringify(body));
-										} catch (e) {
-											
-										}
+										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - Error: " + error);
 										
 										payload = {
 												'pendingPayment' : true,
