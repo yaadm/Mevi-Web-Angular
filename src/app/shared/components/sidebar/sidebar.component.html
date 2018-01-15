@@ -36,7 +36,7 @@
             <span>&nbsp;<small>ומצא עבודה למשאיות שלך</small></span>
         </a>
         
-        <a [routerLink]="['/open-orders-page']" [routerLinkActive]="['router-link-active']" *ngIf="currentUser && currentUser.child('manager').val() === true" class="list-group-item">
+        <a [routerLink]="['/open-orders-page', '0', '0', '0', '0']" [routerLinkActive]="['router-link-active']" *ngIf="currentUser && currentUser.child('manager').val() === true" class="list-group-item">
         	<span><i class="fa fa-cc-visa"></i>&nbsp; הזמנות פותחות</span>
             <br> 
             <span><i class="fa fa-fw"></i>&nbsp;<small>הגש הצעות מחיר</small></span>

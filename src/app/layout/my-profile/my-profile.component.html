@@ -34,7 +34,7 @@
 				</div>		
 			</div>
 			<div class="col-lg-4">
-				<div class="jumbotron">
+				<div class="jumbotron" *ngIf="database.getCurrentUser().child('manager').val()">
 					<h4>הגדרות משתמש</h4>
 					<div class="checkbox form-control">
                         <label>

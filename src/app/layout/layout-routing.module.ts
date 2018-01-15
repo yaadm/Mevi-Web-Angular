@@ -12,6 +12,7 @@ const routes: Routes = [
             { path: 'my-new-orders-page', loadChildren: './my-new-orders/my-new-orders.module#MyNewOrdersModule' },
             { path: 'my-pending-orders-page', loadChildren: './my-pending-orders/my-pending-orders.module#MyPendingOrdersModule' },
             { path: 'my-completed-orders-page', loadChildren: './my-completed-orders/my-completed-orders.module#MyCompletedOrdersModule' },
+            { path: 'open-orders-page/:from/:to/:start/:end', loadChildren: './open-orders/open-orders.module#OpenOrdersModule' },
             { path: 'open-orders-page', loadChildren: './open-orders/open-orders.module#OpenOrdersModule' },
             { path: 'my-pending-deliveries-page', loadChildren: './my-pending-deliveries/my-pending-deliveries.module#MyPendingDeliveriesModule' },
             { path: 'my-completed-deliveries-page', loadChildren: './my-completed-deliveries/my-completed-deliveries.module#MyCompletedDeliveriesModule' },

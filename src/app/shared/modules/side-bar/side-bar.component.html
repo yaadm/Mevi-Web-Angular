@@ -1,6 +1,25 @@
 <div *ngIf="database.getCurrentUser() != undefined">
+
+	<div class="breadcrumb" *ngIf="database.getCurrentUser().child('manager').val() == true">
+		<h6>
+			אני פנוי עכשיו
+			<br>
+			<small>
+				מצא הזמנות להיום לפי המיקום שלי
+			</small>
+		</h6>
+		<br>
+		<button type="submit" class="btn btn-success" (click)="openByLocation()"><i class="fa fa-map-marker fw"></i>&nbsp; אני פנוי עכשיו</button>
+	</div>
+
 	<div class="breadcrumb">
-		<h6>רוצה לפרסם מודעה חדשה ?</h6>
+		<h6>
+			צריך להעביר סחורה ?
+			<br>
+			<small>
+				פרסם מודעה וקבל הצעות מחיר ממובילים
+			</small>
+		</h6>
 		<br>
 		<button type="submit" class="btn btn-primary" [routerLink]="['/create-order-page']"><i class="fa fa-edit fw"></i>&nbsp; פרסם מודעה</button>
 	</div>

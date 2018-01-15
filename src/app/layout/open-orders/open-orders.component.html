@@ -4,13 +4,13 @@
 		<h6>חיפוש הזמנות</h6>
 		<div class="jumbotron" style="padding: 15px;">
 			<div class="row">
-	        	<div class="col-lg-11">
+	        	<div class="col-lg-10">
 	        		<div class="row">
 			        	<div class="col-lg-3">
 			        		<span style="font-weight: 500">מאיזור</span>
 			        		<br>
 							<select class="form-control" #selectionAreaFrom>
-				                   <option [value]=0>הכל</option>
+				                   <option [value]=0 selected="selected">הכל</option>
 				                   <option [value]=1>צפון</option>
 				                   <option [value]=2>מרכז</option>
 				                   <option [value]=3>דרום</option>
@@ -20,7 +20,7 @@
 			        		<span style="font-weight: 500">לאיזור</span>
 			        		<br>
 							<select class="form-control" #selectionAreaTo>
-				                   <option [value]=0>הכל</option>
+				                   <option [value]=0 selected="selected">הכל</option>
 				                   <option [value]=1>צפון</option>
 				                   <option [value]=2>מרכז</option>
 				                   <option [value]=3>דרום</option>
@@ -38,9 +38,10 @@
 			        	</div>
 		        	</div>
 	        	</div>
-	        	<div class="col-lg-1">
+	        	<div class="col-lg-2">
 	        		<br>
                 	<button class="btn btn-secondary" type="button" (click)="onSearch()"><i class="fa fa-search"></i></button>
+                	<button class="btn btn-secondary" type="button" [routerLink]="['/open-orders-page', '0', '0', '0', '0']">אפס</button>
 	        	</div>
         	</div>
 		</div>

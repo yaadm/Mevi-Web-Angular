@@ -271,7 +271,9 @@ exports.onNewContactUsMessage = functions.database.ref('/email-inbox/{messageId}
 	
 	if(!event.data.exists()){
 		// was removed
-		return;
+		
+		console.log('Contact us email - was removed from database.');
+		return true;
 	}
 	
 	return sendEmailToUs(event.data);
@@ -617,8 +619,6 @@ function sendPushToUsers(users, action, data) {
 
 function sendEmailToUs(emailDataRef) {
 
-	console.log('sendEmailToUs()');
-	
 	var name = emailDataRef.child('name').val();
 	var uid = emailDataRef.child('uid').val();
 	var email = emailDataRef.child('email').val();
@@ -677,22 +677,26 @@ function sendEmailToUs(emailDataRef) {
 					"</tr>" +
 				"</table>";
 	
-	console.log('before generating email');
-	
 	var generatedHTML = generateEmail(header, body, '', '', uid);
-	
-	console.log('after generating email');
-	
-	console.log('Generated Email:\n' + generatedHTML);
 	
 	mailOptions.html = generatedHTML;
     
     return mailTransport.sendMail(mailOptions).then(() => {
       console.log('Contact us email - sent !');
       
-      return admin.database().ref('/email-inbox/').child(emailDataRef.key).remove();
-    }).catch(error => {
-      console.error('Contact us email - failed to send !', error);  
+      admin.database().ref('/email-inbox/').child(emailDataRef.key).remove();
+      
+      return true;
+      
+    }, error => {
+    	
+        console.log('Contact us email - failed: ' , error);
+        return true;
+        
+      }).catch(error => {
+    	  
+    	  console.error('Contact us email - failed to send !', error);  
+	      return true;
     });
 }
 

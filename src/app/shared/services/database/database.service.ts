@@ -25,6 +25,24 @@ export interface AuthListener {
   onUserChanged(user: DataSnapshot)
 }
 
+export class Constants {
+  public static get NORTH(): number { return 1 };
+  public static get CENTER(): number { return 2 };
+  public static get SOUTH(): number { return 3 };
+  public static get NORTH_LAT(): number { return 32.41; };
+  public static get SOUTH_LAT(): number { return 31.86; };
+  public static getLocation(locationLat): number {
+    
+    if (locationLat >= this.NORTH_LAT) {
+      return this.NORTH_LAT;
+    } else if (locationLat >= this.SOUTH) {
+      return this.CENTER;
+    } else {
+      return this.SOUTH;
+    }
+  }
+}
+
 @Injectable()
 export class DatabaseService {
 
@@ -34,7 +52,7 @@ export class DatabaseService {
   private authListeners: AuthListener[] = [];
   myNewOrdersSubscription: any;
   private allSubscriptions: Subscription[] = [];
-
+  
   constructor(public afAuth: AngularFireAuth, public afDb: AngularFireDatabase, public router: Router) {
 
     this.startListeningForUser();
