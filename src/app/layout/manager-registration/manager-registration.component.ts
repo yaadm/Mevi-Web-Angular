@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DatabaseService } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 
 @Component({
   selector: 'app-manager-registration',

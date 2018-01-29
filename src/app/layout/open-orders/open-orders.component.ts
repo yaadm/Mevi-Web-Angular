@@ -17,7 +17,7 @@ import { DataSnapshot } from 'firebase/database';
   animations: [routerTransition()]
 })
 export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
-  items:  Observable<AngularFireAction<DataSnapshot>[]>;
+  items:  Observable<{}[]>;
   itemsArray = [];
   filteredItemsArray = [];
   searchTerm = undefined;

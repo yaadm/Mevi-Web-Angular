@@ -26,6 +26,7 @@ export interface AuthListener {
 }
 
 export class Constants {
+  
   public static get NORTH(): number { return 1 };
   public static get CENTER(): number { return 2 };
   public static get SOUTH(): number { return 3 };
@@ -148,7 +149,7 @@ export class DatabaseService {
     return this.afDb.object('/all-orders/' + orderId).snapshotChanges();
   }
 
-  subscribeToMyOrders(): Observable<AngularFireAction<DataSnapshot>[]>  {
+  subscribeToMyOrders(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).valueChanges();
   }
@@ -163,12 +164,12 @@ export class DatabaseService {
     return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).query.once('value');
   }
   
-  subscribeToOpenedOrders(): Observable<AngularFireAction<DataSnapshot>[]>  {
+  subscribeToOpenedOrders(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('orderStatus').equalTo(0)).valueChanges();
   }
 
-  subscribeToMyDeliveries(): Observable<AngularFireAction<DataSnapshot>[]>  {
+  subscribeToMyDeliveries(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).valueChanges();
   }
@@ -177,12 +178,12 @@ export class DatabaseService {
     this.allOrdersSubscription.push(subscription);
   }
 
-  subscribeToManagersRequests(): Observable<AngularFireAction<DataSnapshot>[]>  {
+  subscribeToManagersRequests(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/users', ref => ref.orderByChild('requestingManager').equalTo(true)).valueChanges();
   }
 
-  subscribeToAllUsers(): Observable<AngularFireAction<DataSnapshot>[]>  {
+  subscribeToAllUsers(): Observable<{}[]>  {
     return this.afDb.list('/users').valueChanges();
   }
 
@@ -190,7 +191,7 @@ export class DatabaseService {
     return this.afDb.object('/users/' + userId).snapshotChanges();
   }
 
-  subscribeToIsCompanyIdExists(companyId: string): Observable<AngularFireAction<DataSnapshot>[]> {
+  subscribeToIsCompanyIdExists(companyId: string): Observable<{}[]> {
     return this.afDb.list('/users/', ref => ref.orderByChild('companyId').equalTo(companyId)).valueChanges();
   }
 

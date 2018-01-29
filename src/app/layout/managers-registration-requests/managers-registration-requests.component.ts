@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 
 @Component({
   selector: 'app-managers-registration-requests-page',
@@ -16,7 +16,7 @@ import { DialogService } from 'ng2-bootstrap-modal';
   animations: [routerTransition()]
 })
 export class ManagersRegistrationRequestsComponent implements OnInit, OnDestroy, AuthListener {
-  items:  Observable<AngularFireAction<DataSnapshot>[]>;
+  items:  Observable<{}[]>;
   itemsArray = [];
   constructor(private translate: TranslateService, public database: DatabaseService,
       private dialogService: DialogService) {

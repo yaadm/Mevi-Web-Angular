@@ -7,3 +7,12 @@ input[type=checkbox] + i {
 input[type=checkbox]:checked + i {
   color: #5cb85c;
 } 
+/deep/ .mat-steppers-alternative .mat-steppers-horizontal .mat-stepper-indicator:last-child:after {
+	right: auto !important;
+	left: 50% !important;
+}
+
+/deep/ .mat-steppers-alternative .mat-steppers-horizontal .mat-stepper-indicator:first-child:after {
+	right: 50% !important;
+	left: auto !important;
+}

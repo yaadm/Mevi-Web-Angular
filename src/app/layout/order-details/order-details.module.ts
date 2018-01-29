@@ -9,7 +9,7 @@ import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 import { AgmCoreModule } from '@agm/core';
 
 

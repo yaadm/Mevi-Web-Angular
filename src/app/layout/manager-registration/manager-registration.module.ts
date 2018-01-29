@@ -8,7 +8,7 @@ import { ManagerRegistrationComponent } from './manager-registration.component';
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 
 import { PageHeaderModule, FooterPageModule, SharedModalModuleModule } from '../../shared';
 import { FormsModule } from '@angular/forms';

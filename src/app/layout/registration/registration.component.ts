@@ -6,7 +6,7 @@ import { DatabaseService } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 import * as firebase from 'firebase';
 
 @Component({

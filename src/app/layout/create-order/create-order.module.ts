@@ -9,9 +9,11 @@ import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 
 import { SuggestionCardModule } from '../../shared';
+
+import { NgxStepperModule } from 'ngx-stepper';
 
 import { AgmCoreModule } from '@agm/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -35,6 +37,7 @@ export function HttpLoaderFactory(http: Http) {
     BootstrapModalModule,
     SharedModalModuleModule,
     PageHeaderModule,
+    NgxStepperModule,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,

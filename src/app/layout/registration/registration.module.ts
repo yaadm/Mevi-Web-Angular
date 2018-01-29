@@ -10,7 +10,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { PageHeaderModule, FooterPageModule, SharedModalModuleModule } from '../../shared';
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 import { FormsModule } from '@angular/forms';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogComponent, DialogService } from 'ngx-bootstrap-modal';
 
 export interface InputModel {
   title: string;

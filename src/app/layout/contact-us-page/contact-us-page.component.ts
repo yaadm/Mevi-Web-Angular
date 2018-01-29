@@ -2,7 +2,7 @@ import { routerTransition } from '../../router.animations';
 import { DatabaseService } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 
 @Component({
     selector: 'app-contact-us-page',

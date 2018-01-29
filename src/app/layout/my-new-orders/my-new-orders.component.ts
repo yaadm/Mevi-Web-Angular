@@ -14,7 +14,7 @@ import { DataSnapshot } from 'firebase/database';
   animations: [routerTransition()]
 })
 export class MyNewOrdersComponent implements OnInit, OnDestroy, AuthListener {
-  items:  Observable<AngularFireAction<DataSnapshot>[]>;
+  items:  Observable<{}[]>;
   itemsArray = [];
   constructor(private translate: TranslateService, public database: DatabaseService) {
     this.setupTranslation(translate);

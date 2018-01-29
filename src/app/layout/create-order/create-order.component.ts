@@ -2,14 +2,19 @@ import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, NgZone } f
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug, ModalConfirmComponent } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
+import { Constants } from '../../shared/services/database/database.service';
 import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { AgmCoreModule, MapsAPILoader } from '@agm/core';
+import { AgmCoreModule, MapsAPILoader, AgmMap } from '@agm/core';
+import { DatePipe } from '@angular/common';
 import {} from '@types/googlemaps';
 import { NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 import * as firebase from 'firebase';
 import { Router } from '@angular/router';
+import { StepperOptions, NgxStepperComponent } from 'ngx-stepper';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material';
 
 @Component({
   selector: 'app-create-order-page',
@@ -110,14 +115,149 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild('inputAdditionalInfo')
   public inputAdditionalInfoRef: ElementRef;
   
+  @ViewChild('stepperDemo')
+  public steppers: NgxStepperComponent;
+  
+  public options: StepperOptions = {
+    enableSvgIcon: true
+  };
+  
+  public mToMapVisibility = false;
+  public mFromMapVisibility = false;
+  
   constructor(private translate: TranslateService, private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone, private database: DatabaseService, private dialogService: DialogService,
-    private router: Router) {
+    private router: Router, private _iconRegistry: MatIconRegistry, private _sanitizer: DomSanitizer) {
     this.setupTranslation(translate);
   }
 
+  public selectCampaign(): void {
+    this.steppers.showFeedback('Checking, please wait ...');
+    this.steppers.next();
+    if (this.steppers.currentStep === 1) {
+      this.initToMap();
+    }
+  }
+  
+  public finishStepOne() {
+    
+    if (!this.fromSearchElementRef.nativeElement.value) {
+      this.showInfoMessage('חובה להזין כתובת מיקום העמסה');
+      return;
+    } else if (this.fromLatitude === undefined || this.fromLongitude === undefined) {
+      this.showInfoMessage('חובה להזין מיקום העמסה');
+      return;
+    } else if (!this.pickupDateRef.nativeElement.value) {
+      this.showInfoMessage('חובה להזין תאריך העמסה');
+      return;
+    } else if (!this.pickupTimeRef.nativeElement.value) {
+      this.showInfoMessage('חובה להזין שעת העמסה');
+      return;
+    }
+    
+    this.steppers.next();
+    this.initToMap();
+  }
+  
+  public finishStepTwo() {
+    
+    if (!this.toSearchElementRef.nativeElement.value) {
+      this.showInfoMessage('חובה להזין כתובת מיקום פריקה');
+      return;
+    } else if (!this.selectionUnloadingTypeRef.nativeElement.value) {
+      this.showInfoMessage('חובה לבחור סוג פריקה');
+      return;
+    }
+    
+    this.steppers.next();
+  }
+  
+  public finishStepThree() {
+    
+    if (!this.selectionInsuranceRef.nativeElement.value) {
+      this.showInfoMessage('חובה לבחור סוג ביטוח');
+      return;
+    } else if (!this.selectionOrderTypeRef.nativeElement.value || this.selectionOrderTypeRef.nativeElement.value <= 0) {
+      this.showInfoMessage('חובה לבחור סוג הזמנה');
+      return;
+    } else if (this.parseInt(this.selectionOrderTypeRef.nativeElement.value) === 1) {
+      // Products
+      
+      if (this.productsList.length <= 0) {
+        this.showInfoMessage('חובה להזין לפחות מוצר אחד');
+        return;
+      }
+      
+    } else if (this.parseInt(this.selectionOrderTypeRef.nativeElement.value) === 2) {
+      // Trucks
+      
+      if (!this.inputTrucksCountRef.nativeElement.value || this.inputTrucksCountRef.nativeElement.value <= 0) {
+        this.showInfoMessage('חובה להזין כמות משאיות חיובית');
+        return;
+      }
+      
+    }
+    
+    this.steppers.next();
+    
+  }
+  
+  public toggleFromMapVisibility() {
+    this.mFromMapVisibility = !this.mFromMapVisibility;
+  }
+  
+  public toggleToMapVisibility() {
+    this.mToMapVisibility = !this.mToMapVisibility;
+  }
+  
+  initToMap () {
+    this.mapsAPILoader.load().then(() => {
+      // Fetch GeoCoder for reverse geocoding
+      this.geoCoder = new google.maps.Geocoder;
+
+      const event = {
+        coords: {
+          lat: 32.085300,
+          lng: 34.781768
+        }
+      }
+      this.toMarkerDragEnd(event);
+
+      // set current position
+      this.setCurrentPosition();
+
+      const autocompleteTo = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement, {
+        types: ['address']
+      });
+      autocompleteTo.addListener('place_changed', () => {
+        this.ngZone.run(() => {
+          // get the place result
+          const place: google.maps.places.PlaceResult = autocompleteTo.getPlace();
+
+          // verify result
+          if (place.geometry === undefined || place.geometry === null) {
+            return;
+          }
+
+          // set latitude, longitude and zoom
+          this.toLatitude = place.geometry.location.lat();
+          this.toLongitude = place.geometry.location.lng();
+          this.toZoom = 12;
+        });
+      });
+    });
+  }
+  
   ngOnInit() {
 
+    const nowDate = new DatePipe(this.translate.currentLang).transform(new Date(), 'yyyy-MM-dd');
+    this.pickupDateRef.nativeElement.value = nowDate.toString();
+    const nowTime = new DatePipe(this.translate.currentLang).transform(new Date(), 'hh:mm');
+    this.pickupTimeRef.nativeElement.value = nowTime.toString();
+    
+    this._iconRegistry.addSvgIcon('step-done', this._sanitizer.bypassSecurityTrustResourceUrl('./assets/svgs/check.svg'));
+
+    
     // set google maps defaults
     // create search FormControl
     this.searchControl = new FormControl();
@@ -135,7 +275,6 @@ export class CreateOrderComponent implements OnInit {
         }
       }
       this.fromMarkerDragEnd(event);
-      this.toMarkerDragEnd(event);
 
       // set current position
       this.setCurrentPosition();
@@ -157,26 +296,6 @@ export class CreateOrderComponent implements OnInit {
           this.fromLatitude = place.geometry.location.lat();
           this.fromLongitude = place.geometry.location.lng();
           this.fromZoom = 12;
-        });
-      });
-      
-      const autocompleteTo = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement, {
-        types: ['address']
-      });
-      autocompleteTo.addListener('place_changed', () => {
-        this.ngZone.run(() => {
-          // get the place result
-          const place: google.maps.places.PlaceResult = autocompleteTo.getPlace();
-
-          // verify result
-          if (place.geometry === undefined || place.geometry === null) {
-            return;
-          }
-
-          // set latitude, longitude and zoom
-          this.toLatitude = place.geometry.location.lat();
-          this.toLongitude = place.geometry.location.lng();
-          this.toZoom = 12;
         });
       });
     });

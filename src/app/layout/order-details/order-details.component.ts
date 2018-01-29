@@ -13,7 +13,7 @@ import { MapsAPILoader } from '@agm/core';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
 import * as firebase from 'firebase';
-import { DialogService } from 'ng2-bootstrap-modal';
+import { DialogService } from 'ngx-bootstrap-modal';
 import { HttpClient } from '@angular/common/http';
 
 @Pipe({name: 'resolveInsurance'})

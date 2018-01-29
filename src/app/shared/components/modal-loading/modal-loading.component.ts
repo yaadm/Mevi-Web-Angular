@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { DialogComponent, DialogService } from 'ng2-bootstrap-modal';
+import { DialogComponent, DialogService } from 'ngx-bootstrap-modal';
 
 @Component({
     selector: 'app-modal-loading',

@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { ContactUsPageRoutingModule } from './contact-us-page-routing.module';
 import { ContactUsPageComponent } from './contact-us-page.component';
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 
 import { FormsModule } from '@angular/forms';
 

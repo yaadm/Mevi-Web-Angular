@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class HomeComponent implements OnInit {
 
-  public doughnutChartLabels: string[] = ['הזמנות פתוחות', 'עסקאות ממתינות', 'עסקאות שהולשמו'];
+  public doughnutChartLabels: string[] = ['הזמנות פתוחות', 'עסקאות ממתינות', 'עסקאות שהושלמו'];
   public doughnutChartData: number[] = [];
   statistics: any;
   public sliders: Array<any> = [];
