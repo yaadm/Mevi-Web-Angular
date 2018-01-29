@@ -191,7 +191,7 @@ export class MyCalendarComponent implements OnInit, OnDestroy, AuthListener {
     
     if (event.meta === searchInDate) {
       
-      this.router.navigate(['/open-orders-page']);
+      this.router.navigate(['/open-orders-page', 0, 0, event.start.getTime(), event.end.getTime()]);
     } else {
       
       this.router.navigate(['/order-details', event.meta]);

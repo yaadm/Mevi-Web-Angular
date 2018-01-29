@@ -109,7 +109,7 @@ export class CreateOrderComponent implements OnInit {
   
   @ViewChild('inputAdditionalInfo')
   public inputAdditionalInfoRef: ElementRef;
-
+  
   constructor(private translate: TranslateService, private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone, private database: DatabaseService, private dialogService: DialogService,
     private router: Router) {

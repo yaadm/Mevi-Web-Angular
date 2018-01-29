@@ -174,7 +174,7 @@ exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId
 	// Exit when the data is deleted.
 	if (!event.data.exists()) {
 		console.log('data deleted');
-		return;
+		return true;
 	} else if (event.data.previous.exists()) {
 		console.log('data edited');
 	} else {
@@ -200,11 +200,16 @@ exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId
 
 exports.onBidSelected = functions.database.ref('/all-orders/{orderId}/selectedBid').onWrite(event => {
 	
+	if (!event.data.exists()) {
+		console.log('data deleted.');
+		return true;
+	}
+	
 	const bidderId = event.data.val();
 	
 	if(!bidderId){
-		//data not exists
-		return;
+		console.log('data deleted.');
+		return true;
 	}
 	
 	var promises = [];
@@ -246,6 +251,12 @@ const MANAGER_STATUS_APPROVED = "1";
 const MANAGER_STATUS_DENIED = "2";
 
 exports.onManagerStateChanged = functions.database.ref('/users/{userId}/manager').onWrite(event => {
+	
+	if(!event.data.previous.exists()) {
+		
+		// user was created
+		return;
+	}
 	
 	const isManager = event.data.val();
 	const userId = event.params.userId;
@@ -483,7 +494,7 @@ function sendEmailToUsers(users, action, data) {
 			
 			var subject = 'קיבלת הצעת מחיר חדשה !';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>קיבלת הצעת מחיר חדשה<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>קיבלת הצעת מחיר חדשה<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 		    mailOptions.html = body;
 		    
@@ -491,7 +502,7 @@ function sendEmailToUsers(users, action, data) {
 			
 			var subject = 'זכית בהצעת מחיר !';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>זכית בהצעת המחיר !<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>זכית בהצעת המחיר !<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 		    mailOptions.html = body;
 		    
@@ -523,7 +534,7 @@ function sendEmailToUsers(users, action, data) {
 			
 			var subject = 'פורסמה בקשת הובלה חדשה';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>פורסמה בקשת הובלה חדשה<br><a href="https://mevi.co.il?orderId=' + data + '">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>פורסמה בקשת הובלה חדשה<br><a href="https://mevi.co.il/order-details/' + data + '">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 		    mailOptions.html = body;
 			
@@ -531,7 +542,7 @@ function sendEmailToUsers(users, action, data) {
 			
 			var subject = 'מישהו נרשם למנהל משאיות - נא לבדוק באפליקציה';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>פורסמה בקשת ניהול חדשה<br><a href="https://mevi.co.il">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>פורסמה בקשת ניהול חדשה<br><a href="https://mevi.co.il/managers-registration-requests-page">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 		    mailOptions.html = body;
 			
@@ -1168,9 +1179,19 @@ function paymentCron(){
 
 				ordersSnapshot.forEach(function(orderSnapshot) {
 					
-					var key = orderSnapshot.key;
+					if (!orderSnapshot) {
+						console.log('orderSnapshot is null !');
+						return;
+					}
 					
-					var managerUid = orderSnapshot.child('selectedBid').val();
+					const key = orderSnapshot.key;
+					
+					const managerUid = orderSnapshot.child('selectedBid').val();
+					
+					if (!managerUid) {
+						console.log('managerUid is null !');
+						return;
+					}
 					
 					// get the User's paymentAccessToken
 					promises.push(admin.database().ref('/users').child(managerUid).once('value').then(userSnapshot => {

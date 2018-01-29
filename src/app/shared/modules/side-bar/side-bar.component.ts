@@ -31,20 +31,23 @@ export class SideBarComponent implements OnInit {
                 switch (error.code) {
                     case 1:
                         console.log('Permission Denied');
-                        this.openOpenOrdersbyLocation(undefined);
                         break;
                     case 2:
                         console.log('Position Unavailable');
-                        this.openOpenOrdersbyLocation(undefined);
                         break;
                     case 3:
                         console.log('Timeout');
-                        this.openOpenOrdersbyLocation(undefined);
                         break;
                 }
+              
+                this.openOpenOrdersbyLocation(undefined);
             }
         );
-    };
+    } else {
+      
+      console.log('no geolocation');
+      this.openOpenOrdersbyLocation(undefined); 
+    }
   }
   
   openOpenOrdersbyLocation(fromArea) {

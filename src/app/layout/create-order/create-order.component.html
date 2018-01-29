@@ -1,5 +1,6 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'הזמנה חדשה'" [icon]="'fa-edit'"></app-page-header>
+
 	<div class="breadcrumb">
        	<h4>{{'Loading Details' | translate}}</h4>
        	<!-- <h6>שם בית העסק</h6>
@@ -14,7 +15,7 @@
 				autocapitalize="off" spellcheck="off" type="text"
 				class="form-control" #fromSearch [formControl]="searchControl" placeholder="{{'Search Location' | translate}}">
            </div>
-      		<small><i class='fa fa-fw'></i>פורמט: [רחוב, עיר, ארץ]</small>
+      		<small><i class='fa fa-fw'></i>פורמט: [רחוב ומספר, עיר, ארץ]</small>
 		<agm-map [latitude]="fromLatitude" [longitude]="fromLongitude" [scrollwheel]="false" [zoom]="fromZoom"> 
 			<agm-marker [latitude]="fromLatitude" [longitude]="fromLongitude" [markerDraggable]="true" (dragEnd)="fromMarkerDragEnd($event)"></agm-marker>
 		</agm-map>
@@ -44,7 +45,7 @@
 				autocapitalize="off" spellcheck="off" type="text"
 				class="form-control" #toSearch [formControl]="searchControl" placeholder="{{'Search Location' | translate}}">
            </div>
-      		<small><i class='fa fa-fw'></i>פורמט: [רחוב, עיר, ארץ]</small>
+      		<small><i class='fa fa-fw'></i>פורמט: [רחוב ומספר, עיר, ארץ]</small>
 		<agm-map [latitude]="toLatitude" [longitude]="toLongitude" [scrollwheel]="false" [zoom]="toZoom"> 
 			<agm-marker [latitude]="toLatitude" [longitude]="toLongitude" [markerDraggable]="true" (dragEnd)="toMarkerDragEnd($event)"></agm-marker>
 		</agm-map>

@@ -12,6 +12,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { BootstrapModalModule } from 'ng2-bootstrap-modal';
 import { AgmCoreModule } from '@agm/core';
 
+
 import { SuggestionCardModule, ProductCardModule, TruckCardModule, FooterPageModule, SharedModalModuleModule, PageHeaderModule, firebaseConfigDebug } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
