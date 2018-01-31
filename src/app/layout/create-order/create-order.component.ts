@@ -119,7 +119,8 @@ export class CreateOrderComponent implements OnInit {
   public steppers: NgxStepperComponent;
   
   public options: StepperOptions = {
-    enableSvgIcon: true
+    enableSvgIcon: true,
+    mobileStepText: false
   };
   
   public mToMapVisibility = false;

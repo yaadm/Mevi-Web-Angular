@@ -1,6 +1,6 @@
-// ::-webkit-scrollbar { 
-//     display: none; 
-// }
+::-webkit-scrollbar { 
+    display: none; 
+}
 
 .ta-c{
 	text-align: center;
@@ -12,4 +12,7 @@
 }
 .color-secondary{
 	color: #5cb85c;
+}
+.main-content-container{
+	padding: 1rem;
 }

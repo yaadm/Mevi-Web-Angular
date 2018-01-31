@@ -1,4 +1,4 @@
-<div [@routerTransition] *ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('appManager').val() === true">
+<div [@routerTransition] *ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('appManager').val() === true" class="main-content-container">
 	<h2 class="text-muted">מערכת ניהול<br><small>ניהול משתמשים</small></h2>
 	<div>
 		<h6>חיפוש משתמשים</h6>

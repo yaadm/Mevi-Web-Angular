@@ -1,4 +1,42 @@
-<div [@routerTransition]>
+<div [@routerTransition] class="mh_container">
+
+	<div class="background-image">
+	</div>
+	 <div class="container">
+	    <div class="row">
+	        <div class="col-md-6 block" style="margin-top: 2rem; margin-bottom: 2rem;">
+	            <div class="circle-green block">
+	            	<div class="circle-white block" style="margin: 10px;" (click)="onCreateNewOrderClicked()">
+		                <p>
+		                	<span class="fa fa-truck fa-5x" style="color: #5cb85c;"></span>
+		                	<br><br>
+		                	צריך להעביר סחורה ?
+		                	<br>
+		                	<small>
+		                		קבל הצעות מחיר ממובילים
+		                	</small>
+	                	</p>
+	            	</div>
+	            </div>
+	        </div>
+	        <div class="col-md-6 block" style="margin-top: 2rem; margin-bottom: 2rem;">
+	            <div class="circle-red block">
+	            	<div class="circle-white block" style="margin: 10px;" (click)="onManagerRequestClicked()">
+		                <p>
+		                	<span class="fa fa-cc-visa fa-5x" style="color: red;"></span>
+		                	<br><br>
+		                	אני בעל משאיות
+		                	<br>
+		                	<small>
+		                		מצא עבודות למשאיות שלך
+		                	</small>
+	                	</p>
+	            	</div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
 	<!-- <div class="row">
 		<div class="col-xl-12">
 			<h3 class="page-header">
@@ -11,7 +49,7 @@
 			</ol>
 		</div>
 	</div> -->
-	<div class="row">
+	<!-- <div class="row">
         <div class="col-md-12">
             <ngb-carousel>
                 <ng-template ngbSlide *ngFor="let slider of sliders">
@@ -24,8 +62,8 @@
             </ngb-carousel>
         </div>
     </div>
-    <hr>
-	<div class="row">
+    <hr> -->
+	<!-- <div class="row main-content-container">
 		<div class="col-lg-9">
 			<div class="row">
 				<div class="col-lg-6">
@@ -78,7 +116,9 @@
 				</div>
 			</div>
 		</div>
+	</div> -->
+	<div style="margin-top: 8.5rem;">
+		<app-footer-page></app-footer-page>
 	</div>
-	<app-footer-page></app-footer-page>
 </div>
 

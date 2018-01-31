@@ -1,4 +1,4 @@
-<div [@routerTransition]>
+<div [@routerTransition] class="main-content-container">
 	<app-page-header [heading]="'פרופיל משתמש'" [icon]="'fa-user'"></app-page-header>
 	<div *ngIf="database.getCurrentUser() != undefined">
 		<div class="row">

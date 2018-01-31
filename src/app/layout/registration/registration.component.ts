@@ -65,13 +65,15 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     const companyIdExistsSubscription = this.database.subscribeToIsCompanyIdExists(this.companyIdRef.nativeElement.value).subscribe(
-        (afa: AngularFireAction<DataSnapshot>[]) => {
+        (afa: any) => {
           
           companyIdExistsSubscription.unsubscribe();
 
+          console.log('afa: ' + JSON.stringify(afa[0]));
+          
           if (afa.length > 0) {
 
-            const foundUid = afa[0].payload.child('uid').val();
+            const foundUid = afa[0].uid;
             const myUid = this.database.currentUser.child('uid').val();
 
             if (foundUid !== myUid) {
@@ -94,6 +96,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             this.hasCompletedSuccessfully = true;
             this.router.navigate(['/home-page']);
           }, reason => {
+            console.log('error: ' + reason);
             this.loading = false;
           });
       }, error => {

@@ -1,0 +1,77 @@
+.background-image{
+	
+	position: fixed;
+    left: 0;
+    right: 0;
+    left: 0;
+    z-index: -1;
+  
+	background-image: url("/assets/images/wp_truck.jpg");
+	background-position: right center;
+  	background-repeat: no-repeat;
+  	
+    height: 100vh;
+    width: 100%;
+}
+.container{
+  	height: 100%;
+  	width: auto;
+  	padding-top: 8rem;
+}
+.block {
+    text-align: center;
+    vertical-align: middle;
+}
+.circle-green {
+    background: #5cb85c;
+    border-radius: 200px;
+    color: black;
+    height: 300px;
+    font-weight: bold;
+    width: 300px;
+    display: table;
+    margin: auto;
+}
+.circle-green p {
+    vertical-align: middle;
+    display: table-cell;
+}
+.circle-white {
+	background: linear-gradient(white, graytext);
+    border-radius: 190px;
+    color: black;
+    height: 290px;
+    font-weight: bold;
+    width: 290px;
+    display: table;
+    
+    cursor: pointer;
+    
+    -webkit-box-shadow: 2px 5px 5px 0px rgba(0, 0, 0, 1);
+    -moz-box-shadow: 2px 5px 5px 0px rgba(0, 0, 0, 1);
+    box-shadow: 2px 5px 5px 0px rgba(0, 0, 0, 1);
+}
+.circle-white:ACTIVE {
+	-webkit-box-shadow: 1px 1px 3px 1px rgba(1, 1, 1, 1);
+    -moz-box-shadow: 1px 1px 3px 1px rgba(1, 1, 1, 1);
+    box-shadow: 1px 1px 3px 1px rgba(1, 1, 1, 1);
+}
+
+.circle-white p {
+    vertical-align: middle;
+    display: table-cell;
+}
+.circle-red {
+    background: red;
+    border-radius: 200px;
+    color: black;
+    height: 300px;
+    font-weight: bold;
+    width: 300px;
+    display: table;
+    margin: auto;
+}
+.circle-white p {
+    vertical-align: middle;
+    display: table-cell;
+}
