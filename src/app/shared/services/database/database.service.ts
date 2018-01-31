@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 export const firebaseConfigDebug = {
-    apiKey: 'AIzaSyBVXuyXlPNqEm0OgzZLtLositCCAfZN7QQ', // 
+    apiKey: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo', // AIzaSyBVXuyXlPNqEm0OgzZLtLositCCAfZN7QQ
     authDomain: 'gettruck-c3ad3.firebaseapp.com',
     databaseURL: 'https://gettruck-c3ad3.firebaseio.com',
     projectId: 'gettruck-c3ad3',
