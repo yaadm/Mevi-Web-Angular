@@ -43,17 +43,16 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
       // user logged in
       
       if (HomeComponent.shouldRedirectToCreateOrder) {
-        this.router.navigate(['/create-order-page']);
         HomeComponent.shouldRedirectToCreateOrder = false;
+        this.router.navigate(['/create-order-page']);
       } else if (HomeComponent.shouldRedirectToManagerRegistration) {
         
+        HomeComponent.shouldRedirectToManagerRegistration = false;
         if (user.child('manager').val() === true) {
           // user is manager
           this.router.navigate(['/open-orders-page', 0, 0, 0, 0]);
-          HomeComponent.shouldRedirectToCreateOrder = false;
         } else {
           this.router.navigate(['/manager-registration-page']);
-          HomeComponent.shouldRedirectToCreateOrder = false;
         }
       }
     }

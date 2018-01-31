@@ -43,12 +43,25 @@ export class MyProfileComponent {
       'name': this.inputCompanyNameRef.nativeElement.value,
       'companyAddress': this.inputCompanyAddressRef.nativeElement.value,
       'companyPhone': this.inputCompanyPhoneRef.nativeElement.value,
-      'subscribedToMailingList': this.checkboxEmailSubscriptionRef.nativeElement.checked
+      'subscribedToMailingList': false
+    }
+    
+    if (this.checkboxEmailSubscriptionRef !== undefined && this.checkboxEmailSubscriptionRef.nativeElement !== undefined) {
+      payload.subscribedToMailingList = this.checkboxEmailSubscriptionRef.nativeElement.checked;
     }
     
     this.database.updateMyUserData(payload).then(_ => {
       // updated
       this.dialogService.addDialog(ModalInformComponent, { title: 'הצלחה', message: 'הפרופיל עודכן בהצלחה !' });
+    }, reason => {
+      // error
+      
+      // TODO: notify to Crash system
+      
+      alert(reason);
+    }).catch(error => {
+      
+      alert(error);
     });
     
   }

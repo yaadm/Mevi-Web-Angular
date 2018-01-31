@@ -84,7 +84,7 @@
 				</div>
 				<div class="col-lg-6"
 					*ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() === true">
-					<app-suggestion-card [actionRout]="['/open-orders-page']"
+					<app-suggestion-card [actionRout]="['/open-orders-page', 0, 0, 0, 0]"
 						[bgClass]="'card-danger'" [icon]="'fa-cc-visa'"
 						[header]="'Find jobs for your trucks' | translate"
 						[text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"

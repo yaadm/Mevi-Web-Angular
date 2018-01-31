@@ -35,7 +35,7 @@
 			<button type="submit" class="btn btn-warning" [routerLink]="['/manager-registration-page']"><i class="fa fa-cc-visa fw"></i>&nbsp; הרשם כבעל משאית</button>
 		</div>
 		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
-			<button type="submit" class="btn btn-warning" [routerLink]="['/open-orders-page']"><i class="fa fa-cc-visa fw"></i>&nbsp; הגש הצעות מחיר</button>
+			<button type="submit" class="btn btn-warning" [routerLink]="['/open-orders-page', 0, 0, 0, 0]"><i class="fa fa-cc-visa fw"></i>&nbsp; הגש הצעות מחיר</button>
 		</div>
 	</div>
 	

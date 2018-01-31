@@ -54,8 +54,11 @@ export class PaymentComponent implements OnInit, OnDestroy, AfterViewInit, AuthL
       }
       
       if (user.child('uid').val() === this.userId && user.child('manager').val() === true) {
-        console.log('navigating to open-orders-page');
-        this.router.navigate(['/open-orders-page']);
+        // console.log('navigating to open-orders-page');
+        // this.router.navigate(['/open-orders-page', 0, 0, 0, 0]);
+        
+        console.log('navigating to manager-registration-page');
+        this.router.navigate(['/manager-registration-page']);
       }
     }
   }
