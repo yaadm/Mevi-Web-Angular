@@ -48,7 +48,8 @@ export function HttpLoaderFactory(http: Http) {
     AgmCoreModule.forRoot({
       apiKey: firebaseConfigDebug.apiKey,
       libraries: ['places'],
-      language: 'iw'
+      language: 'he',
+      region: 'IL'
     }),
     FormsModule,
     ReactiveFormsModule,

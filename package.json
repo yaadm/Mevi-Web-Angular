@@ -28,7 +28,10 @@
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.6",
     "@ngx-translate/core": "^9.1.1",
     "@ngx-translate/http-loader": "^0.1.0",
+    "angular-animate": "^1.4.14",
+    "angular-aria": "^1.4.14",
     "angular-calendar": "^0.22.3",
+    "angular-messages": "^1.4.14",
     "angularfire2": "^5.0.0-rc.4",
     "core-js": "^2.5.1",
     "date-fns": "^1.29.0",
@@ -39,6 +42,7 @@
     "mdl-stepper": "^1.1.6",
     "ng2-charts": "^1.6.0",
     "ngx-bootstrap-modal": "^1.1.0",
+    "ngx-google-places-autocomplete": "^1.0.5",
     "ngx-stepper": "^1.1.6",
     "rxjs": "^5.5.2",
     "zone.js": "^0.8.17"
@@ -47,7 +51,7 @@
     "@angular/cli": "^1.5.0",
     "@angular/compiler-cli": "^5.0.0",
     "@angular/language-service": "^5.0.0",
-    "@types/googlemaps": "^3.29.2",
+    "@types/googlemaps": "^3.30.5",
     "@types/jasmine": "2.5.45",
     "@types/node": "^6.0.88",
     "angular-ide": "^0.9.38",
@@ -63,6 +67,6 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.0.4",
     "tslint": "~5.7.0",
-    "typescript": "^2.5.3"
+    "typescript": "^2.4.2"
   }
 }

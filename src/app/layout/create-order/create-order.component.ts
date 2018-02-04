@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, NgZone, EventEmitter } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug, ModalConfirmComponent } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
@@ -7,7 +7,7 @@ import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AgmCoreModule, MapsAPILoader, AgmMap } from '@agm/core';
 import { DatePipe } from '@angular/common';
-import {} from '@types/googlemaps';
+import { } from '@types/googlemaps';
 import { NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DialogService } from 'ngx-bootstrap-modal';
 import * as firebase from 'firebase';
@@ -15,6 +15,8 @@ import { Router } from '@angular/router';
 import { StepperOptions, NgxStepperComponent } from 'ngx-stepper';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material';
+import { GooglePlaceDirective } from 'ngx-google-places-autocomplete';
+import { Address } from 'ngx-google-places-autocomplete/objects/address';
 
 @Component({
   selector: 'app-create-order-page',
@@ -115,19 +117,26 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild('inputAdditionalInfo')
   public inputAdditionalInfoRef: ElementRef;
   
+  @ViewChild('placesRef') 
+  public placesRef: GooglePlaceDirective;
+    
   @ViewChild('stepperDemo')
   public steppers: NgxStepperComponent;
   
-  public options: StepperOptions = {
+  public stepperOptions: StepperOptions = {
     enableSvgIcon: true,
     mobileStepText: false
   };
+  
+  public gpacOptions = {
+    componentRestrictions: { country: 'IL' }
+  }
   
   public mToMapVisibility = false;
   public mFromMapVisibility = false;
   
   constructor(private translate: TranslateService, private mapsAPILoader: MapsAPILoader,
-    private ngZone: NgZone, private database: DatabaseService, private dialogService: DialogService,
+    private ngZone: NgZone, public database: DatabaseService, private dialogService: DialogService,
     private router: Router, private _iconRegistry: MatIconRegistry, private _sanitizer: DomSanitizer) {
     this.setupTranslation(translate);
   }
@@ -164,6 +173,9 @@ export class CreateOrderComponent implements OnInit {
     
     if (!this.toSearchElementRef.nativeElement.value) {
       this.showInfoMessage('חובה להזין כתובת מיקום פריקה');
+      return;
+    } else if (!this.toLatitude || !this.toLongitude) {
+      this.showInfoMessage('חובה לבחור סוג פריקה');
       return;
     } else if (!this.selectionUnloadingTypeRef.nativeElement.value) {
       this.showInfoMessage('חובה לבחור סוג פריקה');
@@ -212,7 +224,9 @@ export class CreateOrderComponent implements OnInit {
   }
   
   initToMap () {
+    
     this.mapsAPILoader.load().then(() => {
+      
       // Fetch GeoCoder for reverse geocoding
       this.geoCoder = new google.maps.Geocoder;
 
@@ -226,43 +240,43 @@ export class CreateOrderComponent implements OnInit {
 
       // set current position
       this.setCurrentPosition();
-
-      const autocompleteTo = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement, {
-        types: ['address']
-      });
-      autocompleteTo.addListener('place_changed', () => {
+      
+      const autocomplete = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement);
+      autocomplete.addListener('place_changed', () => {
         this.ngZone.run(() => {
+          
+          const address: google.maps.places.PlaceResult = autocomplete.getPlace();
+          console.log('address:' + address.formatted_address);
           // get the place result
-          const place: google.maps.places.PlaceResult = autocompleteTo.getPlace();
 
           // verify result
-          if (place.geometry === undefined || place.geometry === null) {
+          if (address.geometry === undefined || address.geometry === null) {
             return;
           }
 
           // set latitude, longitude and zoom
-          this.toLatitude = place.geometry.location.lat();
-          this.toLongitude = place.geometry.location.lng();
+          this.toLatitude = address.geometry.location.lat();
+          this.toLongitude = address.geometry.location.lng();
           this.toZoom = 12;
         });
       });
+
     });
   }
   
   ngOnInit() {
-
-    const nowDate = new DatePipe(this.translate.currentLang).transform(new Date(), 'yyyy-MM-dd');
-    this.pickupDateRef.nativeElement.value = nowDate.toString();
-    const nowTime = new DatePipe(this.translate.currentLang).transform(new Date(), 'hh:mm');
-    this.pickupTimeRef.nativeElement.value = nowTime.toString();
     
+    const nowDate = new DatePipe('en').transform(new Date(), 'yyyy-MM-dd');
+    this.pickupDateRef.nativeElement.value = nowDate.toString();
+    const nowTime = new DatePipe('en').transform(new Date(), 'hh:mm');
+    this.pickupTimeRef.nativeElement.value = nowTime.toString();
     this._iconRegistry.addSvgIcon('step-done', this._sanitizer.bypassSecurityTrustResourceUrl('./assets/svgs/check.svg'));
-
     
     // set google maps defaults
     // create search FormControl
     this.searchControl = new FormControl();
 
+    
     // load Places AutoComplete
     this.mapsAPILoader.load().then(() => {
 
@@ -279,26 +293,30 @@ export class CreateOrderComponent implements OnInit {
 
       // set current position
       this.setCurrentPosition();
-
-      const autocompleteFrom = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement, {
-        types: ['address']
-      });
-      autocompleteFrom.addListener('place_changed', () => {
+      
+      const autocomplete = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement);
+      autocomplete.addListener('place_changed', () => {
         this.ngZone.run(() => {
+          
+          const address: google.maps.places.PlaceResult = autocomplete.getPlace();
+          console.log('address:' + address.formatted_address);
           // get the place result
-          const place: google.maps.places.PlaceResult = autocompleteFrom.getPlace();
 
           // verify result
-          if (place.geometry === undefined || place.geometry === null) {
+          if (address.geometry === undefined || address.geometry === null) {
             return;
           }
 
           // set latitude, longitude and zoom
-          this.fromLatitude = place.geometry.location.lat();
-          this.fromLongitude = place.geometry.location.lng();
+          this.fromLatitude = address.geometry.location.lat();
+          this.fromLongitude = address.geometry.location.lng();
           this.fromZoom = 12;
         });
       });
+
+    }, reason => {
+      // on failed
+      console.log('failed to load Maps API: ' + reason);
     });
   }
 
@@ -583,6 +601,42 @@ export class CreateOrderComponent implements OnInit {
     return undefined;
   }
 
+  public handleFromAddressChange(address: Address) {
+      this.ngZone.run(() => {
+          
+          console.log('address:' + address);
+          // get the place result
+
+          // verify result
+          if (address.geometry === undefined || address.geometry === null) {
+            return;
+          }
+
+          // set latitude, longitude and zoom
+          this.fromLatitude = address.geometry.location.lat;
+          this.fromLongitude = address.geometry.location.lng;
+          this.fromZoom = 12;
+        });
+  };
+  
+  public handleToAddressChange(address: Address) {
+      this.ngZone.run(() => {
+          
+          console.log('address:' + address);
+          // get the place result
+
+          // verify result
+          if (address.geometry === undefined || address.geometry === null) {
+            return;
+          }
+
+          // set latitude, longitude and zoom
+          this.toLatitude = address.geometry.location.lat;
+          this.toLongitude = address.geometry.location.lng;
+          this.toZoom = 12;
+        });
+  };
+  
   private setupTranslation(translate: TranslateService) {
     translate.addLangs(['en', 'iw']);
     translate.setDefaultLang('iw');

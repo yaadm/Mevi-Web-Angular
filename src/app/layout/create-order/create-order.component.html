@@ -1,8 +1,7 @@
 <div [@routerTransition] class="main-content-container" style="min-height: 80vh;">
     <!-- <app-page-header [heading]="'הזמנה חדשה'" [icon]="'fa-edit'"></app-page-header> -->
-
 	<div>
-		<ngx-stepper #stepperDemo="stepper" [options]="options">
+		<ngx-stepper #stepperDemo="stepper" [options]="stepperOptions">
 		  <ngx-step [label]="'פרטי העמסה'">
 		    <ngx-step-body>
 	      		<div class="breadcrumb">
@@ -14,9 +13,11 @@
 							
 							<div class="form-group input-group" style="margin-bottom: 0px">
 				                <span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
-				                <input placeholder="search for location" autocorrect="off"
+				                <!-- <input ngx-google-places-autocomplete class="form-control" placeholder="{{'Search Location' | translate}}" [options]='gpacOptions' #fromSearch (onAddressChange)="handleFromAddressChange($event)"/> -->
+				                <input placeholder="חפש מיקום" autocorrect="off"
 								 autocapitalize="off" spellcheck="off" type="text"
-								 class="form-control" #fromSearch [formControl]="searchControl" placeholder="{{'Search Location' | translate}}">
+								 #fromSearch
+								 class="form-control"  [formControl]="searchControl">
 								<button type="submit" style="margin-right: .5rem;" class="btn btn-primary" (click)="toggleFromMapVisibility()">מפה</button>
 				           	</div>
 							
@@ -38,7 +39,7 @@
 						</div>
 					</div>
 					<br><br>
-					<button type="submit" class="btn btn-success" (click)="finishStepOne()">הבא</button>
+					<button type="submit" class="btn btn-success" (click)="finishStepOne()" *ngIf="this.database.currentUser">הבא</button>
 				</div>
 		    </ngx-step-body>
 		    <ngx-step-actions>
@@ -54,7 +55,8 @@
 						<div class="col-md-8">
 							<div class="form-group input-group" style="margin-bottom: 0px">
 					               <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-					               <input placeholder="search for location" autocorrect="off"
+					               <!-- <input ngx-google-places-autocomplete class="form-control" placeholder="{{'Search Location' | translate}}" [options]='gpacOptions' #toSearch (onAddressChange)="handleToAddressChange($event)"/> -->
+					               <input placeholder="חפש מיקום" autocorrect="off"
 									autocapitalize="off" spellcheck="off" type="text"
 									class="form-control" #toSearch [formControl]="searchControl" placeholder="{{'Search Location' | translate}}">
 									<button type="submit" style="margin-right: .5rem;" class="btn btn-primary" (click)="toggleToMapVisibility()">מפה</button>
