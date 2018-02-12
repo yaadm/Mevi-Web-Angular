@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, PipeTransform, Pipe, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, PipeTransform, Pipe, ViewChild, ElementRef, isDevMode } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { TranslateService } from '@ngx-translate/core';
 import {} from '@types/googlemaps';
@@ -65,6 +65,7 @@ export class ResolveUnloadingPipe implements PipeTransform {
   animations: [routerTransition()]
 })
 export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
+  isDevMod = false;
   orderId = '';
   order: Observable<any>;
   orderSubscription: any;
@@ -111,6 +112,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
     } else {
       console.log('orderId is null !');
     }
+    this.isDevMod = isDevMode();
   }
 
   ngOnInit() {
@@ -402,7 +404,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
     const pickupLng = order.pickupLng;
     const destinationLat = order.destinationLat;
     const destinationLng = order.destinationLng;
-    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&key=' + firebaseConfigDebug.apiKey;
+    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&language=iw&key=' + firebaseConfigDebug.apiKey;
   }
 
   getMillisFromTimeInput(rawTime) {

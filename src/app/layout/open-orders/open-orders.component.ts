@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef, isDevMode } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { routerTransition } from '../../router.animations';
 import { Router, ActivatedRoute, Params } from '@angular/router';
@@ -141,7 +141,10 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   updateItemsArray (order) {
     
     const myUid = this.database.getCurrentUser().child('uid').val();
-    if (order.userId !== myUid) {
+    
+    const shouldHide = !isDevMode() && order.test === true;
+    
+    if (order.userId !== myUid && !shouldHide) {
       const index = this.itemsArray.indexOf(order, 0);
       if (index !== -1) {
         this.itemsArray[index] = order;

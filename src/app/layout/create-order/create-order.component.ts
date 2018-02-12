@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, NgZone, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, NgZone, EventEmitter, isDevMode } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, firebaseConfigDebug, ModalConfirmComponent } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
@@ -17,6 +17,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material';
 import { GooglePlaceDirective } from 'ngx-google-places-autocomplete';
 import { Address } from 'ngx-google-places-autocomplete/objects/address';
+import { delay } from 'q';
 
 @Component({
   selector: 'app-create-order-page',
@@ -26,8 +27,15 @@ import { Address } from 'ngx-google-places-autocomplete/objects/address';
 })
 export class CreateOrderComponent implements OnInit {
 
+  isDevMode: boolean;
+  defaultGeocoderEvent = {
+    coords: {
+      lat: 32.085300,
+      lng: 34.781768
+    }
+  }  
+
   loading = false;
-  
   public fromLatitude: number;
   public fromLongitude: number;
   public fromZoom = 12;
@@ -81,15 +89,6 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild('inputProductsAmount')
   public inputProductsAmountRef: ElementRef;
 
-  @ViewChild('checkboxIsContainer')
-  public checkboxIsContainerRef: ElementRef;
-
-  @ViewChild('checkboxIsOnPallets')
-  public checkboxIsOnPallets: ElementRef;
-
-  @ViewChild('checkboxIsFregile')
-  public checkboxIsFregileRef: ElementRef;
-
   @ViewChild('selectorWidth')
   public selectorWidthRef: ElementRef;
 
@@ -117,11 +116,17 @@ export class CreateOrderComponent implements OnInit {
   @ViewChild('inputAdditionalInfo')
   public inputAdditionalInfoRef: ElementRef;
   
+  @ViewChild('selectorCargoShippingOptions')
+  public selectorCargoShippingOptions: ElementRef;
+  
   @ViewChild('placesRef') 
   public placesRef: GooglePlaceDirective;
     
   @ViewChild('stepperDemo')
   public steppers: NgxStepperComponent;
+  
+  @ViewChild('checkboxIsTestAccount')
+  public checkboxIsTestAccount: ElementRef;
   
   public stepperOptions: StepperOptions = {
     enableSvgIcon: true,
@@ -138,6 +143,7 @@ export class CreateOrderComponent implements OnInit {
   constructor(private translate: TranslateService, private mapsAPILoader: MapsAPILoader,
     private ngZone: NgZone, public database: DatabaseService, private dialogService: DialogService,
     private router: Router, private _iconRegistry: MatIconRegistry, private _sanitizer: DomSanitizer) {
+    this.isDevMode = isDevMode();
     this.setupTranslation(translate);
   }
 
@@ -166,7 +172,9 @@ export class CreateOrderComponent implements OnInit {
     }
     
     this.steppers.next();
-    this.initToMap();
+    
+    
+    // this.initToMap();
   }
   
   public finishStepTwo() {
@@ -225,21 +233,13 @@ export class CreateOrderComponent implements OnInit {
   
   initToMap () {
     
-    this.mapsAPILoader.load().then(() => {
-      
-      // Fetch GeoCoder for reverse geocoding
+    // Fetch GeoCoder for reverse geocoding
       this.geoCoder = new google.maps.Geocoder;
 
-      const event = {
-        coords: {
-          lat: 32.085300,
-          lng: 34.781768
-        }
-      }
-      this.toMarkerDragEnd(event);
+      this.toMarkerDragEnd(this.defaultGeocoderEvent);
 
       // set current position
-      this.setCurrentPosition();
+      setTimeout(() => { this.setToCurrentPosition(); }, 1000);
       
       const autocomplete = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement);
       autocomplete.addListener('place_changed', () => {
@@ -260,8 +260,6 @@ export class CreateOrderComponent implements OnInit {
           this.toZoom = 12;
         });
       });
-
-    });
   }
   
   ngOnInit() {
@@ -283,16 +281,10 @@ export class CreateOrderComponent implements OnInit {
       // Fetch GeoCoder for reverse geocoding
       this.geoCoder = new google.maps.Geocoder;
 
-      const event = {
-        coords: {
-          lat: 32.085300,
-          lng: 34.781768
-        }
-      }
-      this.fromMarkerDragEnd(event);
-
+      this.fromMarkerDragEnd(this.defaultGeocoderEvent);
+      
       // set current position
-      this.setCurrentPosition();
+      setTimeout(() => { this.setFromCurrentPosition(); }, 1000);
       
       const autocomplete = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement);
       autocomplete.addListener('place_changed', () => {
@@ -314,6 +306,8 @@ export class CreateOrderComponent implements OnInit {
         });
       });
 
+      this.initToMap();
+      
     }, reason => {
       // on failed
       console.log('failed to load Maps API: ' + reason);
@@ -360,7 +354,7 @@ export class CreateOrderComponent implements OnInit {
     });
   }
 
-  private setCurrentPosition() {
+  private setFromCurrentPosition() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
 
@@ -372,11 +366,27 @@ export class CreateOrderComponent implements OnInit {
         }
 
         this.fromMarkerDragEnd(event);
-        this.toMarkerDragEnd(event);
 
         this.fromLatitude = position.coords.latitude;
         this.fromLongitude = position.coords.longitude;
         this.fromZoom = 12;
+
+      });
+    }
+  }
+
+  private setToCurrentPosition() {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+
+        const event = {
+          coords: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+        }
+
+        this.toMarkerDragEnd(event);
 
         this.toLatitude = position.coords.latitude;
         this.toLongitude = position.coords.longitude;
@@ -384,29 +394,63 @@ export class CreateOrderComponent implements OnInit {
       });
     }
   }
-
+  
   addNewProduct () {
 
-    if (!this.inputProductNameRef.nativeElement.value) {
+    const productName = this.inputProductNameRef.nativeElement.value;
+    const productQuantity = this.parseInt(this.inputProductsAmountRef.nativeElement.value);
+    const selectorCargoShippingOptions = this.parseInt(this.selectorCargoShippingOptions.nativeElement.value);
+    
+    if (!productName) {
       console.log('inputProductName is empty');
+      this.showInfoMessage('חובה להזין שם למוצר');
       return;
-    } else if (!this.inputProductsAmountRef.nativeElement.value || this.inputProductsAmountRef.nativeElement.value <= 0) {
+    } else if (!productQuantity || productQuantity <= 0) {
       console.log('inputProductsAmount is empty');
+      this.showInfoMessage('חובה להזין כמות');
+      return;
+    } else if (!selectorCargoShippingOptions) {
+      this.showInfoMessage('חובה לבחור איך אתה מעביר את הסחורה');
       return;
     }
-
+    
     const item = {
-      'name': this.inputProductNameRef.nativeElement.value,
-      'quantity': this.parseInt(this.inputProductsAmountRef.nativeElement.value),
-      'container': this.checkboxIsContainerRef.nativeElement.checked,
-      'onPallets': this.checkboxIsOnPallets.nativeElement.checked,
-      'fragile': this.checkboxIsFregileRef.nativeElement.checked,
-      'width': this.parseInt(this.selectorWidthRef.nativeElement.value),
-      'height': this.parseInt(this.selectorHeightRef.nativeElement.value),
-      'length': this.parseInt(this.selectorLengthRef.nativeElement.value),
-      'weight': this.parseInt(this.selectorWeightRef.nativeElement.value)
+      'name': productName,
+      'quantity': productQuantity,
+      'cargoShippingOptions': selectorCargoShippingOptions,
+      'container': false,
+      'onPallets': false,
+      'width': 1,
+      'height': 1,
+      'length': 1,
+      'weight': 10
     }
-
+    
+    if (selectorCargoShippingOptions === 1) {
+      // pallets
+      item.container = false;
+      item.onPallets = true;
+      
+    } else if (selectorCargoShippingOptions === 2) {
+      // container
+      item.container = true;
+      item.onPallets = false;
+      
+    } else if (selectorCargoShippingOptions === 3) {
+      // sacks
+      item.container = false;
+      item.onPallets = false;
+      
+    } else if (selectorCargoShippingOptions === 4) {
+      // other selected
+      item.width = this.parseInt(this.selectorWidthRef.nativeElement.value);
+      item.height = this.parseInt(this.selectorHeightRef.nativeElement.value);
+      item.length = this.parseInt(this.selectorLengthRef.nativeElement.value);
+      item.weight = this.parseInt(this.selectorWeightRef.nativeElement.value);
+    }
+    
+    // TODO: should we add Fragile ?
+    
     this.productsList.push(item);
 
     this.resetAddProductForm();
@@ -423,14 +467,28 @@ export class CreateOrderComponent implements OnInit {
 
   resetAddProductForm() {
     this.inputProductNameRef.nativeElement.value = '';
-    this.inputProductsAmountRef.nativeElement.value = '';
-    this.checkboxIsContainerRef.nativeElement.checked = false;
-    this.checkboxIsOnPallets.nativeElement.checked = false;
-    this.checkboxIsFregileRef.nativeElement.checked = false;
-    this.selectorWidthRef.nativeElement.value = 1;
-    this.selectorHeightRef.nativeElement.value = 1;
-    this.selectorLengthRef.nativeElement.value = 1;
-    this.selectorWeightRef.nativeElement.value = 10;
+    this.inputProductsAmountRef.nativeElement.value = 1;
+    
+    if (this.selectorWidthRef) {
+      
+      this.selectorWidthRef.nativeElement.value = 1;
+    }
+    
+    if (this.selectorHeightRef) {
+      
+      this.selectorHeightRef.nativeElement.value = 1;
+    }
+    
+    if (this.selectorLengthRef) {
+      
+      this.selectorLengthRef.nativeElement.value = 1;
+    }
+    
+    if (this.selectorWeightRef) {
+      
+      this.selectorWeightRef.nativeElement.value = 10;
+    }
+    
   }
 
   isAnyPaymentMethodChecked () {
@@ -515,6 +573,13 @@ export class CreateOrderComponent implements OnInit {
       'truckQuantity' : null,
       'cargoList' : null,
       'orderId' : null,
+      'test' : false
+    }
+    
+    if (this.checkboxIsTestAccount && this.checkboxIsTestAccount.nativeElement && this.checkboxIsTestAccount.nativeElement.checked) {
+      // this is a test account
+      console.log('Created a Test Order !');
+      payload.test = true;
     }
     
     if (this.parseInt(this.selectionOrderTypeRef.nativeElement.value) === 1) {

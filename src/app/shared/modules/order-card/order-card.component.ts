@@ -35,6 +35,6 @@ export class OrderCardComponent implements OnInit {
       const pickupLng = order.pickupLng;
       const destinationLat = order.destinationLat;
       const destinationLng = order.destinationLng;
-      return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&key=' + firebaseConfigDebug.apiKey;
+      return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&language=iw&key=' + firebaseConfigDebug.apiKey;
     }
 }

@@ -1203,11 +1203,33 @@ function paymentCron(){
 						console.log("starting payment operation for user: " + uid + " for order: " + key);
 						
 						var paymentAccessToken = userSnapshot.child('paymentAccessToken').val();
+						var isTest = orderSnapshot.child('test').val();
 						
-						if(!paymentAccessToken){
+						if (isTest === true) {
+							
+							const bidAmount = orderSnapshot.child('bidsList').child(managerUid).child('bidAmount').val();
+							var paymentAmount = bidAmount * mPaymentPercentage;
+							
+							paymentAmount = paymentAmount.toFixed(2); // 2 decimals after number
+							
+							const payload = {
+									'pendingPayment' : false,
+									'paymentDate' : admin.database.ServerValue.TIMESTAMP,
+									'saleToken' : 'test',
+									'ReceiptLink' : 'test',
+									'paymentAmountInNIS' : paymentAmount
+								}
+							
+							innerPromises.push(admin.database().ref('/all-orders/').child(key).update(payload));
+							
+							console.log("TEST ACCOUNT | Success: account [" + uid + "] was charged [" + paymentAmount + " NIS] for order [" + key + "]");
+							
+						} else if(!paymentAccessToken){
 							console.log("Failure: paymentAccessToken is null !");
 							console.log("revoking manager permission for user: " + uid);
 
+							// TODO: send email with link to renew your credit card information
+							
 							const userPayload = {
 									'manager' : false,
 									'managerRequestDenialReason' : 'חיוב נדחה, נא להזין כרטיס אשראי חדש',
@@ -1275,7 +1297,7 @@ function paymentCron(){
 									}
 								};
 							
-							console.log("payment request params: " + JSON.stringify(options));
+							// console.log("payment request params: " + JSON.stringify(options));
 							
 							try{
 								
@@ -1283,7 +1305,7 @@ function paymentCron(){
 								
 								request(options, function(error, response, body) {
 									
-									try {
+									/*try {
 										console.log("error" + JSON.stringify(error));
 									} catch (e) {
 										
@@ -1299,7 +1321,7 @@ function paymentCron(){
 										console.log("response" + JSON.stringify(response));
 									} catch (e) {
 										
-									}
+									}*/
 									
 									var payload = undefined;
 									
@@ -1349,16 +1371,24 @@ function paymentCron(){
 													'pendingPayment' : true,
 													'failedToCharge' : true,
 													'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
-													'failedToChargeReason' : error, //TODO: change to actual errors from external API
+													'failedToChargeReason' : error,
 													"ClientMessage": clientMessage,
 												    "DebugMessage": debugMessage,
 											}
+											
+											const userPayload = {
+													'manager' : false,
+													'managerRequestDenialReason' : 'חיוב נדחה, נא להזין כרטיס אשראי חדש',
+													'requestingManagerDenied' : true,
+													'requestingManagerDeniedDate' : admin.database.ServerValue.TIMESTAMP,
+													'requestingManager' : false
+											}
+											
+											innerPromises.push(admin.database().ref('/users').child(uid).update(userPayload));
 										}
 										
 										
 									} else {
-										
-										//TODO: change manager = false if the user's payment has failed !
 										
 										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - Error: " + error);
 										
@@ -1366,7 +1396,7 @@ function paymentCron(){
 												'pendingPayment' : true,
 												'failedToCharge' : true,
 												'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
-												'failedToChargeReason' : error //TODO: change to actual errors from external API
+												'failedToChargeReason' : error
 										}
 									}
 									

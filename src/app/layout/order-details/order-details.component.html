@@ -6,6 +6,10 @@
 			<h6>סטטוס הזמנה</h6>
 		</div>
 	
+		<div *ngIf="currentOrder.test" style="color: red; font-size: 30sp;">
+			זו מודעת בדיקה !!!!
+		</div>
+	
 		<div class="row">
 	        <div class="col-lg-8" >
 	        	<div class="breadcrumb">
@@ -35,32 +39,35 @@
 		               	<div class="form-control">{{currentOrder.pickupDate | date: 'dd/MM/yyyy'}}</div>
 					</div>
 					<h6>מזמין</h6>
-					<div class="form-group input-group" style="margin-bottom: 0px">
-		               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.userId === database.getCurrentUser().child('uid').val() || currentOrder.selectedBid === database.getCurrentUser().child('uid').val() ? currentOrder.userName : 'חסוי'}}</div>
-					</div>
-					<div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val()">
-						<div class="form-control in-bl" style='margin-bottom: 5px'>
-							<small>
-								<table>
-									<tr>
-										<td>
-											<i class="fa fa-phone fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrder.companyPhone}}
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-envelope fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrder.userEmail}}
-										</td>
-									</tr>
-								</table>
-							</small>
+					<div class="form-group">
+						<div class="input-group" style="margin-bottom: 0px">
+			               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+			               	<div class="form-control">{{currentOrder.userId === database.getCurrentUser().child('uid').val() || currentOrder.selectedBid === database.getCurrentUser().child('uid').val() ? currentOrder.userName : 'חסוי'}}</div>
+						</div>
+						
+						<div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val()">
+							<div class="form-control in-bl" style='margin-bottom: 5px'>
+								<small>
+									<table>
+										<tr>
+											<td>
+												<i class="fa fa-phone fa-fw"></i>
+											</td>
+											<td>
+												{{currentOrder.companyPhone}}
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<i class="fa fa-envelope fa-fw"></i>
+											</td>
+											<td>
+												{{currentOrder.userEmail}}
+											</td>
+										</tr>
+									</table>
+								</small>
+							</div>
 						</div>
 					</div>
 					
@@ -100,14 +107,14 @@
 			
 				<div class="breadcrumb" *ngIf="currentOrder.duration">
 					<h6>זמן נסיעה משוער</h6>
-					<span>
-						<i class="fa fa-clock-o fa-fw"></i> &nbsp; {{currentOrder.duration}}
+					<span style="font-size: 18px;">
+						<i class="fa fa-clock-o fa-fw" style="color: #0275d8"></i> &nbsp; {{currentOrder.duration}}
 					</span>
 					<br>
 					<br>
 					<h6>מרחק נסיעה</h6>
-					<span>
-						<i class="fa fa-arrows-h fa-fw"></i> &nbsp; {{currentOrder.distance}}
+					<span style="font-size: 18px;">
+						<i class="fa fa-arrows-h fa-fw" style="color: #0275d8;"></i> &nbsp; {{currentOrder.distance}}
 					</span>
 				</div>
 				
@@ -477,7 +484,7 @@
 					<h6><small>מזהה הזמנה</small></h6> 
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.orderId}}</div>
+		               	<div class="form-control" style="font-size: 12px;">{{currentOrder.orderId}}</div>
 					</div>
 					<h6><small>תאריך פרסום</small></h6> 
 					<div class="form-group input-group">

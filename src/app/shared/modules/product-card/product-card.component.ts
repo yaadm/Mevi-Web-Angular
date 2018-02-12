@@ -2,6 +2,24 @@ import { DatabaseService, firebaseConfigDebug } from '../../services/database/da
 import { Component, OnInit, Input, Output, EventEmitter, PipeTransform, Pipe } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
+
+@Pipe({name: 'resolveShippingOptions'})
+export class ResolveShippingOptionsPipe implements PipeTransform {
+  transform(value: number): string {
+    switch (value) {
+      case 1:
+        return 'משטחים';
+      case 2:
+        return 'קונטיינר';
+      case 3:
+        return 'שקים (באלות)';
+       case 4:
+        return 'אחר';
+    }
+    return 'לא ידוע';
+  }
+}
+
 @Pipe({name: 'resolveSize'})
 export class ResolveSizePipe implements PipeTransform {
   transform(value: number): string {

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductCardComponent, ResolveSizePipe, ResolveWeightPipe } from './product-card.component';
+import { ProductCardComponent, ResolveSizePipe, ResolveWeightPipe, ResolveShippingOptionsPipe } from './product-card.component';
 
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -19,7 +19,7 @@ import { RouterModule } from '@angular/router';
           }
         })
     ],
-    declarations: [ProductCardComponent, ResolveSizePipe, ResolveWeightPipe],
+    declarations: [ProductCardComponent, ResolveSizePipe, ResolveWeightPipe, ResolveShippingOptionsPipe],
     exports: [ProductCardComponent]
 })
 export class ProductCardModule { }

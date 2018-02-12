@@ -153,124 +153,117 @@
 					           <div *ngIf="selectionOrderType.value == 1">
 					           	<h6>הוספת מוצר</h6>
 					            <div class="form-control">
-					            	<div class="row">
-					            		<div class="col-lg-6">
+						            <div class="row">
+					            		<div class="col-lg-12">
 					            			<h6><small>שם המוצר</small></h6>
 								            <div class="form-group input-group">
 							                	<span class="input-group-addon"><i class="fa fa-archive fa-fw"></i></span>
-												<input class="form-control" type="text" id="from_input_time" placeholder="מה אתה רוצה להעביר ?" #inputProductName>
+												<input class="form-control" type="text" id="from_input_time" placeholder="שם המוצר" #inputProductName>
 											</div>
+					            		</div>
+				            		</div>
+				            		<div class="row">
+					            		<div class="col-lg-6">
+					            			<h6><small>איך אתה אורז את הסחורה ?</small></h6>
+								            <div class="form-group input-group">
+							                	<span class="input-group-addon"><i class="fa fa-dropbox fa-fw"></i></span>
+								                <select class="form-control" #selectorCargoShippingOptions>
+								                    <option [value]=1 selected="selected">משטחים</option>
+								                    <option [value]=2>קונטיינר</option>
+								                    <option [value]=3>שקים (באלות)</option>
+								                    <option [value]=4>אחר</option>
+								                </select>
+								            </div>
 					            		</div>
 					            		<div class="col-lg-6">
 					            			<h6><small>כמות יחידות</small></h6>
 								            <div class="form-group input-group">
 							                	<span class="input-group-addon"><i class="fa fa-list-ol fa-fw"></i></span>
-												<input class="form-control" type="number" id="from_input_time" placeholder="כמה יחידות ?" #inputProductsAmount>
+												<input class="form-control" type="number" id="from_input_time" value="1" #inputProductsAmount>
 											</div>
 					            		</div>
-					            	</div>
-					            	<div class="row">
-					            		<div class="col-lg-4">
-								            <div class="checkbox">
-						                        <label>
-						                            <input type="checkbox" value="" #checkboxIsContainer> קונטיינר
-						                        </label>
-						                    </div>
-					            		</div>
-					            		<div class="col-lg-4">
-								            <div class="checkbox">
-						                        <label>
-						                            <input type="checkbox" value="" #checkboxIsOnPallets> על משטחים
-						                        </label>
-						                    </div>
-					            		</div>
-					            		<div class="col-lg-4">
-								            <div class="checkbox">
-						                        <label>
-						                            <input type="checkbox" value="" #checkboxIsFregile> שביר
-						                        </label>
-						                    </div>
-					            		</div>
-					            	</div>
-					            	<div class="row">
-					            		<div class="col-lg-6">
-					            			<h6><small>רוחב</small></h6>
-								            <div class="form-group input-group">
-							                	<span class="input-group-addon"><i class="fa fa-arrows-h fa-fw"></i></span>
-								                <select class="form-control" #selectorWidth>
-								                    <option [value]=1 selected="selected">עד מטר</option>
-								                    <option [value]=2>עד 2 מטר</option>
-								                    <option [value]=3>עד 3 מטר</option>
-								                    <option [value]=4>עד 4 מטר</option>
-								                    <option [value]=5>עד 5 מטר</option>
-								                    <option [value]=6>עד 6 מטר</option>
-								                    <option [value]=7>עד 7 מטר</option>
-								                    <option [value]=8>עד 8 מטר</option>
-								                    <option [value]=9>יותר מ 8 מטר</option>
-								                </select>
-								            </div>
-					            		</div>
-					            		<div class="col-lg-6">
-					            			<h6><small>גובה</small></h6>
-								            <div class="form-group input-group">
-							                	<span class="input-group-addon"><i class="fa fa-arrows-v fa-fw"></i></span>
-								                <select class="form-control" #selectorHeight>
-								                    <option [value]=1 selected="selected">עד מטר</option>
-								                    <option [value]=2>עד 2 מטר</option>
-								                    <option [value]=3>עד 3 מטר</option>
-								                    <option [value]=4>עד 4 מטר</option>
-								                    <option [value]=5>עד 5 מטר</option>
-								                    <option [value]=6>עד 6 מטר</option>
-								                    <option [value]=7>עד 7 מטר</option>
-								                    <option [value]=8>עד 8 מטר</option>
-								                    <option [value]=9>יותר מ 8 מטר</option>
-								                </select>
-								            </div>
-					            		</div>
-					            	</div>
-					            	<div class="row">
-					            		<div class="col-lg-6">
-					            			<h6><small>אורך</small></h6>
-								            <div class="form-group input-group">
-							                	<span class="input-group-addon"><i class="fa fa-expand fa-fw"></i></span>
-								                <select class="form-control" #selectorLength>
-								                    <option [value]=1 selected="selected">עד מטר</option>
-								                    <option [value]=2>עד 2 מטר</option>
-								                    <option [value]=3>עד 3 מטר</option>
-								                    <option [value]=4>עד 4 מטר</option>
-								                    <option [value]=5>עד 5 מטר</option>
-								                    <option [value]=6>עד 6 מטר</option>
-								                    <option [value]=7>עד 7 מטר</option>
-								                    <option [value]=8>עד 8 מטר</option>
-								                    <option [value]=9>יותר מ 8 מטר</option>
-								                </select>
-								            </div>
-					            		</div>
-					            		<div class="col-lg-6">
-					            			<h6><small>משקל</small></h6>
-								            <div class="form-group input-group">
-							                	<span class="input-group-addon"><i class="fa fa-exclamation-circle fa-fw"></i></span>
-								                <select class="form-control" #selectorWeight>
-								                    <option [value]=10 selected="selected">עד 10 קילו</option>
-								                    <option [value]=20>עד 20 קילו</option>
-								                    <option [value]=50>עד 50 קילו</option>
-								                    <option [value]=200>עד 200 קילו</option>
-								                    <option [value]=500>עד חצי טון</option>
-								                    <option [value]=1000>עד טון</option>
-								                    <option [value]=2000>עד 2 טון</option>
-								                    <option [value]=5000>עד 5 טון</option>
-								                    <option [value]=5001>יותר מ 5 טון</option>
-								                </select>
-								            </div>
-					            		</div>
-					            	</div>
+				            		</div>
+				            		<div *ngIf="selectorCargoShippingOptions.value == 4">
+						            	<div class="row">
+						            		<div class="col-lg-6">
+						            			<h6><small>רוחב</small></h6>
+									            <div class="form-group input-group">
+								                	<span class="input-group-addon"><i class="fa fa-arrows-h fa-fw"></i></span>
+									                <select class="form-control" #selectorWidth>
+									                    <option [value]=1 selected="selected">עד מטר</option>
+									                    <option [value]=2>עד 2 מטר</option>
+									                    <option [value]=3>עד 3 מטר</option>
+									                    <option [value]=4>עד 4 מטר</option>
+									                    <option [value]=5>עד 5 מטר</option>
+									                    <option [value]=6>עד 6 מטר</option>
+									                    <option [value]=7>עד 7 מטר</option>
+									                    <option [value]=8>עד 8 מטר</option>
+									                    <option [value]=9>יותר מ 8 מטר</option>
+									                </select>
+									            </div>
+						            		</div>
+						            		<div class="col-lg-6">
+						            			<h6><small>גובה</small></h6>
+									            <div class="form-group input-group">
+								                	<span class="input-group-addon"><i class="fa fa-arrows-v fa-fw"></i></span>
+									                <select class="form-control" #selectorHeight>
+									                    <option [value]=1 selected="selected">עד מטר</option>
+									                    <option [value]=2>עד 2 מטר</option>
+									                    <option [value]=3>עד 3 מטר</option>
+									                    <option [value]=4>עד 4 מטר</option>
+									                    <option [value]=5>עד 5 מטר</option>
+									                    <option [value]=6>עד 6 מטר</option>
+									                    <option [value]=7>עד 7 מטר</option>
+									                    <option [value]=8>עד 8 מטר</option>
+									                    <option [value]=9>יותר מ 8 מטר</option>
+									                </select>
+									            </div>
+						            		</div>
+						            	</div>
+						            	<div class="row">
+						            		<div class="col-lg-6">
+						            			<h6><small>אורך</small></h6>
+									            <div class="form-group input-group">
+								                	<span class="input-group-addon"><i class="fa fa-expand fa-fw"></i></span>
+									                <select class="form-control" #selectorLength>
+									                    <option [value]=1 selected="selected">עד מטר</option>
+									                    <option [value]=2>עד 2 מטר</option>
+									                    <option [value]=3>עד 3 מטר</option>
+									                    <option [value]=4>עד 4 מטר</option>
+									                    <option [value]=5>עד 5 מטר</option>
+									                    <option [value]=6>עד 6 מטר</option>
+									                    <option [value]=7>עד 7 מטר</option>
+									                    <option [value]=8>עד 8 מטר</option>
+									                    <option [value]=9>יותר מ 8 מטר</option>
+									                </select>
+									            </div>
+						            		</div>
+						            		<div class="col-lg-6">
+						            			<h6><small>משקל</small></h6>
+									            <div class="form-group input-group">
+								                	<span class="input-group-addon"><i class="fa fa-exclamation-circle fa-fw"></i></span>
+									                <select class="form-control" #selectorWeight>
+									                    <option [value]=10 selected="selected">עד 10 קילו</option>
+									                    <option [value]=20>עד 20 קילו</option>
+									                    <option [value]=50>עד 50 קילו</option>
+									                    <option [value]=200>עד 200 קילו</option>
+									                    <option [value]=500>עד חצי טון</option>
+									                    <option [value]=1000>עד טון</option>
+									                    <option [value]=2000>עד 2 טון</option>
+									                    <option [value]=5000>עד 5 טון</option>
+									                    <option [value]=5001>יותר מ 5 טון</option>
+									                </select>
+									            </div>
+						            		</div>
+						            	</div>
+				            		</div>
 					            	
 					            	<button type="submit" class="btn btn-secondary" (click)="addNewProduct()">הוסף מוצר</button>
 					            </div>
 					            
 					            <br>
 					            <h6>רשימת מוצרים ({{productsList.length}})</h6>
-					            <div>
+					            <div style="margin-bottom: 1rem;">
 					            	<div *ngIf="productsList.length > 0">
 					            		<div *ngFor="let productItem of productsList"id="product{{productsList.indexOf(productItem).toString()}}">
 											<app-product-card [productItem]="productItem" [productsList]="productsList"></app-product-card>
@@ -285,7 +278,7 @@
 					           </div>
 					           <h6>הערות</h6>
 					           <fieldset class="form-group">
-					               <textarea class="form-control" rows="3" #inputAdditionalInfo></textarea>
+					               <textarea class="form-control" rows="3" #inputAdditionalInfo placeholder="הערות כגון: גדלים ספציפיים של משטחים, האם שביר? האם החומרים מסוכנים ? האם צריך ציוד מיוחד ? או כל דרישה אחרת שאתה צריך..."></textarea>
 					           </fieldset>
 					           <br><br>
 								<button type="submit" class="btn btn-secondary" (click)="steppers.back()">הקודם</button>
@@ -336,6 +329,12 @@
 			           	</div>
 			        <br>
 			      	<small>* חובה לבחור לפחות אחת מהאפשרויות</small>
+			      	<div class="checkbox" *ngIf="isDevMode">
+			      		<br><br>
+                        <label>
+                            <input type="checkbox" value="" #checkboxIsTestAccount>&nbsp;<i class="fa fa-exclamation-triangle fw"></i>&nbsp; מודעה זו היא בדיקה ולא תופיע במערכת 
+                        </label>
+                    </div>
 			      	<br><br>
 					<button type="submit" class="btn btn-secondary" (click)="steppers.back()">הקודם</button>
 					<button type="submit" class="btn btn-primary" (click)="publishOrder()" [attr.disabled]="loading ? '' : null">פרסם מודעה</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i>

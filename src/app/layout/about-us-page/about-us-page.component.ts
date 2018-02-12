@@ -19,6 +19,6 @@ export class AboutUsPageComponent implements OnInit {
     const width = 500;
     const pickupLat = 31.658314;
     const pickupLng = 34.620346;
-    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng  + '&zoom=12' + '&key=' + firebaseConfigDebug.apiKey;
+    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng  + '&zoom=12' + '&language=iw&key=' + firebaseConfigDebug.apiKey;
   }
 }
