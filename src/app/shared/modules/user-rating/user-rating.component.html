@@ -1,0 +1,9 @@
+<ngb-rating [(rate)]="user.rating" [max]="5" #userRatingBar
+	[readonly]="true"> <ng-template let-fill="fill"
+	let-index="index"> <span *ngIf="fill === 100"
+	class="star" [class.filled]="fill === 100">&#9733;</span> <span
+	*ngIf="fill === 0" class="star">&#9733;</span> <span
+	*ngIf="fill < 100 && fill > 0" class="star"> <span class="half"
+	[style.width.%]="fill">&#9733;</span>&#9733;
+</span> </ng-template> </ngb-rating>
+(<b>{{user.rating ? user.rating : '0'}}</b>)

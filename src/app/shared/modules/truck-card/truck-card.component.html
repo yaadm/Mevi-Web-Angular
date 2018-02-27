@@ -1,33 +1,30 @@
 <div class="form-control in-bl" style='margin-bottom: 5px'>
-	<div class="row"  style="font-size: 12px;">
-		<div class="col-md-3">
-			<i class="fa fa-truck fa-5x"></i>
-		</div>
-		<div class="col-md-9">
-			<div class="row">
-				<div class="col-md-3">
-					סוג משאית
-				</div>
-				<div class="col-md-9">
-					<strong>{{order.truckType | resolveTruckType}}</strong>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-3">
-					סוג נגרר
-				</div>
-				<div class="col-md-9">
-					<strong>{{order.truckSubType | resolveTruckSubType}}</strong>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-3">
-					כמות משאיות
-				</div>
-				<div class="col-md-9">
-					<strong>{{order.truckQuantity}}</strong>
-				</div>
-			</div>
-		</div>
-	</div>
+	<table style="margin-bottom: 0px; font-size: .8rem;">
+		<tbody>
+			<tr>
+				<td rowspan="3" style="text-align: center;">
+					<i class="fa fa-truck fa-5x" style="margin-left: 1rem;"></i>
+				</td>
+				<td>
+					<table class="table table-sm" style="margin-bottom: 0px;">
+						<tbody>
+							<tr>
+								<td>סוג משאית</td>
+								<td><strong>{{order.truckType | resolveTruckType}}</strong></td>
+							</tr>
+							<tr>
+								<td>סוג נגרר</td>
+								<td><strong>{{order.truckSubType |
+										resolveTruckSubType}}</strong></td>
+							</tr>
+							<tr>
+								<td>כמות משאיות</td>
+								<td><strong>{{order.truckQuantity}}</strong></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>

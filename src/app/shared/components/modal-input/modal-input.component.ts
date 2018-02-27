@@ -4,6 +4,7 @@ import { DialogComponent, DialogService } from 'ngx-bootstrap-modal';
 export interface InputModel {
   title: string;
   message: string;
+  subMessage: string;
 }
 
 @Component({

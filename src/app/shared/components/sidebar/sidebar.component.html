@@ -76,10 +76,16 @@
             </a>
             <li class="nested" [class.expand]="showMenu === 'app_manager_pages'">
                 <ul class="submenu">
-                    <li>
+                    <!-- <li>
                         <a [routerLink]="['/managers-registration-requests-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-user-plus"></i>&nbsp; {{ 'Managers Requests' | translate }}</span></a>
+                    </li> -->
+                    <li>
+                        <a [routerLink]="['/manage-unpaid-orders-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-book"></i>&nbsp; עסקאות חייבות</span></a>
                     </li>
                     <li>
+                        <a [routerLink]="['/manage-cancelled-orders-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-book"></i>&nbsp; עסקאות שבוטלו</span></a>
+                    </li>
+                    <li> 
                         <a [routerLink]="['/manage-users-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-users"></i>&nbsp; {{ 'Manage Users' | translate }}</span></a>
                     </li>
                 </ul>

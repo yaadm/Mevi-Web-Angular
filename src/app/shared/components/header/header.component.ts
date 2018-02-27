@@ -28,7 +28,10 @@ export class HeaderComponent implements OnInit, OnDestroy, AuthListener {
           if (val instanceof NavigationEnd && window.innerWidth <= 992 && this.isToggled()) {
               this.toggleSidebar();
           }
-          window.scrollTo(0, 0);
+          if(val instanceof NavigationEnd){
+            
+            window.scrollTo(0, 0);
+          }
       });
 
     }

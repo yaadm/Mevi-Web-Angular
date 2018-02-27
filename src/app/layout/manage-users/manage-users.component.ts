@@ -20,6 +20,9 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
   itemsArray = [];
   visibilityMap: string[] = [];
   
+  @ViewChild('selectionSearchType')
+  public selectionSearchTypeRef: ElementRef;
+  
   @ViewChild('inputCompanyId')
   public inputCompanyIdRef: ElementRef;
   
@@ -127,6 +130,42 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
     this.visibilityMap.splice(0, this.visibilityMap.length);
   }
   
+  onSearchTypeChanged() {
+    
+    const searchType = this.selectionSearchTypeRef.nativeElement.value;
+    if (searchType === '0') {
+      this.resetAllVisibility();
+    } else if (searchType === '1') {
+      this.itemsArray.forEach(user => {
+        
+        if (user.requestingManager === true) {
+          
+          const index = this.visibilityMap.indexOf(user.uid);
+          if (index !== -1) {
+            this.visibilityMap.splice(index, 1);
+          }
+        } else {
+          
+          this.visibilityMap.push(user.uid);
+        }
+      });
+    } else if (searchType === '2') {
+      this.itemsArray.forEach(user => {
+        
+        if (user.manager === true && !user.rating) {
+          
+          const index = this.visibilityMap.indexOf(user.uid);
+          if (index !== -1) {
+            this.visibilityMap.splice(index, 1);
+          }
+        } else {
+          
+          this.visibilityMap.push(user.uid);
+        }
+      });
+    }
+  }
+  
   showInfoDialog (modalTitle, moadlMessage) {
     this.dialogService.addDialog(ModalInformComponent, {
       title: modalTitle,
@@ -159,6 +198,53 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
             }, reason => {
               // on reject
               this.showInfoDialog('נכשל', 'לא הצלחנו לבטל את המנוי, נא לנסות שוב מאוחר יותר');
+            });
+          }
+      });
+  }
+  
+  updateRating(userItem) {
+    
+    let userRating = 0.0;
+    if (userItem.rating !== undefined) {
+      try {
+        userRating = parseFloat(userItem.rating);
+      } catch (e) {}
+    }
+    
+    this.dialogService.addDialog(ModalInputComponent, {
+      title: 'עדכון דירוג',
+      message: 'הזן דירוג',
+      subMessage: 'הדירוג של ' + userItem.name + ' הוא: ' + userRating.toString()})
+      .subscribe((data) => {
+          if (data) {
+            
+            let rating = -1;
+            
+            try {
+              rating = parseFloat(data);
+              rating = parseFloat(rating.toFixed(2));
+            } catch (e) {
+              this.showInfoDialog('שגיאה', 'הדירוג שהוזן אינו חוקי (מספר בין 0 - 5)');
+              return;
+            }
+            
+            if (rating < 0 || rating > 5) {
+              this.showInfoDialog('שגיאה', 'הדירוג שהוזן אינו חוקי (מספר בין 0 - 5)');
+              return;
+            }
+            
+            const payload = {
+              'rating' : rating,
+            }
+            
+            this.database.updateUserData(userItem.uid, payload).then(_ => {
+              // on success
+              
+              this.showInfoDialog('הצלחה', 'הדירוג עודכן');
+            }, reason => {
+              // on reject
+              this.showInfoDialog('נכשל', 'לא הצלחנו לעדכן את הדירוג, נא לנסות שוב מאוחר יותר');
             });
           }
       });

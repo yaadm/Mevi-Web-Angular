@@ -1,0 +1,57 @@
+<div [@routerTransition] class="main-content-container">
+	<app-page-header [heading]="'עסקאות שבוטלו'" [icon]="'fa-fire'"></app-page-header>
+	<div class="row">
+        <div class="col-lg-8">
+        	<div *ngIf="itemsArray.length > 0">
+				<div *ngFor="let order of itemsArray">
+					<!-- <app-order-card [order]="order"></app-order-card> -->
+					<div class="card card-inverse card-primary">
+					    <div class="card-header" style="padding: 6px">
+					        <table>
+		                       <tbody>
+			                       <tr>
+			                           <td scope="row" class="text-right"><i class="fa fa-user fw"></i>&nbsp;מספר הזמנה</td>
+			                           <td>{{order.orderId}}</td>
+			                       </tr>
+			                       <tr>
+			                           <td scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</td>
+			                           <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
+			                       </tr>
+		                       </tbody>
+		                   </table>
+					    </div>
+					    <div class="card-footer">
+					        <a [routerLink]="['/order-details', order.orderId]" class="card-inverse">
+					        	<span class="float-left">
+					            	<i class="fa fa-arrow-circle-left"></i>
+					            </span>
+					        	<span class="float-right"> {{('View Details' | translate)}}</span>
+					            <div class="clearfix"></div>
+					        </a>
+					    </div>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="itemsArray.length <= 0" class="breadcrumb ta-c">
+				<div>
+					<br>
+					<br>
+					<i class="fa fa-eye-slash fa-5x"></i>
+					<br>
+					<br>
+					<h5>לא נמצאו תוצאות</h5>
+					<br>
+					מה שאומר שלא בוטלו עסקאות עדיין :)
+					<br>
+					<br>
+					<br>
+					<br>
+				</div>
+			</div>
+        </div>
+        <div class="col-lg-4">
+        	<app-side-bar></app-side-bar>
+        </div>
+	</div>
+	<app-footer-page></app-footer-page>
+</div>

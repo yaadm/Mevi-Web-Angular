@@ -13,7 +13,7 @@ import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 import { AgmCoreModule } from '@agm/core';
 
 
-import { SuggestionCardModule, ProductCardModule, TruckCardModule, FooterPageModule, SharedModalModuleModule, PageHeaderModule, firebaseConfigDebug } from '../../shared';
+import { SuggestionCardModule, ProductCardModule, TruckCardModule, FooterPageModule, SharedModalModuleModule, PageHeaderModule, firebaseConfigDebug, UserRatingModule } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -32,6 +32,7 @@ export function HttpLoaderFactory(http: Http) {
     PageHeaderModule,
     SharedModalModuleModule,
     FooterPageModule,
+    UserRatingModule,
     HttpClientModule,
     TranslateModule.forRoot({
         loader: {

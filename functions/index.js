@@ -91,7 +91,7 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 		
 		console.log('order changed.');
 		
-		/*const orderId = event.params.orderId;
+		const orderId = event.params.orderId;
 		const orderStatus = event.data.child('orderStatus').val();
 		const prevOrderStatus = event.data.previous.child('orderStatus').val();
 		
@@ -103,29 +103,31 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 			if(orderStatus == ORDER_STATUS_PENDING && prevOrderStatus !== ORDER_STATUS_PENDING){
 				
 				// order state changed (from new) to pending - bidSelected
-				return;
+				return true;
 			}else if(orderStatus == ORDER_STATUS_COMPLETED && prevOrderStatus !== ORDER_STATUS_COMPLETED){
 				
 				// order state changed (from pending) to completed 
 
-				var promises = [];
+				/*var promises = [];
 				
-				return Promise.all(promises);
+				return Promise.all(promises);*/
 
+				return true;
 			}else if(orderStatus === ORDER_STATUS_CANCELLED && prevOrderStatus !== ORDER_STATUS_CANCELLED){
 				
 				// order state changed (from pending) to cancelled
 				
 				var promises = [];
 				
-				//add to cancelled orders
-				promises.push(admin.database().ref('/cancelled-orders/' + event.params.orderId).set(event.data.val()));
+				const payload = {
+					'needToResolveCancellation' : true
+				}
 				
-				promises.push(admin.database().ref('/all-orders/' + event.params.orderId).remove());
+				promises.push(admin.database().ref('/all-orders/' + event.params.orderId).update(payload));
 				
 				return Promise.all(promises);
 			}
-		}*/
+		}
 	}
 	
 	return true;
@@ -1215,6 +1217,7 @@ function paymentCron(){
 							const payload = {
 									'pendingPayment' : false,
 									'paymentDate' : admin.database.ServerValue.TIMESTAMP,
+									'failedToCharge' : false,
 									'saleToken' : 'test',
 									'ReceiptLink' : 'test',
 									'paymentAmountInNIS' : paymentAmount
@@ -1345,6 +1348,7 @@ function paymentCron(){
 											payload = {
 												'pendingPayment' : false,
 												'paymentDate' : admin.database.ServerValue.TIMESTAMP,
+												'failedToCharge' : false,
 												'saleToken' : saleToken,
 												'ReceiptLink' : receiptLink,
 												'paymentAmountInNIS' : paymentAmount

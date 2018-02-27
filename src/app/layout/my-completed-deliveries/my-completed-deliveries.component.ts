@@ -46,7 +46,7 @@ export class MyCompletedDeliveriesComponent implements OnInit, OnDestroy, AuthLi
 
   updateItemsArray (order) {
     
-    if (order.orderStatus === 2) {
+    if (order.orderStatus === 2 || order.orderStatus === 3) {
       const index = this.itemsArray.indexOf(order, 0);
       if (index !== -1) {
         this.itemsArray[index] = order;

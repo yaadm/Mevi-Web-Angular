@@ -23,13 +23,16 @@
                            <td scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</td>
                            <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
                        </tr>
-                       <tr *ngIf="order.orderStatus === 2">
+                       <tr *ngIf="order.orderStatus == 2">
                            <td scope="row" class="text-right"><i class="fa fa-fire fw"></i>&nbsp;סטטוס&nbsp;&nbsp;</td>
-                           <td *ngIf="order.ownerCancellationReason != undefined || order.bidderCancellationReason != undefined">
-                           		<span>ההזמנה בוטלה</span>
-                           </td>
-                           <td *ngIf="order.ownerCancellationReason == undefined && order.bidderCancellationReason == undefined">
+                           <td>
                            		<span>ההזמנה בוצעה בהצלחה</span>
+                           </td>
+                       </tr>
+                       <tr *ngIf="order.orderStatus == 3">
+                           <td scope="row" class="text-right"><i class="fa fa-fire fw"></i>&nbsp;סטטוס&nbsp;&nbsp;</td>
+                           <td>
+                           		<span>ההזמנה בוטלה</span>
                            </td>
                        </tr>
                        </tbody>

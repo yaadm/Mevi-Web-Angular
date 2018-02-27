@@ -18,6 +18,8 @@ const routes: Routes = [
             { path: 'my-completed-deliveries-page', loadChildren: './my-completed-deliveries/my-completed-deliveries.module#MyCompletedDeliveriesModule' },
             { path: 'managers-registration-requests-page', loadChildren: './managers-registration-requests/managers-registration-requests.module#ManagersRegistrationRequestsModule' },
             { path: 'manage-users-page', loadChildren: './manage-users/manage-users.module#ManageUsersModule' },
+            { path: 'manage-unpaid-orders-page', loadChildren: './manage-unpaid-orders/manage-unpaid-orders.module#ManageUnpaidOrdersModule' },
+            { path: 'manage-cancelled-orders-page', loadChildren: './manage-cancelled-orders/manage-cancelled-orders.module#ManageCancelledOrdersModule' },
             { path: 'about-us-page', loadChildren: './about-us-page/about-us-page.module#AboutUsPageModule' },
             { path: 'contact-us-page', loadChildren: './contact-us-page/contact-us-page.module#ContactUsPageModule' },
             { path: 'payment/:userId', loadChildren: './payment/payment.module#PaymentModule' },

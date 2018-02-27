@@ -1,18 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ManageUsersRoutingModule } from './manage-users-routing.module';
-import { ManageUsersComponent } from './manage-users.component';
+import { ManageUnpaidOrdersRoutingModule } from './manage-unpaid-orders-routing.module';
+import { ManageUnpaidOrdersComponent } from './manage-unpaid-orders.component';
 
 import { Http, HttpModule } from '@angular/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { OrderCardModule, FooterPageModule, SharedModalModuleModule, UserRatingModule } from '../../shared';
-import { BootstrapModalModule } from 'ngx-bootstrap-modal';
-
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { OrderCardModule, FooterPageModule, SideBarModule, PageHeaderModule } from '../../shared';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -22,13 +18,12 @@ export function HttpLoaderFactory(http: Http) {
 @NgModule({
   imports: [
     CommonModule,
-    ManageUsersRoutingModule,
+    ManageUnpaidOrdersRoutingModule,
     HttpModule,
     OrderCardModule,
-    BootstrapModalModule,
     FooterPageModule,
-    UserRatingModule,
-    SharedModalModuleModule,
+    PageHeaderModule,
+    SideBarModule,
     TranslateModule.forRoot({
         loader: {
             provide: TranslateLoader,
@@ -37,7 +32,7 @@ export function HttpLoaderFactory(http: Http) {
         }
     })
   ],
-  declarations: [ ManageUsersComponent ],
+  declarations: [ ManageUnpaidOrdersComponent ],
   providers: []
 })
-export class ManageUsersModule { }
+export class ManageUnpaidOrdersModule { }

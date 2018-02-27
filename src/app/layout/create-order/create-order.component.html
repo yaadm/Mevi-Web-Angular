@@ -22,9 +22,11 @@
 				           	</div>
 							
 				      		<small><i class='fa fa-fw'></i>פורמט: [רחוב ומספר, עיר, ארץ]</small>
-							<agm-map *ngIf="mFromMapVisibility" [latitude]="fromLatitude" [longitude]="fromLongitude" [scrollwheel]="false" [zoom]="fromZoom"> 
-								<agm-marker [latitude]="fromLatitude" [longitude]="fromLongitude" [markerDraggable]="true" (dragEnd)="fromMarkerDragEnd($event)"></agm-marker>
-							</agm-map>
+				      		<div *ngIf="mFromMapVisibility" class="form-control" style="padding: 0px;">
+				      			<agm-map [latitude]="fromLatitude" [longitude]="fromLongitude" [scrollwheel]="false" [zoom]="fromZoom"> 
+									<agm-marker [latitude]="fromLatitude" [longitude]="fromLongitude" [markerDraggable]="true" (dragEnd)="fromMarkerDragEnd($event)"></agm-marker>
+								</agm-map>
+				      		</div>
 							
 							<br><br>
 							<h6>תאריך העמסה</h6>
@@ -62,9 +64,12 @@
 									<button type="submit" style="margin-right: .5rem;" class="btn btn-primary" (click)="toggleToMapVisibility()">מפה</button>
 					           </div>
 					      		<small><i class='fa fa-fw'></i>פורמט: [רחוב ומספר, עיר, ארץ]</small>
-							<agm-map *ngIf="this.steppers.currentStep === 1 && mToMapVisibility" [latitude]="toLatitude" [longitude]="toLongitude" [scrollwheel]="false" [zoom]="toZoom"> 
-								<agm-marker [latitude]="toLatitude" [longitude]="toLongitude" [markerDraggable]="true" (dragEnd)="toMarkerDragEnd($event)"></agm-marker>
-							</agm-map>
+					      		<div *ngIf="this.steppers.currentStep === 1 && mToMapVisibility" class="form-control" style="padding: 0px;">
+					      			<agm-map [latitude]="toLatitude" [longitude]="toLongitude" [scrollwheel]="false" [zoom]="toZoom"> 
+										<agm-marker [latitude]="toLatitude" [longitude]="toLongitude" [markerDraggable]="true" (dragEnd)="toMarkerDragEnd($event)"></agm-marker>
+									</agm-map>
+					      		</div>
+							
 							<br><br>
 							<div>
 								<h6>סוג פריקה</h6>

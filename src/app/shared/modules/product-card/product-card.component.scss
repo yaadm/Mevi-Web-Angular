@@ -7,3 +7,10 @@
 .in-bl {
 	display: inline-block;
 }
+.table {
+	th,
+  	td,
+  	thread {
+  		border: 0px !important;
+	}
+}

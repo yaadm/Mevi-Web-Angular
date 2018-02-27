@@ -3,7 +3,6 @@
 ::-webkit-scrollbar { 
     display: none; 
 }
-
 .ta-c{
 	text-align: center;
 }
@@ -17,4 +16,27 @@
 }
 .main-content-container{
 	padding: 1rem;
+}
+/* .btn {
+	margin: .2rem !important;
+	margin-left: .2rem !important;
+	margin-bottom: .2rem !important;
+} */
+.star {
+  position: relative;  
+  display: inline-block;
+  font-size: 1.0rem;
+  color: #b0c4de;
+}
+.full {
+  color: red;
+}
+.half {
+  position: absolute;
+  display: inline-block;
+  overflow: hidden;
+  color: #1e90ff;
+}
+.filled {
+  color: #1e90ff;
 }

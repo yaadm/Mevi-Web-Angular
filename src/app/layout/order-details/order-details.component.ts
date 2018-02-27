@@ -330,7 +330,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
           
           const payload = {
             'ownerCancellationReason' : input,
-            'orderStatus' : 2, // ORDER_STATUS_COMPLETED
+            'orderStatus' : 3, // ORDER_STATUS_CANCELLED
             'ownerCancellationDate' : firebase.database.ServerValue.TIMESTAMP
           }
           
@@ -356,7 +356,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
           
           const payload = {
             'bidderCancellationReason' : input,
-            'orderStatus' : 2, // ORDER_STATUS_COMPLETED
+            'orderStatus' : 3, // ORDER_STATUS_CANCELLED
             'bidderCancellationDate' : firebase.database.ServerValue.TIMESTAMP
           }
           
@@ -452,6 +452,10 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
             
       });
     });
+  }
+  
+  resolveCancelledOrder() {
+    this.database.resolveCancelledOrder(this.orderId);
   }
   
   private setupTranslation(translate: TranslateService) {

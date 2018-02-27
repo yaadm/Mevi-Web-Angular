@@ -153,7 +153,22 @@ export class DatabaseService {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).valueChanges();
   }
+  
+  subscribeToUnpaidOrders(): Observable<{}[]> {
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('failedToCharge').equalTo(true)).valueChanges();
+  }
 
+  subscribeToCancelledOrders(): Observable<{}[]> {
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('needToResolveCancellation').equalTo(true)).valueChanges();
+  }
+  
+  resolveCancelledOrder(orderId: string) {
+    const payload = {
+      'needToResolveCancellation' : false
+    }
+    return this.afDb.object('/all-orders/' + orderId).update(payload);
+  }
+  
   getMyOrders(): Promise<any>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).query.once('value');
