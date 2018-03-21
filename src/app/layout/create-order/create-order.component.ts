@@ -148,6 +148,7 @@ export class CreateOrderComponent implements OnInit {
   }
 
   public selectCampaign(): void {
+    
     this.steppers.showFeedback('Checking, please wait ...');
     this.steppers.next();
     if (this.steppers.currentStep === 1) {
@@ -169,7 +170,16 @@ export class CreateOrderComponent implements OnInit {
     } else if (!this.pickupTimeRef.nativeElement.value) {
       this.showInfoMessage('חובה להזין שעת העמסה');
       return;
+    } else if (new Date(this.pickupDateRef.nativeElement.value) < this.database.getTodayDate()) {
+      this.showInfoMessage('תאריך ההעמסה שנבחר עבר');
+      console.log('pickupDate: ' + new Date(this.pickupDateRef.nativeElement.value));
+      console.log('nowDate: ' + new Date());
+      return;
     }
+    
+    
+    
+    // TODO: check if input date > current date -> show error message
     
     this.steppers.next();
     
@@ -183,7 +193,7 @@ export class CreateOrderComponent implements OnInit {
       this.showInfoMessage('חובה להזין כתובת מיקום פריקה');
       return;
     } else if (!this.toLatitude || !this.toLongitude) {
-      this.showInfoMessage('חובה לבחור סוג פריקה');
+      this.showInfoMessage('חובה להזין מיקום פריקה');
       return;
     } else if (!this.selectionUnloadingTypeRef.nativeElement.value) {
       this.showInfoMessage('חובה לבחור סוג פריקה');

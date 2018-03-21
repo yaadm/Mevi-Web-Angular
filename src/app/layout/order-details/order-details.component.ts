@@ -9,6 +9,7 @@ import { ModalConfirmComponent } from '../../shared/components/modal-confirm/mod
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { ModalInputComponent } from '../../shared/components/modal-input/modal-input.component';
 import { AuthListener } from '../../shared/services';
+import { Constants } from '../../shared/services/database/database.service';
 import { MapsAPILoader } from '@agm/core';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
@@ -139,13 +140,24 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
           } catch (e) {}
 
           this.bidsArray = [];
-          const now = new Date().getTime();
           afa.payload.child('bidsList').forEach(item => {
             const itemPayload = item.val();
 
             // remove expired bids
-            if (itemPayload.expirationDate === undefined || itemPayload.expirationDate === 0 || itemPayload.expirationDate > now) {
+            if (itemPayload.expirationDate === undefined || itemPayload.expirationDate === 0) {
+              // no expiration date
+                            
               this.bidsArray.push(itemPayload);
+            } else {
+              // has expiration date
+              
+              const expirationDate = this.database.resetDateToMidnight(itemPayload.expirationDate);
+              const nowDate = this.database.resetDateToMidnight(new Date());
+              
+              if (itemPayload.expirationDate >= nowDate) {
+                
+                this.bidsArray.push(itemPayload);
+              }
             }
           });
           
@@ -176,11 +188,25 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
     } else if (!this.bidDateRef.nativeElement.value) {
       this.showInfoMessage('שגיאה', 'חובה להזין תאריך הגעה');
       return;
+    } else if (this.database.resetDateToMidnight(new Date(this.bidDateRef.nativeElement.value)) < 
+                this.database.resetDateToMidnight(new Date(this.currentOrder.pickupDate))) {
+      this.showInfoMessage('שגיאה', 'תאריך הגעה לא יכול להיות לפני התאריך המבוקש');
+      return;
+    } else if (this.database.resetDateToMidnight(new Date(this.bidDateRef.nativeElement.value)) < 
+                this.database.resetDateToMidnight(new Date())) {
+      this.showInfoMessage('שגיאה', 'תאריך הגעה לא יכול להיות בעבר');
+      return;
     } else if (!this.bidTimeRef.nativeElement.value || this.getMillisFromTimeInput(this.bidTimeRef.nativeElement.value) === undefined) {
       this.showInfoMessage('שגיאה', 'חובה להזין שעת הגעה');
       return;
     } else if (this.checkboxExpirationRef.nativeElement.checked && !this.bidExpirationRef.nativeElement.value) {
       this.showInfoMessage('שגיאה', 'חובה להזין תאריך תפוגה');
+      return;
+    } else if (this.checkboxExpirationRef.nativeElement.checked && 
+                this.bidExpirationRef.nativeElement.value &&
+                this.database.resetDateToMidnight(new Date(this.bidExpirationRef.nativeElement.value)) < 
+                this.database.resetDateToMidnight(new Date())) {
+      this.showInfoMessage('שגיאה', 'תאריך התפוגה לא יכול להיות בעבר');
       return;
     } else if (!this.isAnyPaymentMethodChecked()) {
       this.showInfoMessage('לא הזנת שדה חובה', 'חובה לבחור אופן קבלת תשלום');
@@ -404,7 +430,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
     const pickupLng = order.pickupLng;
     const destinationLat = order.destinationLat;
     const destinationLng = order.destinationLng;
-    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + 200 + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&language=iw&key=' + firebaseConfigDebug.apiKey;
+    const height = Constants.STATIC_MAP_HEIGHT; 
+    return 'https://maps.googleapis.com/maps/api/staticmap?size=' + width + 'x' + height + '&markers=' + pickupLat + ',' + pickupLng + '&markers=' + destinationLat + ',' + destinationLng + '&language=iw&key=' + firebaseConfigDebug.apiKey;
   }
 
   getMillisFromTimeInput(rawTime) {

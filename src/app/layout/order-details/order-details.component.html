@@ -47,26 +47,25 @@
 						
 						<div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('appManager').val() === true">
 							<div class="form-control in-bl" style='margin-bottom: 5px'>
-								<small>
-									<table>
-										<tr>
-											<td>
-												<i class="fa fa-phone fa-fw"></i>
-											</td>
-											<td>
-												{{currentOrder.companyPhone}}
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<i class="fa fa-envelope fa-fw"></i>
-											</td>
-											<td>
-												{{currentOrder.userEmail}}
-											</td>
-										</tr>
-									</table>
-								</small>
+								<table  style="font-size: .8rem;">
+									<tr>
+										<td>
+											<i class="fa fa-phone fa-fw"></i>
+										</td>
+										<td>
+											<a href="{{'tel:' + currentOrder.companyPhone}}">{{currentOrder.companyPhone}}</a>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<i class="fa fa-envelope fa-fw"></i>
+										</td>
+										<td>
+											<a href="{{'mailto:' + currentOrder.userEmail}}">{{currentOrder.userEmail}}</a>
+											
+										</td>
+									</tr>
+								</table>
 							</div>
 						</div>
 					</div>
@@ -106,13 +105,13 @@
 			<div class="col-lg-4">
 			
 				<div class="breadcrumb" *ngIf="currentOrder.duration">
-					<h6>זמן נסיעה משוער</h6>
+					<h6><b>זמן נסיעה משוער</b></h6>
 					<span style="font-size: 18px;">
 						<i class="fa fa-clock-o fa-fw" style="color: #0275d8"></i> &nbsp; {{currentOrder.duration}}
 					</span>
 					<br>
 					<br>
-					<h6>מרחק נסיעה</h6>
+					<h6><b>מרחק נסיעה</b></h6>
 					<span style="font-size: 18px;">
 						<i class="fa fa-arrows-h fa-fw" style="color: #0275d8;"></i> &nbsp; {{currentOrder.distance}}
 					</span>
@@ -122,212 +121,208 @@
 					<div *ngIf="currentOrder.selectedBid != undefined">
 						<h6>ההצעה הזוכה</h6>
 						<div class="form-control in-bl" style='margin-bottom: 5px'>
-							<small>
-								<table style="width: 100%">
-									<tr>
-										<td>
-											<i class="fa fa-user fa-fw"></i> &nbsp;
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}}
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-phone fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-envelope fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}
-										</td>
-									</tr>
-									<tr>
-										<td colspan=2>
-											<hr class="ng-tns-c6-1">
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidAmount').val()}} ש"ח
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-calendar fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupDate').val() | date: 'dd/MM/yyyy'}}
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-clock-o fa-fw"></i>
-										</td>
-										<td>
-											{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
-										</td>
-									</tr>
-									<tr>
-										<td colspan=2>
-											<hr class="ng-tns-c6-1">
-											<u>אפשרויות תשלום</u>
-										</td>
-									</tr>
-									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCash').val()">
-										<td>
-											<i class="fa fa-money fa-fw"></i>
-										</td>
-										<td>
-											מזומן
-										</td>
-									</tr>
-									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCredit').val()">
-										<td>
-											<i class="fa fa-credit-card fa-fw"></i>
-										</td>
-										<td>
-											אשראי
-										</td>
-									</tr>
-									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentWire').val()">
-										<td>
-											<i class="fa fa-exchange fa-fw"></i>
-										</td>
-										<td>
-											העברה בנקאית
-										</td>
-									</tr>
-									<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCheck').val()">
-										<td>
-											<i class="fa fa-id-card-o fa-fw"></i>
-										</td>
-										<td>
-											צק
-										</td>
-									</tr>
-								</table>
-							</small>
+							<table style="width: 100%; font-size: .8rem;">
+								<tr>
+									<td>
+										<i class="fa fa-user fa-fw"></i> &nbsp;
+									</td>
+									<td>
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-phone fa-fw"></i>
+									</td>
+									<td>
+										<a href="{{'tel:' + currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}</a>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-envelope fa-fw"></i>
+									</td>
+									<td>
+										<a href="{{'mailto:' + currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}</a>
+									</td>
+								</tr>
+								<tr>
+									<td colspan=2>
+										<hr class="ng-tns-c6-1">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+									</td>
+									<td>
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidAmount').val()}} ש"ח
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-calendar fa-fw"></i>
+									</td>
+									<td>
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupDate').val() | date: 'dd/MM/yyyy'}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-clock-o fa-fw"></i>
+									</td>
+									<td>
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
+									</td>
+								</tr>
+								<tr>
+									<td colspan=2>
+										<hr class="ng-tns-c6-1">
+										<u>אפשרויות תשלום</u>
+									</td>
+								</tr>
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCash').val()">
+									<td>
+										<i class="fa fa-money fa-fw"></i>
+									</td>
+									<td>
+										מזומן
+									</td>
+								</tr>
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCredit').val()">
+									<td>
+										<i class="fa fa-credit-card fa-fw"></i>
+									</td>
+									<td>
+										אשראי
+									</td>
+								</tr>
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentWire').val()">
+									<td>
+										<i class="fa fa-exchange fa-fw"></i>
+									</td>
+									<td>
+										העברה בנקאית
+									</td>
+								</tr>
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCheck').val()">
+									<td>
+										<i class="fa fa-id-card-o fa-fw"></i>
+									</td>
+									<td>
+										צק
+									</td>
+								</tr>
+							</table>
 						</div>
 					</div>
 					<div *ngIf="currentOrder.selectedBid === undefined">
 						<h6>הצעות מחיר</h6>
 						<div>
-							<div *ngIf="bidsArray.length <= 0" class="form-control">
-								<small>
-									עדיין אין הצעות מחיר...
-									<br>
-									<small><i class="fa fa-envelope fw"></i> &nbsp; יישלח אליך אימייל ברגע שתקבל הצעת מחיר חדשה</small>
-								</small>
+							<div *ngIf="bidsArray.length <= 0" class="form-control" style="font-size: .8rem;">
+							
+								עדיין אין הצעות מחיר...
+								<br>
+								<small><i class="fa fa-envelope fw"></i> &nbsp; יישלח אליך אימייל ברגע שתקבל הצעת מחיר חדשה</small>
+							
 							</div>
 							<div *ngIf="bidsArray.length > 0">
 								<div *ngFor="let bidItem of bidsArray">
 									<div class="form-control in-bl" style='margin-bottom: 5px'>
-										<small>
-											<table>
-												<tr>
-													<td>
-														<i class="fa fa-user fa-fw"></i> &nbsp;
-													</td>
-													<td>
-														חסוי
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.bidder.rating">
-													<td>
-														<i class="fa fa-line-chart fa-fw"></i> &nbsp;
-													</td>
-													<td>
-														<app-user-rating [user]="bidItem.bidder"></app-user-rating>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
-													</td>
-													<td>
-														{{bidItem.bidAmount}} ש"ח
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<i class="fa fa-calendar fa-fw"></i>
-													</td>
-													<td>
-														{{bidItem.pickupDate | date: 'dd/MM/yyyy'}}
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<i class="fa fa-clock-o fa-fw"></i>
-													</td>
-													<td>
-														{{bidItem.pickupTime | date: 'HH:mm'}}
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.expirationDate && bidItem.expirationDate >= 0">
-													<td>
-														<i class="fa fa-ban fa-fw"></i>
-													</td>
-													<td>
-														{{bidItem.expirationDate | date: 'dd/MM/yyyy'}}
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.possiblePaymentMethods">
-													<td colspan="2">
-														<br>
-														<u>אפשרויות תשלום</u>
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCash">
-													<td>
-														<i class="fa fa-check-square-o fw color-secondary"></i>
-													</td>
-													<td>
-														<i class="fa fa-money fw"></i>&nbsp; מזומן
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCredit">
-													<td>
-														<i class="fa fa-check-square-o fw color-secondary"></i>
-													</td>
-													<td>
-														<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentWire">
-													<td>
-														<i class="fa fa-check-square-o fw color-secondary"></i>
-													</td>
-													<td>
-														<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
-													</td>
-												</tr>
-												<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCheck">
-													<td>
-														<i class="fa fa-check-square-o fw color-secondary"></i>
-													</td>
-													<td>
-														<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
-													</td>
-												</tr>
-												<tr>
-													<td colspan=2>
-														<br>
-														<button type="submit" class="btn btn-sm btn-success" (click)="acceptBid(bidItem)" [attr.disabled]="loadingAcceptBid ? '' : null">בצע עסקה</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingAcceptBid"></i>
-													</td>
-												</tr>
-											</table>
-										</small>
+										<table style="font-size: .8rem;">
+											<tr>
+												<td>
+													<i class="fa fa-user fa-fw"></i> &nbsp;
+												</td>
+												<td>
+													חסוי
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.bidder.rating">
+												<td>
+													<i class="fa fa-line-chart fa-fw"></i> &nbsp;
+												</td>
+												<td>
+													<app-user-rating [user]="bidItem.bidder"></app-user-rating>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+												</td>
+												<td>
+													{{bidItem.bidAmount}} ש"ח
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<i class="fa fa-calendar fa-fw"></i>
+												</td>
+												<td>
+													{{bidItem.pickupDate | date: 'dd/MM/yyyy'}}
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<i class="fa fa-clock-o fa-fw"></i>
+												</td>
+												<td>
+													{{bidItem.pickupTime | date: 'HH:mm'}}
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.expirationDate && bidItem.expirationDate >= 0">
+												<td>
+													<i class="fa fa-ban fa-fw"></i>
+												</td>
+												<td>
+													{{bidItem.expirationDate | date: 'dd/MM/yyyy'}}
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.possiblePaymentMethods">
+												<td colspan="2">
+													<br>
+													<u>אפשרויות תשלום</u>
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCash">
+												<td>
+													<i class="fa fa-check-square-o fw color-secondary"></i>
+												</td>
+												<td>
+													<i class="fa fa-money fw"></i>&nbsp; מזומן
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCredit">
+												<td>
+													<i class="fa fa-check-square-o fw color-secondary"></i>
+												</td>
+												<td>
+													<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentWire">
+												<td>
+													<i class="fa fa-check-square-o fw color-secondary"></i>
+												</td>
+												<td>
+													<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+												</td>
+											</tr>
+											<tr *ngIf="bidItem.possiblePaymentMethods && bidItem.possiblePaymentMethods.paymentCheck">
+												<td>
+													<i class="fa fa-check-square-o fw color-secondary"></i>
+												</td>
+												<td>
+													<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
+												</td>
+											</tr>
+											<tr>
+												<td colspan=2>
+													<br>
+													<button type="submit" class="btn btn-sm btn-success" (click)="acceptBid(bidItem)" [attr.disabled]="loadingAcceptBid ? '' : null">בצע עסקה</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingAcceptBid"></i>
+												</td>
+											</tr>
+										</table>
 									</div>
 								</div>
 							</div>
@@ -338,88 +333,84 @@
 					<h6>הצעת המחיר שלי</h6>
 					<div *ngIf="myBid != undefined">
 						<div class="form-control in-bl" style='margin-bottom: 5px'>
-							<small>
-								<table>
-									<tr>
-										<td>
-											<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
-										</td>
-										<td>
-											 {{myBid.bidAmount}} ש"ח
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-calendar fa-fw"></i>
-										</td>
-										<td>
-											{{myBid.pickupDate | date: 'dd/MM/yyyy'}}
-										</td>
-									</tr>
-									<tr>
-										<td>
-											<i class="fa fa-clock-o fa-fw"></i>
-										</td>
-										<td>
-											{{myBid.pickupTime | date: 'HH:mm'}}
-										</td>
-									</tr>
-									<tr *ngIf="myBid.expirationDate != undefined && myBid.expirationDate > 0">
-										<td>
-											<i class="fa fa-ban fa-fw"></i>
-										</td>
-										<td>
-											{{myBid.expirationDate | date: 'dd/MM/yyyy'}}
-										</td>
-									</tr>
-									<tr *ngIf="myBid.possiblePaymentMethods">
-										<td colspan="2">
-											<br>
-											<u>אפשרויות קבלת תשלום</u>
-										</td>
-									</tr>
-									<tr *ngIf="myBid.possiblePaymentMethods.paymentCash">
-										<td>
-											<i class="fa fa-check-square-o fw color-secondary"></i>
-										</td>
-										<td>
-											<i class="fa fa-money fw"></i>&nbsp; מזומן
-										</td>
-									</tr>
-									<tr *ngIf="myBid.possiblePaymentMethods.paymentCredit">
-										<td>
-											<i class="fa fa-check-square-o fw color-secondary"></i>
-										</td>
-										<td>
-											<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
-										</td>
-									</tr>
-									<tr *ngIf="myBid.possiblePaymentMethods.paymentWire">
-										<td>
-											<i class="fa fa-check-square-o fw color-secondary"></i>
-										</td>
-										<td>
-											<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
-										</td>
-									</tr>
-									<tr *ngIf="myBid.possiblePaymentMethods.paymentCheck">
-										<td>
-											<i class="fa fa-check-square-o fw color-secondary"></i>
-										</td>
-										<td>
-											<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
-										</td>
-									</tr>
-									<tr>
-										<td colspan=2>
-											<br>
-											<button type="submit" class="btn btn-sm btn-danger" (click)="removeMyBid()" [attr.disabled]="loadingDeleteBid ? '' : null">מחק הצעת מחיר</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingDeleteBid"></i>
-										</td>
-									</tr>
-								</table>
-							</small>
-							
-							
+							<table style="font-size: .8rem;">
+								<tr>
+									<td>
+										<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
+									</td>
+									<td>
+										 {{myBid.bidAmount}} ש"ח
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-calendar fa-fw"></i>
+									</td>
+									<td>
+										{{myBid.pickupDate | date: 'dd/MM/yyyy'}}
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<i class="fa fa-clock-o fa-fw"></i>
+									</td>
+									<td>
+										{{myBid.pickupTime | date: 'HH:mm'}}
+									</td>
+								</tr>
+								<tr *ngIf="myBid.expirationDate != undefined && myBid.expirationDate > 0">
+									<td>
+										<i class="fa fa-ban fa-fw"></i>
+									</td>
+									<td>
+										{{myBid.expirationDate | date: 'dd/MM/yyyy'}}
+									</td>
+								</tr>
+								<tr *ngIf="myBid.possiblePaymentMethods">
+									<td colspan="2">
+										<br>
+										<u>אפשרויות קבלת תשלום</u>
+									</td>
+								</tr>
+								<tr *ngIf="myBid.possiblePaymentMethods.paymentCash">
+									<td>
+										<i class="fa fa-check-square-o fw color-secondary"></i>
+									</td>
+									<td>
+										<i class="fa fa-money fw"></i>&nbsp; מזומן
+									</td>
+								</tr>
+								<tr *ngIf="myBid.possiblePaymentMethods.paymentCredit">
+									<td>
+										<i class="fa fa-check-square-o fw color-secondary"></i>
+									</td>
+									<td>
+										<i class="fa fa-credit-card fw chckedbg"></i>&nbsp; אשראי
+									</td>
+								</tr>
+								<tr *ngIf="myBid.possiblePaymentMethods.paymentWire">
+									<td>
+										<i class="fa fa-check-square-o fw color-secondary"></i>
+									</td>
+									<td>
+										<i class="fa fa-exchange fw chckedbg"></i>&nbsp; העברה בנקאית
+									</td>
+								</tr>
+								<tr *ngIf="myBid.possiblePaymentMethods.paymentCheck">
+									<td>
+										<i class="fa fa-check-square-o fw color-secondary"></i>
+									</td>
+									<td>
+										<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
+									</td>
+								</tr>
+								<tr>
+									<td colspan=2>
+										<br>
+										<button type="submit" class="btn btn-sm btn-danger" (click)="removeMyBid()" [attr.disabled]="loadingDeleteBid ? '' : null">מחק הצעת מחיר</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingDeleteBid"></i>
+									</td>
+								</tr>
+							</table>
 						</div>
 					</div>
 					<div class="form-control" *ngIf="myBid == undefined">

@@ -1,8 +1,7 @@
 <div [@routerTransition] class="main-content-container">
 	<div>
-		<h2 class="text-muted">הרשמת מנהל<br><i class="fa fa-lock fa-fw"></i><small>תשלום מאובטח</small></h2>
-		<small>
-			<table class="form-control" *ngIf="userSnapshot">
+		<h2 class="text-muted">הרשמת מוביל<br><i class="fa fa-lock fa-fw"></i><small>תשלום מאובטח</small></h2>
+			<table class="form-control" *ngIf="userSnapshot" style="font-size: 1rem;">
 				<tr>
 					<td>
 						<i class="fa fa-user fa-fw"></i> &nbsp;
@@ -20,7 +19,13 @@
 					</td>
 				</tr>
 			</table>
-		</small>
+			<br>
+			<div class="form-control" style="font-size: 1rem; color: white; background-color: green; padding: .5rem; font-weight: bold;">
+				* שים לב ! - חשבונך  <u>לא יחוייב</u> בהזנת כרטיס האשראי
+			</div>
+			<div class="form-control" style="font-size: .8rem; color: white; background-color: green; padding: .5rem;">
+				במידה והרווחת דרך האתר, תחוייב ב 8% מסך העסקה 24 שעות לאחר מועד העסקה.
+			</div>
 		<br>
 		<iframe class="iframeheight" #iframeContent></iframe>
 	</div>

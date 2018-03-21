@@ -27,6 +27,8 @@ export interface AuthListener {
 
 export class Constants {
   
+  public static get STATIC_MAP_HEIGHT(): number { return 200 };
+  
   public static get NORTH(): number { return 1 };
   public static get CENTER(): number { return 2 };
   public static get SOUTH(): number { return 3 };
@@ -286,5 +288,14 @@ export class DatabaseService {
     this.allOrdersSubscription.forEach(subscription => {
       subscription.unsubscribe();
     });
+  }
+  
+  getTodayDate () {
+    const today = new Date();
+    return this.resetDateToMidnight(today);
+  }
+  
+  resetDateToMidnight (date) {
+    return date.setHours(0, 0, 0, 0);
   }
 }

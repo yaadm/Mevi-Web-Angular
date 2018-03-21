@@ -109,11 +109,14 @@ export class MyCalendarComponent implements OnInit, OnDestroy, AuthListener {
     const myId = this.database.currentUser.child('uid').val();
     
     let selectedColor = colors.red;
+    let eventTitle: string;
     
     if (orderSnapshot.child('selectedBid').val() === myId) { // my delivery
       selectedColor = colors.yellow;
+      eventTitle = 'הובלה: ';
     } else if (orderSnapshot.child('userId').val() === myId) { // my order
       selectedColor = colors.green;
+      eventTitle = 'הזמנה: ';
     } else if (orderStatus === 0) {
       return;
     }
@@ -122,7 +125,7 @@ export class MyCalendarComponent implements OnInit, OnDestroy, AuthListener {
     const deliveryDate = orderSnapshot.child('bidsList').child(selectedBid).child('pickupDate').val();
     
     this.events.push({
-      title: 'הזמנה: ' + orderSnapshot.child('orderId').val(),
+      title: eventTitle + orderSnapshot.child('orderId').val(),
       start: new Date(deliveryDate),
       end: new Date(deliveryDate),
       color: selectedColor,
@@ -134,8 +137,8 @@ export class MyCalendarComponent implements OnInit, OnDestroy, AuthListener {
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
     
     const isManager = this.database.currentUser.child('manager').val();
-    
-    if (isManager) {
+    const isPast = this.database.getTodayDate() > date;
+    if (isManager && !isPast) {
       
       if (!this.activeDayIsOpen) {
       

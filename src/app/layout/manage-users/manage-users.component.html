@@ -46,7 +46,7 @@
 							<i class="fa fa-envelope fa-fw"></i>
 						</td>
 						<td>
-							{{user.email}}
+							<a href="{{'mailto:' + user.email}}">{{user.email}}</a>
 						</td>
 					</tr>
 					<tr *ngIf="user.companyId">
@@ -63,7 +63,7 @@
 							<i class="fa fa-phone fa-fw"></i>
 						</td>
 						<td>
-							{{user.companyPhone}}
+							<a href="{{'tel:' + user.companyPhone}}">{{user.companyPhone}}</a>
 						</td>
 					</tr>
 				</table>

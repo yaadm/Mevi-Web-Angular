@@ -76,11 +76,15 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 		
 	    const orderId = event.params.orderId;
 	    const order = event.data;
+	    const isTest = event.data.child('test').val();
 	    
 	    var promises = [];
-	    
-	    //send push to managers
-	    promises.push(sendNotificationToManagers("action_new_post", order));
+	     
+	    if (!isTest) {
+	    	
+	    	//send push to managers
+	    	promises.push(sendNotificationToManagers("action_new_post", order));
+	    }
 	    
 	    promises.push(updateDistanceForOrder(order));
 	    
@@ -422,7 +426,7 @@ function sendEmailToUser(user, action, data) {
 			
 			var subject = 'בקשת הניהול שלך אושרה !';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>בקשת הניהול שלך אושרה !<br><a href="https://mevi.co.il">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>בקשת הניהול שלך אושרה !<br><a href="https://mevi.co.il/manager-registration-page">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 			mailOptions.html = body;
 		} else {
