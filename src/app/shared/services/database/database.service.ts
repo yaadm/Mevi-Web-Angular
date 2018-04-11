@@ -110,10 +110,8 @@ export class DatabaseService {
             // User Logged Out
             console.log('Logged Out');
             this.currentUser = undefined;
-            this.publishUserChangeToAuth(this.currentUser);
+            this.publishUserChangeToAuth(undefined);
 
-            // TODO: check if not in public page (main, about us, contact us etc..) only then route to /home.
-            this.router.navigate(['/home-page']);
           }
         }
       );
@@ -127,6 +125,7 @@ export class DatabaseService {
   }
 
   logout() {
+    this.router.navigate(['/home-page']);
     this.unsubscribeFromAll();
     // firebase.database().goOffline();
     localStorage.removeItem('isLoggedin');

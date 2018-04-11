@@ -19,6 +19,7 @@ export class UserProfileComponent implements OnInit, OnDestroy, AuthListener {
   userId: string;
   userObject: DataSnapshot;
   currentUser: any;
+  subscription;
   userObjectObs: Observable<AngularFireAction<DataSnapshot>>;
   constructor(private translate: TranslateService, public database: DatabaseService, private activatedRoute: ActivatedRoute) {
     this.userId = this.activatedRoute.snapshot.params['userId'];
@@ -31,14 +32,15 @@ export class UserProfileComponent implements OnInit, OnDestroy, AuthListener {
   }
 
   ngOnDestroy(): void {
-      this.database.unsubscribeFromAuth(this);
+    this.database.unsubscribe(this.subscription);
+    this.database.unsubscribeFromAuth(this);
   }
 
   onUserChanged(user: any) {
     if (user) {
         this.currentUser = user;
         this.userObjectObs = this.database.subscribeToUserById(this.userId);
-        this.userObjectObs.subscribe(
+        this.subscription = this.userObjectObs.subscribe(
         (afa: AngularFireAction<DataSnapshot>) => {
             this.userObject = afa.payload;
         });

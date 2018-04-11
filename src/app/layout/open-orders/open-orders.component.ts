@@ -18,6 +18,7 @@ import { DataSnapshot } from 'firebase/database';
 })
 export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   items:  Observable<{}[]>;
+  itemsSubscription;
   itemsArray = [];
   filteredItemsArray = [];
   searchTerm = undefined;
@@ -119,13 +120,14 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   }
   
   ngOnDestroy(): void {
-      this.database.unsubscribeFromAuth(this);
+    this.database.unsubscribeFromAuth(this);
+    this.database.unsubscribe(this.itemsSubscription);
   }
 
   onUserChanged(user: any) {
     if (user) {
       this.items = this.database.subscribeToOpenedOrders();
-      this.items.subscribe(
+      this.itemsSubscription = this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
             this.updateItemsArray(order);
@@ -134,7 +136,6 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
         });
       
     } else {
-      this.database.unsubscribeFromAuth(this);
     }
   }
 

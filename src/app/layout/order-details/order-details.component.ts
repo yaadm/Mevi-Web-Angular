@@ -120,10 +120,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   }
 
   ngOnDestroy(): void {
-    if (this.orderSubscription) {
-      this.orderSubscription.unsubscribe();
-    }
     this.database.unsubscribeFromAuth(this);
+    this.database.unsubscribe(this.orderSubscription);
   }
 
   onUserChanged(user: any) {
@@ -165,9 +163,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       this.database.addSubscription(this.orderSubscription);
     } else {
 
-      if (this.orderSubscription) {
-        this.orderSubscription.unsubscribe();
-      }
+      this.database.unsubscribe(this.orderSubscription);
       this.currentOrder = undefined;
     }
   }

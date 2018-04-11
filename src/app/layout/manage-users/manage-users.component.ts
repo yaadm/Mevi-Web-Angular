@@ -19,6 +19,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
   items:  Observable<{}[]>;
   itemsArray = [];
   visibilityMap: string[] = [];
+  itemsSubscription;
   
   @ViewChild('selectionSearchType')
   public selectionSearchTypeRef: ElementRef;
@@ -39,12 +40,13 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
 
   ngOnDestroy(): void {
       this.database.unsubscribeFromAuth(this);
+      this.database.unsubscribe(this.itemsSubscription);
   }
 
   onUserChanged(user: any) {
     if (user) {
       this.items = this.database.subscribeToAllUsers();
-      this.items.subscribe(
+      this.itemsSubscription = this.items.subscribe(
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.forEach(userItem => {
             this.updateItemsArray(userItem);

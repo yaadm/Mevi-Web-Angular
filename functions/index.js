@@ -12,7 +12,7 @@ var ORDER_STATUS_DELETED = 4;
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 const nodemailer = require('nodemailer');
 var request = require('request');
 const gmailEmail = encodeURIComponent(functions.config().gmail.email);
@@ -29,9 +29,9 @@ const urlForPaymentReq = "https://icredit.rivhit.co.il/API/PaymentPageRequest.sv
 const accessTokenTerminalSaving = "d8a0e2a5-0fff-4aee-8e63-7c69f9ce09c1"; // DebugKey: 872f1891-d4f8-4a44-b566-dfb26e99401e
 const accessTokenTerminalPayment  = "bdbca16d-4090-4e20-9c81-d7fe3f3c826c"; // DebugKey: 872f1891-d4f8-4a44-b566-dfb26e99401e
 
-exports.onCreateUser = functions.auth.user().onCreate(event => {
+exports.onCreateUser = functions.auth.user().onCreate((userRecord, context) => {
 	
-	const user = event.data; // The Firebase user.
+	const user = userRecord; // The Firebase user.
 
 	const uid = user.uid;
 	const email = user.email; // The email of the user.
@@ -57,9 +57,9 @@ exports.onCreateUser = functions.auth.user().onCreate(event => {
 	return admin.database().ref('/users/' + uid).set(userObject);
 });
 
-exports.onDeleteUser = functions.auth.user().onDelete(event => {
+exports.onDeleteUser = functions.auth.user().onDelete((userRecord, context) => {
 	
-	const user = event.data; // The Firebase user.
+	const user = userRecord; // The Firebase user.
 	const uid = user.uid;
 	
 	console.log('user deleted: ' + JSON.stringify(user));
@@ -67,20 +67,20 @@ exports.onDeleteUser = functions.auth.user().onDelete(event => {
 	return admin.database().ref('/users/' + uid).remove();
 });
 
-exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite(event => {
+exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite((change, context) => {
 
-	if(event.data.previous.exists() && !event.data.exists()){
+	if(change.before.exists() && !change.after.exists()){
 		//  order was deleted
 		console.log('order deleted.');
 		
-	} else if (!event.data.previous.exists() && event.data.exists()){
+	} else if (!change.before.exists() && change.after.exists()){
 		// order was created
 		
 		console.log('order created.');
 		
-	    const orderId = event.params.orderId;
-	    const order = event.data;
-	    const isTest = event.data.child('test').val();
+	    const orderId = context.params.orderId;
+	    const order = change.after;
+	    const isTest = change.after.child('test').val();
 	    
 	    var promises = [];
 	     
@@ -94,14 +94,14 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 	    
 	    
 	    return Promise.all(promises);
-	} else if(event.data.previous.exists() && event.data.exists()){
+	} else if(change.before.exists() && change.after.exists()){
 		// order Edited
 		
 		console.log('order changed.');
 		
-		const orderId = event.params.orderId;
-		const orderStatus = event.data.child('orderStatus').val();
-		const prevOrderStatus = event.data.previous.child('orderStatus').val();
+		const orderId = context.params.orderId;
+		const orderStatus = change.after.child('orderStatus').val();
+		const prevOrderStatus = change.before.child('orderStatus').val();
 		
 		if(orderStatus !== prevOrderStatus){
 			//status has changed
@@ -131,7 +131,7 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 					'needToResolveCancellation' : true
 				}
 				
-				promises.push(admin.database().ref('/all-orders/' + event.params.orderId).update(payload));
+				promises.push(admin.database().ref('/all-orders/' + context.params.orderId).update(payload));
 				
 				return Promise.all(promises);
 			}
@@ -179,19 +179,19 @@ function updateDistanceForOrder (order) {
 	}
 }
 
-exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId}').onWrite(event => {
+exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId}').onWrite((change, context) => {
 
 	// Exit when the data is deleted.
-	if (!event.data.exists()) {
+	if (!change.after.exists()) {
 		console.log('data deleted');
 		return true;
-	} else if (event.data.previous.exists()) {
+	} else if (change.before.exists()) {
 		console.log('data edited');
 	} else {
 		console.log('data created');
 	}
 	
-	const orderId = event.params.orderId;
+	const orderId = context.params.orderId;
 	
 	//send notification to owner
 	return admin.database().ref('/all-orders/' + orderId + '/userId').once('value').then(userIdSnapshot => {
@@ -208,14 +208,14 @@ exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId
 	});
 });
 
-exports.onBidSelected = functions.database.ref('/all-orders/{orderId}/selectedBid').onWrite(event => {
+exports.onBidSelected = functions.database.ref('/all-orders/{orderId}/selectedBid').onWrite((change, context) => {
 	
-	if (!event.data.exists()) {
+	if (!change.after.exists()) {
 		console.log('data deleted.');
 		return true;
 	}
 	
-	const bidderId = event.data.val();
+	const bidderId = change.after.val();
 	
 	if(!bidderId){
 		console.log('data deleted.');
@@ -224,52 +224,55 @@ exports.onBidSelected = functions.database.ref('/all-orders/{orderId}/selectedBi
 	
 	var promises = [];
 	
-	promises.push(sendNotificationsToUserById(bidderId, "action_new_delivery", event.params.orderId));
+	promises.push(sendNotificationsToUserById(bidderId, "action_new_delivery", context.params.orderId));
 	
 	return Promise.all(promises);
 });
 
-exports.onAppManagerStateChange = functions.database.ref('/users/{userId}/appManager').onWrite(event => {
+exports.onAppManagerStateChange = functions.database.ref('/users/{userId}/appManager').onWrite((change, context) => {
 	
-	if(!event.data.exists()){
+	if(!change.after.exists()){
 		console.log('appManager key removed');
-		return;
+		return true;
 	}
 	
-	const isAppManager = event.data.val();
-	const userId = event.params.userId;
+	const isAppManager = change.after.val();
+	const userId = context.params.userId;
 	
 	if(isAppManager){
 		return sendNotificationsToUserById(userId, 'app-manager-state-change', '1'); // true
 	} else {
 		return sendNotificationsToUserById(userId, 'app-manager-state-change', '0'); // false
 	}
-	
+
+	return true;
 });
 
-exports.onNewManagerRequest = functions.database.ref('/users/{userId}/requestingManager').onWrite(event => {
+exports.onNewManagerRequest = functions.database.ref('/users/{userId}/requestingManager').onWrite((change, context) => {
 	
-	var isRequestingManager = event.data.val();
-	var wasRequestingManager = event.data.previous.val();
+	var isRequestingManager = change.after.val();
+	var wasRequestingManager = change.before.val();
 	if(isRequestingManager){
 		return sendNotificationToAppManagers("action_new_manager_request", '');
 	}
+
+	return true;
 });
 
 const MANAGER_STATUS_PENDING = "0";
 const MANAGER_STATUS_APPROVED = "1";
 const MANAGER_STATUS_DENIED = "2";
 
-exports.onManagerStateChanged = functions.database.ref('/users/{userId}/manager').onWrite(event => {
+exports.onManagerStateChanged = functions.database.ref('/users/{userId}/manager').onWrite((change, context) => {
 	
-	if(!event.data.previous.exists()) {
+	if(!change.before.exists()) {
 		
 		// user was created
-		return;
+		return true;
 	}
 	
-	const isManager = event.data.val();
-	const userId = event.params.userId;
+	const isManager = change.after.val();
+	const userId = context.params.userId;
 	
 	if(isManager === true){
 		return sendNotificationsToUserById(userId, "action_manager_request_status_changed", MANAGER_STATUS_APPROVED);
@@ -278,26 +281,28 @@ exports.onManagerStateChanged = functions.database.ref('/users/{userId}/manager'
 	}
 });
 
-exports.onRequestingManagerDenied = functions.database.ref('/users/{userId}/requestingManagerDenied').onWrite(event => {
+exports.onRequestingManagerDenied = functions.database.ref('/users/{userId}/requestingManagerDenied').onWrite((change, context) => {
 	
-	const requestingManagerDenied = event.data.val();
-	const userId = event.params.userId;
+	const requestingManagerDenied = change.after.val();
+	const userId = context.params.userId;
 	
 	if(requestingManagerDenied === true){
 		return sendNotificationsToUserById(userId, "action_manager_request_status_changed", MANAGER_STATUS_DENIED);
 	}
+	
+	return true;
 });
 
-exports.onNewContactUsMessage = functions.database.ref('/email-inbox/{messageId}').onWrite(event => {
+exports.onNewContactUsMessage = functions.database.ref('/email-inbox/{messageId}').onWrite((change, context) => {
 	
-	if(!event.data.exists()){
+	if(!change.after.exists()){
 		// was removed
 		
 		console.log('Contact us email - was removed from database.');
 		return true;
 	}
 	
-	return sendEmailToUs(event.data);
+	return sendEmailToUs(change.after);
 });
 
 function sendNotificationToManagers(action, order) {
@@ -932,13 +937,32 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 	
 	const uid = req.query.uid;
 
-	if(!uid){
+	if(!uid || uid == undefined){
 		
 		console.log("onUserPaymentMethodCompleted uid is null");
 		
-		return false;
+		return res.status(200).send(`<!doctype html>
+			    <head>
+			      <title>כשלון</title>
+			    </head>
+			    <body>
+			      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+			    </body>
+			  </html>`);
 	} else {
 		console.log("onUserPaymentMethodCompleted uid: " + uid);
+	}
+	
+	if (uid == 'undefined') {
+		console.log("stopping onUserPaymentMethodCompleted");
+		return res.status(200).send(`<!doctype html>
+			    <head>
+			      <title>כשלון</title>
+			    </head>
+			    <body>
+			      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+			    </body>
+			  </html>`);
 	}
 	
 	var AccessToken = req.body.TransactionToken;
@@ -975,9 +999,16 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 	} else {
 		
 		console.log("onUserPaymentMethodCompleted AccessToken is null");
+		return res.status(302).send(`<!doctype html>
+			    <head>
+			      <title>כשלון</title>
+			    </head>
+			    <body>
+			      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+			    </body>
+			  </html>`);
 	}
 	
-	return true;
 });
 
 exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
@@ -985,6 +1016,19 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 	
 	const uid = req.query.uid;
 	console.log("rediredctUserToPayment uid: " + uid);
+	
+	if(!uid || uid == undefined){
+		console.log("rediredctUserToPayment uid is null");
+		
+		return res.status(302).send(`<!doctype html>
+			    <head>
+			      <title>כשלון</title>
+			    </head>
+			    <body>
+			      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+			    </body>
+			  </html>`);
+	}
 	
 	try{
 		
@@ -1011,7 +1055,7 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 				}
 			};
 		
-		request(options, function(error, response, body) {
+		return request(options, function(error, response, body) {
 			
 			var payload = undefined;
 			
@@ -1023,7 +1067,14 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 				if(!redirectUrl){
 					console.log("failed to receive redirect url for payment (null)");
 					
-					return res.redirect;
+					return res.status(302).send(`<!doctype html>
+						    <head>
+						      <title>כשלון</title>
+						    </head>
+						    <body>
+						      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+						    </body>
+						  </html>`);
 					
 				} else {
 					
@@ -1037,6 +1088,14 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 			} else {
 				
 				console.log("failed to redirect user to payment page" +"\n" + JSON.stringify(body));
+				return res.status(302).send(`<!doctype html>
+					    <head>
+					      <title>כשלון</title>
+					    </head>
+					    <body>
+					      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+					    </body>
+					  </html>`);
 			}
 			
 		});
@@ -1044,6 +1103,14 @@ exports.rediredctUserToPayment = functions.https.onRequest((req, res) => {
 	}catch(e){
 		
 		console.log("charing request function error: " + e.message);
+		return res.status(302).send(`<!doctype html>
+			    <head>
+			      <title>כשלון</title>
+			    </head>
+			    <body>
+			      <h1 style="margin: 50px;">יצירת חשבון המנהל נכשלה, נא נסה שוב מאוחר יותר !</h1>
+			    </body>
+			  </html>`);
 	}
 	
 });
