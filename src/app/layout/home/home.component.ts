@@ -19,6 +19,8 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
   public doughnutChartData: number[] = [];
   statistics: any;
   public sliders: Array<any> = [];
+  showYoutubeOverlay = true;
+  videoIsReady = false;
   
   constructor(private translate: TranslateService, public database: DatabaseService, public router: Router) {
     this.setupTranslation(translate);
@@ -37,6 +39,10 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
       });
   }
 
+  toggleOverlayVideo() {
+    this.showYoutubeOverlay = !this.showYoutubeOverlay;
+  }
+  
   onUserChanged(user: any) {
     
     if (user !== undefined) {

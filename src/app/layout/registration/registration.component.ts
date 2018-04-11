@@ -61,6 +61,9 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     } else if (!this.checkboxAgreementRef.nativeElement.checked) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
       return;
+    } else if (!this.database.currentUser) {
+      this.showInformationDialog('שגיאה במשתמש', 'נסה להתחבר מחדש ולנסות שנית מאוחר יותר, תודה');
+      return;
     }
 
     this.loading = true;

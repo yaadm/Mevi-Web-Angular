@@ -52,6 +52,8 @@ exports.onCreateUser = functions.auth.user().onCreate(event => {
 			'subscribedToPushNotifications' : true
 	};
 	
+	console.log('user created: ' + JSON.stringify(userObject));
+	
 	return admin.database().ref('/users/' + uid).set(userObject);
 });
 
@@ -59,6 +61,8 @@ exports.onDeleteUser = functions.auth.user().onDelete(event => {
 	
 	const user = event.data; // The Firebase user.
 	const uid = user.uid;
+	
+	console.log('user deleted: ' + JSON.stringify(user));
 	
 	return admin.database().ref('/users/' + uid).remove();
 });
@@ -1374,6 +1378,8 @@ function paymentCron(){
 											}
 
 											console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - ICredit Status: " + status + " ,DebugMessage: " + debugMessage);
+											
+											console.log("Removing Manager permissions for user [" + uid + "]");
 											
 											payload = {
 													'pendingPayment' : true,

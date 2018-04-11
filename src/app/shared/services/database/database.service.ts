@@ -9,12 +9,12 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 export const firebaseConfigDebug = {
-    apiKey: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo', // AIzaSyBVXuyXlPNqEm0OgzZLtLositCCAfZN7QQ 
+    apiKey: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo', // AIzaSyBVXuyXlPNqEm0OgzZLtLositCCAfZN7QQ
     authDomain: 'gettruck-c3ad3.firebaseapp.com',
     databaseURL: 'https://gettruck-c3ad3.firebaseio.com',
     projectId: 'gettruck-c3ad3',
     storageBucket: 'gettruck-c3ad3.appspot.com',
-    messagingSenderId: '808278210056'
+    messagingSenderId: '808278210056' 
 };
 
 /**
@@ -71,6 +71,18 @@ export class DatabaseService {
 
             this.user = firebaseUser;
 
+            if (!firebaseUser.uid) {
+      
+              console.log('Error loading User !');
+      
+              this.logout();
+      
+              const promise = new Promise<void>((resolve, reject) => {
+                reject();
+              });
+              return promise;
+            }
+            
             // User Signed In
             const userSubscription: Subscription = this.afDb.object('/users/' + firebaseUser.uid).snapshotChanges().subscribe(
               (afa: AngularFireAction<DataSnapshot>) => {
@@ -91,7 +103,7 @@ export class DatabaseService {
               }
             );
 
-            this.allSubscriptions.push(userSubscription);
+            this.addSubscription(userSubscription);
 
           } else {
 
@@ -116,7 +128,7 @@ export class DatabaseService {
 
   logout() {
     this.unsubscribeFromAll();
-    firebase.database().goOffline();
+    // firebase.database().goOffline();
     localStorage.removeItem('isLoggedin');
     this.afAuth.auth.signOut();
   }
@@ -173,21 +185,43 @@ export class DatabaseService {
   
   getMyOrders(): Promise<any>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).query.once('value');
   }
   
   getMyDeliveries(): Promise<any>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).query.once('value');
   }
   
   subscribeToOpenedOrders(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      return new Observable<{}[]>();
+    }
     return this.afDb.list('/all-orders', ref => ref.orderByChild('orderStatus').equalTo(0)).valueChanges();
   }
 
   subscribeToMyDeliveries(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      return new Observable<{}[]>();
+    }
     return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).valueChanges();
   }
 
@@ -197,6 +231,10 @@ export class DatabaseService {
 
   subscribeToManagersRequests(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      return new Observable<{}[]>();
+    }
     return this.afDb.list('/users', ref => ref.orderByChild('requestingManager').equalTo(true)).valueChanges();
   }
 
@@ -218,26 +256,55 @@ export class DatabaseService {
   
   updateBidForOrder(orderId, payload): Promise<void> {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.object('/all-orders/' + orderId + '/bidsList/' + uid).set(payload);
   }
   
   removeMyBidFromOrder(orderId): Promise<void> {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.object('/all-orders/' + orderId + '/bidsList/' + uid).remove();
   }
   
   deleteOrderById(orderId): Promise<void> {
-    const uid = this.currentUser.child('uid').val();
     return this.afDb.object('/all-orders/' + orderId).remove();
   }
   
   updateOrderData(orderId, payload): Promise<void> {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.object('/all-orders/' + orderId).update(payload);
   }
   
   updateMyUserData(payload): Promise<void> {
     const uid = this.currentUser.child('uid').val();
+    
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
+    
     return this.afDb.object('/users/' + uid).update(payload);
   }
 
@@ -273,6 +340,13 @@ export class DatabaseService {
   
   enableNotificationOnNewOrders () {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      const promise = new Promise<void>((resolve, reject) => {
+        reject();
+      });
+      return promise;
+    }
     return this.afDb.object('/users/' + uid).update({'subscribedToMailingList' : true});
   }
   
@@ -288,6 +362,12 @@ export class DatabaseService {
     this.allOrdersSubscription.forEach(subscription => {
       subscription.unsubscribe();
     });
+    
+    for (const subscription of this.allOrdersSubscription) {
+      if (subscription) {
+          subscription.unsubscribe();
+      }
+    }
   }
   
   getTodayDate () {

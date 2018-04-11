@@ -114,7 +114,7 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
   }
 
   getDateString(dateInMillis) {
-    const dp = new DatePipe(this.translate.currentLang);
+    const dp = new DatePipe('en');
     return dp.transform(new Date(+dateInMillis), 'yyyy-MM-dd');
   }
   
@@ -129,8 +129,8 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
         (afa: AngularFireAction<DataSnapshot>[]) => {
           afa.reverse().forEach(order => {
             this.updateItemsArray(order);
-            this.filterOrders();
           });
+          this.filterOrders();
         });
       
     } else {

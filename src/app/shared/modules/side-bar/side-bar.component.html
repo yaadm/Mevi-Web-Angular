@@ -9,7 +9,7 @@
 			</small>
 		</h6>
 		<br>
-		<button type="submit" class="btn btn-success" (click)="openByLocation()"><i class="fa fa-map-marker fw"></i>&nbsp; אני פנוי עכשיו</button>
+		<button type="submit" class="btn btn-success" (click)="openByLocation()"><i class="fa fa-map-marker fw"  [attr.disabled]="loadingOpenByLocation ? '' : null"></i>&nbsp; אני פנוי עכשיו</button>&nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingOpenByLocation"></i>
 	</div>
 
 	<div class="breadcrumb">

@@ -10,9 +10,12 @@ import { TranslateService } from '@ngx-translate/core';
     styleUrls: ['./side-bar.component.scss']
 })
 export class SideBarComponent implements OnInit {
-    constructor(private translate: TranslateService, public database: DatabaseService, public router: Router) { }
+  
+  loadingOpenByLocation = false;
+  
+  constructor(private translate: TranslateService, public database: DatabaseService, public router: Router) { }
 
-    ngOnInit() {}
+  ngOnInit() {}
 
   onNewOrderNotificationClick () {
     this.database.enableNotificationOnNewOrders();
@@ -20,14 +23,24 @@ export class SideBarComponent implements OnInit {
   
   openByLocation() {
     
+    
+    
     if (window.navigator && window.navigator.geolocation) {
+      
+      console.log('openByLocation()');
+      
+      this.loadingOpenByLocation = true;
+      
         window.navigator.geolocation.getCurrentPosition(
             position => {
-                console.log(position);
+                this.loadingOpenByLocation = false;
+                console.log('position: ' + position.toString());
                 const fromArea = Constants.getLocation(position.coords.latitude);
                 this.openOpenOrdersbyLocation(fromArea);
             },
             error => {
+              this.loadingOpenByLocation = false;
+              console.log('error: ' + error);
                 switch (error.code) {
                     case 1:
                         console.log('Permission Denied');
@@ -37,6 +50,9 @@ export class SideBarComponent implements OnInit {
                         break;
                     case 3:
                         console.log('Timeout');
+                        break;
+                    default:
+                        console.log('error: ' + error);
                         break;
                 }
               

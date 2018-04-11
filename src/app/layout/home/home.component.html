@@ -1,10 +1,10 @@
 <div [@routerTransition] class="mh_container">
 
-	<div class="background-image">
+	<div class="background-image" style="height: 100vh;">
 	</div>
 	 <div class="container">
 	    <div class="row">
-	        <div class="col-md-6 block" style="margin-top: 2rem; margin-bottom: 2rem;">
+	        <div class="col-md-6 block" style="margin-bottom: 2rem;">
 	            <div class="circle-green block">
 	            	<div class="circle-white block" style="margin: 10px;" (click)="onCreateNewOrderClicked()">
 		                <p>
@@ -19,7 +19,7 @@
 	            	</div>
 	            </div>
 	        </div>
-	        <div class="col-md-6 block" style="margin-top: 2rem; margin-bottom: 2rem;">
+	        <div class="col-md-6 block" style="margin-bottom: 2rem;">
 	            <div class="circle-blue block">
 	            	<div class="circle-white block" style="margin: 10px;" (click)="onManagerRequestClicked()">
 		                <p>
@@ -36,89 +36,19 @@
 	        </div>
 	    </div>
 	</div>
-
-	<!-- <div class="row">
-		<div class="col-xl-12">
-			<h3 class="page-header">
-				<strong>Mevi</strong><small> - פתרונות שינוע</small>
-			</h3>
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><i class="fa fa-home"></i> <a
-					href="Javascript:void(0)" [routerLink]="['/home-page']">{{'Home'
-						| translate}}</a></li>
-			</ol>
-		</div>
-	</div> -->
-	<!-- <div class="row">
-        <div class="col-md-12">
-            <ngb-carousel>
-                <ng-template ngbSlide *ngFor="let slider of sliders">
-                    <img class="img-fluid mx-auto d-block" [src]="slider.imagePath" alt="Random first slide" width="100%">
-                    <div class="carousel-caption">
-                        <h3>{{slider.label}}</h3>
-                        <p>{{slider.text}}</p>
-                    </div>
-                </ng-template>
-            </ngb-carousel>
-        </div>
+	
+	<div *ngIf="videoIsReady">
+		<div class="form-control bottom-left-video" style="padding: .2rem;" *ngIf="showYoutubeOverlay">
+			<div (click)="toggleOverlayVideo()">
+				<div class="btn" style="padding: 0px;">
+					<i class="fa fa-close fa-fw"></i> &nbsp;סגור 
+				</div>
+			</div>
+	    	<iframe width="420" height="236" src="https://www.youtube.com/embed/HWfVXzkt-WA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+	    </div>
+	    <div class="form-control bottom-left-video" *ngIf="!showYoutubeOverlay">
+			<i class="fa fa-youtube fa-3x" (click)="toggleOverlayVideo()"></i>
+	    </div>
     </div>
-    <hr> -->
-	<!-- <div class="row main-content-container">
-		<div class="col-lg-9">
-			<div class="row">
-				<div class="col-lg-6">
-					<app-suggestion-card [actionRout]="['/create-order-page']"
-						[bgClass]="'card-success'" [icon]="'fa-truck'"
-						[header]="'Get bids for your deliveries' | translate"
-						[text]="'Need to transport goods ? \nHere, you can gets bids for your orders ensuring the best price possible' | translate"
-						[action]="this.database.getCurrentUser() ? ('Publish order' | translate) : ''"></app-suggestion-card>
-				</div>
-
-				<div class="col-lg-6"
-					*ngIf="database.getCurrentUser() == undefined || (database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() !== true)">
-					<app-suggestion-card [actionRout]="['/manager-registration-page']"
-						[bgClass]="'card-danger'" [icon]="'fa-cc-visa'"
-						[header]="'Find jobs for your trucks' | translate"
-						[text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"
-						[action]="this.database.getCurrentUser() ? ('Register as manager' | translate) : ''"></app-suggestion-card>
-				</div>
-				<div class="col-lg-6"
-					*ngIf="database.getCurrentUser() != undefined && database.getCurrentUser().child('manager').val() === true">
-					<app-suggestion-card [actionRout]="['/open-orders-page', 0, 0, 0, 0]"
-						[bgClass]="'card-danger'" [icon]="'fa-cc-visa'"
-						[header]="'Find jobs for your trucks' | translate"
-						[text]="'Dont let your trucks rest.. \nFind jobs for your truck and start making money !' | translate"
-						[action]="'הגש הצעות מחיר'"></app-suggestion-card>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12">
-					<app-suggestion-card
-						[actionLink]="'https://play.google.com/store/apps/details?id=com.objective.gettruck'"
-						[bgClass]="'card-warning'" [icon]="'fa-android'"
-						[header]="'עכשיו גם לאנדרואיד'"
-						[text]="'אנו שמחים להביא לכם את השירות שלנו גם לאנדרואיד\nבאפליקציה תוכלו לקבל הודעות בזמן אמת ולהשאר עם יד על הדופק'"
-						[action]="'הורד את האפליקציה'"></app-suggestion-card>
-				</div>
-			</div>
-
-		</div>
-		<div class="col-lg-3">
-			<div *ngIf="statistics != undefined">
-				<div class="card mb-3">
-					<div class="card-header">נתוני מערכת נכון לתאריך:
-						{{statistics.child('date').val() | date: 'dd/MM/yyyy'}}</div>
-					<div class="card-block">
-						<canvas baseChart height="180px" [data]="doughnutChartData"
-							[labels]="doughnutChartLabels" [chartType]="'doughnut'">
-	                    </canvas>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
-	<!-- <div style="margin-top: 8.5rem;">
-		<app-footer-page></app-footer-page>
-	</div> -->
 </div>
 
