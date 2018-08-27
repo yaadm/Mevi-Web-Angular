@@ -7,3 +7,4 @@ export * from './page-header/page-header.module';
 export * from './footer-page/footer-page.module';
 export * from './side-bar/side-bar.module';
 export * from './user-rating/user-rating.module';
+export * from './user-payments/user-payments.module';

@@ -1,0 +1,70 @@
+<div [@routerTransition] class="main-content-container" *ngIf="statistics != undefined">
+
+	<app-page-header heading="{{'סטטיסטיקות נכון לתאריך ' + (statistics.child('date').val() | date: 'dd/MM/yyyy')}}" [icon]="'fa-fire'"></app-page-header>
+
+	<div class="row">
+		<div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('newManagersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('newManagersCountThisMonth').val()" [label]="'מנהלים שנרשמו החודש'" ></app-stat>
+        </div>
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('newUsersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('newUsersCountThisMonth').val()" [label]="'משתמשים שנרשמו החודש'" ></app-stat>
+        </div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('newOrdersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('newOrdersCountThisMonth').val()" [label]="'הזמנות שנוצרו החודש'" ></app-stat>
+        </div>
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('pendingnOrdersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('pendingnOrdersCountThisMonth').val()" [label]="'עסקאות שנסגרו החודש'" ></app-stat>
+        </div>
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('completedOrdersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('completedOrdersCountThisMonth').val()" [label]="'עסקאות שבוצעו החודש'" ></app-stat>
+        </div>
+	</div>
+	
+	<div class="row">
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('payedOrdersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('payedOrdersCountThisMonth').val()" [label]="'עסקאות ששילמו החודש'" ></app-stat>
+        </div>
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('failedToChargeOrdersCountThisMonth').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('failedToChargeOrdersCountThisMonth').val()" [label]="'עסקאות חייבות החודש'" ></app-stat>
+        </div>
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('openOrdersCount').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('openOrdersCount').val()" [label]="'הזמנות בסטטוס חדש'" ></app-stat>
+        </div>
+        <!-- <div class="col-lg-4">
+            <app-stat [bgClass]="'card-info'" [icon]="'fa-comments'" [count]="statistics.child('pendingOrdersCount').val()" [label]="'עסקאות שנסגרו'" ></app-stat>
+        </div> -->
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('completedOrdersCount').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('completedOrdersCount').val()" [label]="'הזמנות בסטטוס סגור'" ></app-stat>
+        </div>
+	</div>
+	
+	<div class="row">
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('payedOrdersCount').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('payedOrdersCount').val()" [label]="'עסקאות ששילמו'" ></app-stat>
+        </div>
+        <div class="col-lg-4">
+            <app-stat bgClass="{{statistics.child('failedToChargeOrdersCount').val() <= 0 ? 'card-danger' : 'card-primary'}}" [icon]="'fa-comments'" [count]="statistics.child('failedToChargeOrdersCount').val()" [label]="'עסקאות חייבות'" ></app-stat>
+        </div>
+	</div>
+
+	<div class="row">
+        <div class="col-lg-6">
+        	<div class="card mb-3">
+                <div class="card-header">
+                    נתוני מערכת נכון לתאריך: {{statistics.child('date').val() | date: 'dd/MM/yyyy'}}
+                </div>
+                <div class="card-block">
+                    <canvas baseChart height="180px" [data]="doughnutChartData" [labels]="doughnutChartLabels" [chartType]="'doughnut'" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

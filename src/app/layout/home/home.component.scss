@@ -19,6 +19,13 @@
 	left: 0;
 	width: auto;
 }
+.home-container{
+ 	padding-bottom: 0px;
+}
+.yt-video{
+	height: auto;
+	width: auto;
+}
 .container{
   	height: 100%;
   	width: auto;
@@ -95,3 +102,22 @@
     vertical-align: middle;
     display: table-cell;
 }
+@media only screen and (max-width: 600px) {
+	.yt-video{
+		width: 100%;
+		height: auto;
+	}
+	.home-container{
+	 	padding-bottom: 40%;
+	}
+	.background-image{
+		background-image: url("/assets/images/wp_truck_small.jpg") !important;
+		height: 1024px;
+    	width: 600px;
+	}
+	
+}
+
+
+
+

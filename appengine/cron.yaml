@@ -3,13 +3,20 @@ cron:
 #  url: /publish/hourly-tick
 #  schedule: every 1 hours
 
+# IL TIME 9:00
+- description: Push a "tick" onto pubsub every day
+  url: /publish/morning-tick
+  schedule: every day 06:00
+
+# IL TIME 3:00
 - description: Push a "tick" onto pubsub every day
   url: /publish/daily-tick
   schedule: every day 00:00
 
-- description: Push a "tick" onto pubsub every day
-  url: /publish/daily-tick-delayed
-  schedule: every day 03:00
+# IL TIME 6:00
+#- description: Push a "tick" onto pubsub every day
+#  url: /publish/daily-tick-delayed
+#  schedule: every day 03:00
 
 #- description: Push a "tick" onto pubsub every week
 #  url: /publish/weekly-tick

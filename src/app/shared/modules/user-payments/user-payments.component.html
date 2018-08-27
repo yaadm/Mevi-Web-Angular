@@ -1,0 +1,43 @@
+<div>
+	<h4>תשלומים</h4>
+</div>
+<div class="table table-responsive" *ngIf="filteredItemsArray && filteredItemsArray.length > 0">
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>מזהה הזמנה</th>
+				<th>סכום</th>
+				<th>תאריך תשלום</th>
+				<th>לינק לקבלה</th>
+				<th>הערות</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let payment of filteredItemsArray"
+				class="table-success">
+
+				<th scope="row"><a [routerLink]="['/order-details', payment.orderId]">{{ payment.orderId }}</a>  </th>
+				<td>{{ payment.paymentAmountInNIS }} ש"ח</td>
+				<td>{{ (payment.timestamp | date: 'dd/MM/yyyy') }}</td>
+				<td *ngIf="payment.receiptLink"><a [href]="payment.receiptLink"  target="_blank">לינק לקבלה</a></td>
+				<td *ngIf="!payment.receiptLink">ללא</td>
+				<td>{{ payment.notes }}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div  *ngIf="!filteredItemsArray || filteredItemsArray.length <= 0" class="breadcrumb ta-c">
+	<div>
+		<br>
+		<br>
+		<i class="fa fa-eye-slash fa-5x"></i>
+		<br>
+		<br>
+		<h5>לא נמצאו תוצאות</h5>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+	</div>
+</div>

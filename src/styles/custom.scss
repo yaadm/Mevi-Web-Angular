@@ -1,7 +1,15 @@
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-
+html {
+	text-size-adjust: 10%;
+}
 ::-webkit-scrollbar { 
     display: none; 
+}
+.v-align {
+	vertical-align: middle;
+	text-align: center;
+	margin-bottom: auto;
+	margin-top: auto;
 }
 .ta-c{
 	text-align: center;
@@ -10,6 +18,9 @@
 }
 .color-primary{
 	color: #0275d8;
+}
+.gray_light{
+	color: rgba(255, 255, 255, 0.5);
 }
 .color-secondary{
 	color: #5cb85c;
@@ -40,3 +51,27 @@
 .filled {
   color: #1e90ff;
 }
+.table {
+	 font-size: .9rem;
+}
+.table tr th {
+	text-align: right;
+}
+.table tbody tr {
+	cursor: pointer;
+}
+.table-responsive {
+	display: table;
+}
+@media only screen and (max-width: 600px) {
+    .table-responsive {
+	  display: block;
+	}
+}
+
+
+
+
+
+
+

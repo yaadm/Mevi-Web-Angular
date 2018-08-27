@@ -5,13 +5,21 @@
             <i class="fa fa-home fa-fw"></i>&nbsp;{{ 'Home' | translate }}
         </a>
         
-        <a [routerLink]="['/create-order-page']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined">
-            <i class="fa fa-edit fa-fw"></i>&nbsp;{{ 'Publish Order' | translate }} 
-            <br> 
-            <i class="fa fa-fw"></i>&nbsp;<small>וקבל הצעות מחיר</small>
-        </a>
+        <div *ngIf="currentUser != undefined && currentUser.child('blocked').val() === true">
+        	<a [routerLink]="['/contact-us-page']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined">
+	            <i class="fa fa-ban fa-fw"></i>&nbsp;אתה חסום מהמערכת 
+	        </a>
+        </div>
         
-        <div class="nested-menu" *ngIf="currentUser != undefined && currentUser.child('companyId').val()">
+        <div *ngIf="currentUser != undefined && currentUser.child('blocked').val() !== true">
+	        <a [routerLink]="['/create-order-page']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined">
+	            <i class="fa fa-edit fa-fw"></i>&nbsp;{{ 'Publish Order' | translate }} 
+	            <br> 
+	            <i class="fa fa-fw"></i>&nbsp;<small>וקבל הצעות מחיר</small>
+	        </a>
+        </div>
+        
+        <div class="nested-menu" *ngIf="currentUser != undefined && currentUser.child('companyId').val() && currentUser.child('blocked').val() !== true">
             <a class="list-group-item" (click)="addExpandClass('orders_pages')">
                 <span><i class="fa fa-fw fa-book"></i>&nbsp; {{ 'My Orders' | translate }}</span>
             </a>
@@ -30,37 +38,42 @@
             </li>
         </div>
         
-        <a [routerLink]="['/manager-registration-page']" *ngIf="currentUser && currentUser.child('manager').val() === false" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-truck"></i>&nbsp;{{ 'Register As Manager' | translate }}
-            <br> 
-            <span>&nbsp;<small>ומצא עבודה למשאיות שלך</small></span>
-        </a>
-        
-        <a [routerLink]="['/open-orders-page', '0', '0', '0', '0']" [routerLinkActive]="['router-link-active']" *ngIf="currentUser && currentUser.child('manager').val() === true" class="list-group-item">
-        	<span><i class="fa fa-cc-visa"></i>&nbsp; הזמנות פותחות</span>
-            <br> 
-            <span><i class="fa fa-fw"></i>&nbsp;<small>הגש הצעות מחיר</small></span>
-        </a>
-        
-        <div class="nested-menu" *ngIf="currentUser && currentUser.child('manager').val() === true">
-            <a class="list-group-item" (click)="addExpandClass('deliveries_pages')">
-                <span><i class="fa fa-truck"></i>&nbsp; {{ 'My Deliveries' | translate }}</span>
-            </a>
-            <li class="nested" [class.expand]="showMenu === 'deliveries_pages'">
-                <ul class="submenu">
-                    <li>
-                        <a [routerLink]="['/my-pending-deliveries-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-truck"></i>&nbsp; {{ 'Pending Deliveries' | translate }}</span></a>
-                    </li>
-                    <li>
-                        <a [routerLink]="['/my-completed-deliveries-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-lock"></i>&nbsp; {{ 'Completed Deliveries' | translate }}</span></a>
-                    </li>
-                </ul>
-            </li>
+        <div *ngIf="currentUser && currentUser.child('blocked').val() !== true">
+        	
+	        <a [routerLink]="['/manager-registration-page']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+	        	<span><i class="fa fa-clipboard"></i>&nbsp; הרשם כמוביל</span>
+	            <br> 
+	            <span><i class="fa fa-fw"></i>&nbsp;<small>ומלא משאיות חוזרות</small></span>
+	        </a>
+	        
+	        <a [routerLink]="['/open-orders-page', '0', '0', '0', '0']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+	        	<span><i class="fa fa-cc-visa"></i>&nbsp; הזמנות פתוחות</span>
+	            <br> 
+	            <span><i class="fa fa-fw"></i>&nbsp;<small>הגש הצעות מחיר</small></span>
+	        </a>
+	        
+	        <div class="nested-menu" *ngIf="currentUser && currentUser.child('manager').val() === true">
+	            <a class="list-group-item" (click)="addExpandClass('deliveries_pages')">
+	                <span><i class="fa fa-truck"></i>&nbsp; {{ 'My Deliveries' | translate }}</span>
+	            </a>
+	            <li class="nested" [class.expand]="showMenu === 'deliveries_pages'">
+	                <ul class="submenu">
+	                    <li>
+	                        <a [routerLink]="['/my-pending-deliveries-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-truck"></i>&nbsp; {{ 'Pending Deliveries' | translate }}</span></a>
+	                    </li>
+	                    <li>
+	                        <a [routerLink]="['/my-completed-deliveries-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-lock"></i>&nbsp; {{ 'Completed Deliveries' | translate }}</span></a>
+	                    </li>
+	                </ul>
+	            </li>
+	        </div>
+	        
+	        <a [routerLink]="['/my-calendar']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined && currentUser.child('companyId').val()">
+	            <i class="fa fa-calendar fa-fw"></i>&nbsp;היומן שלי
+	        </a>
         </div>
         
-        <a [routerLink]="['/my-calendar']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="currentUser != undefined && currentUser.child('companyId').val()">
-            <i class="fa fa-calendar fa-fw"></i>&nbsp;היומן שלי
-        </a>
+        
         
         <a [routerLink]="['/about-us-page']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-address-book"></i>&nbsp;{{ 'About Us' | translate }}
@@ -76,9 +89,9 @@
             </a>
             <li class="nested" [class.expand]="showMenu === 'app_manager_pages'">
                 <ul class="submenu">
-                    <!-- <li>
+                    <li>
                         <a [routerLink]="['/managers-registration-requests-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-user-plus"></i>&nbsp; {{ 'Managers Requests' | translate }}</span></a>
-                    </li> -->
+                    </li>
                     <li>
                         <a [routerLink]="['/manage-unpaid-orders-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-book"></i>&nbsp; עסקאות חייבות</span></a>
                     </li>
@@ -88,13 +101,16 @@
                     <li> 
                         <a [routerLink]="['/manage-users-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-users"></i>&nbsp; {{ 'Manage Users' | translate }}</span></a>
                     </li>
+                    <li> 
+                        <a [routerLink]="['/statistics-page']" [routerLinkActive]="['router-link-active']"><span><i class="fa fa-users"></i>&nbsp; סטטיסטיקות</span></a>
+                    </li>
                 </ul>
             </li>
         </div>
         
         <br><br>
         
-        <a routerLink="/dashboard" *ngIf="isDevMode" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <a [routerLink]="['/dashboard']" *ngIf="isDevMode" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-dashboard"></i>&nbsp;{{ 'Dashboard' | translate }}
         </a>
         <a [routerLink]="['/charts']" *ngIf="isDevMode" [routerLinkActive]="['router-link-active']" class="list-group-item">

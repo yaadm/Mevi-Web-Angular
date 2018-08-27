@@ -4,7 +4,7 @@
         <span class="input-group-addon"><i class="fa fa-upload fa-fw"></i></span>
         <select class="form-control" #selectionSearchType (change)="onSearchTypeChanged()">
             <option [value]=0>חיפוש</option>
-            <option [value]=1>בקשות ניהול טלפוניות</option>
+            <option [value]=1>בקשות טלפוניות</option>
             <option [value]=2>חוסרי דירוג</option>
         </select>
     </div>
@@ -75,6 +75,8 @@
 						</td>
 						<td>
 							מנהל משאיות
+							&nbsp;
+							<button type="submit" class="btn btn-sm btn-danger" (click)="denyManager(user)">בטל הרשאות מנהל</button>
 						</td>
 					</tr>
 					<tr>
@@ -82,7 +84,20 @@
 							<i class="fa fa-cc-visa fa-fw"></i>
 						</td>
 						<td>
-							{{user.paymentAccessToken ? 'אשראי מחובר' : 'אשראי לא מחובר'}}
+							{{user.paymentAccessToken ? 'אשראי מחובר'  : 'אשראי לא מחובר'}}
+							<button *ngIf="user.paymentAccessToken" type="submit" class="btn btn-sm btn-danger" (click)="removeCreditCard(user)">מחק אשראי</button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-briefcase fa-fw"></i>
+						</td>
+						<td>
+							אובליגו: {{ user.obligo > 0 ? user.obligo + ' שח' : '0 שח'}}
+							&nbsp;
+							<span *ngIf="user.manager === true">
+					        	<button type="submit" class="btn btn-sm btn-success" (click)="approveManagerWithObligo(user)">עדכן תיק אובליגו</button>
+					        </span>
 						</td>
 					</tr>
 					<tr>
@@ -97,11 +112,18 @@
 				</table>
 			</div>
 			<div style="margin-right: .5rem; margin-bottom: .5rem;">
-		        <button type="submit" class="btn btn-sm btn-danger">הקפא משתמש</button>
-		        <span *ngIf="user.manager === true">
-		        	<button type="submit" class="btn btn-sm btn-danger" (click)="denyManager(user)">בטל הרשאות מנהל</button>
-		        </span>
+		        <button type="submit" class="btn btn-sm btn-danger" (click)="blockUser(user)">{{ user?.blocked ? 'בטל חסימה' : 'חסום משתמש'}}</button>
 		        <button type="submit" class="btn btn-sm btn-success" [routerLink]="['/payment', user.uid]">עדכן אשראי</button>
+		        <span *ngIf="user.manager === false">
+		        	<button type="submit" class="btn btn-sm btn-success" (click)="approveManagerWithObligo(user)">פתח תיק אובליגו</button>
+		        	<span *ngIf="user.paymentAccessToken">
+		        		<button type="submit" class="btn btn-sm btn-success" (click)="approveManagerWithCredit(user)">אשר בקשת ניהול (אשראי מחובר)</button>
+		        	</span>
+		        </span>
+		        <button type="submit" class="btn btn-sm btn-success" [routerLink]="['/user-orders', user.uid]">פרופיל משתמש</button>
+		        <span *ngIf="user.requestingManager === true">
+		        	<button type="submit" class="btn btn-sm btn-danger" (click)="denyManagerRequest(user)">סיום בקשה טלפונית</button>
+		        </span>
 			</div>
 		</div>
 	</div>

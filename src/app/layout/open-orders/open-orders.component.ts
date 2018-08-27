@@ -264,6 +264,8 @@ export class OpenOrdersComponent implements OnInit, OnDestroy, AuthListener {
         }
       }
       
+      console.log('order added: ' + JSON.stringify(order.orderId));
+      
       return true;
       
     });

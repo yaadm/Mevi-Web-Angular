@@ -178,16 +178,27 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   
   publishBid () {
     
+    if (!this.database.getCurrentUser()) {
+      this.showInfoMessage('שגיאה', 'משתמש לא מחובר');
+      return;
+    } else if (!this.database.getCurrentUser().child('manager').val()) {
+      this.showInfoMessage('אתה לא רשום כמוביל', 'בכדי לתת הצעות מחיר ולסגור עסקה, אתה צריך להרשם כמוביל', ['/manager-registration-page'], 'להרשמה חינם לחץ כאן !'); // TODO: add suggestion to register
+      return;
+    } else if (this.database.getCurrentUser().child('blocked').val()) {
+      this.showInfoMessage('שגיאה', 'המשתמש שלך חסום, בכדי לפתור את הבעיה נא צור קשר עם האתר', ['/contact-us-page'], 'ליצירת קשר'); // TODO: add suggestion to register
+      return;
+    }
+    
     if (!this.bidAmountRef.nativeElement.value || this.bidAmountRef.nativeElement.value <= 0) {
       this.showInfoMessage('שגיאה', 'חובה להזין סכום חיובי');
       return;
     } else if (!this.bidDateRef.nativeElement.value) {
       this.showInfoMessage('שגיאה', 'חובה להזין תאריך הגעה');
       return;
-    } else if (this.database.resetDateToMidnight(new Date(this.bidDateRef.nativeElement.value)) < 
-                this.database.resetDateToMidnight(new Date(this.currentOrder.pickupDate))) {
-      this.showInfoMessage('שגיאה', 'תאריך הגעה לא יכול להיות לפני התאריך המבוקש');
-      return;
+//    } else if (this.database.resetDateToMidnight(new Date(this.bidDateRef.nativeElement.value)) < 
+//                this.database.resetDateToMidnight(new Date(this.currentOrder.pickupDate))) {
+//      this.showInfoMessage('שגיאה', 'תאריך הגעה לא יכול להיות לפני התאריך המבוקש');
+//      return;
     } else if (this.database.resetDateToMidnight(new Date(this.bidDateRef.nativeElement.value)) < 
                 this.database.resetDateToMidnight(new Date())) {
       this.showInfoMessage('שגיאה', 'תאריך הגעה לא יכול להיות בעבר');
@@ -212,10 +223,21 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       return;
     }
     
+    const userDebt = this.database.getCurrentUser().child('debt').val();
+    const userObligo = this.database.getCurrentUser().child('obligo').val();
+    
+    if (userObligo !== undefined && userDebt !== undefined && userObligo > 0) {
+      const futurePaymentAmount = parseInt(this.bidAmountRef.nativeElement.value, 10) * Constants.PAYMENT_PERCENTAGE;
+      if (userDebt + futurePaymentAmount >= userObligo) {
+        this.showInfoMessage('הסכום הנל חורג מהאובליגו', 'להגדלת האובליגו צור קשר, או הזן כרטיס אשראי ובצע עסקאות ללא הגבלה.', ['/manager-registration-page'], 'לעדכון החשבון');
+        return;
+      }
+    }
+    
     this.dialogService.addDialog(ModalConfirmComponent, { 
       title: 'אישור הגשת הצעת מחיר', 
       message: 'אתה עומד להגיש הצעת מחיר על סך: ' + parseInt(this.bidAmountRef.nativeElement.value, 10) + ' ש"ח', 
-      subMessage: '*אנו מחייבים 8% מסכום העסקה - בעת השלמת עסקה' })
+      subMessage: '*אנו מחייבים 8% מסכום העסקה - בעת השלמת עסקה (כ 24 שעות לאחר יום ההובלה)' })
       .subscribe((isConfirmed) => {
         
         if (isConfirmed) {
@@ -293,6 +315,13 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
   }
   
   acceptBid (bidItem) {
+    if (!this.database.getCurrentUser()) {
+      this.showInfoMessage('שגיאה', 'משתמש לא מחובר');
+      return;
+    } else if (this.database.getCurrentUser().child('blocked').val()) {
+      this.showInfoMessage('שגיאה', 'המשתמש שלך חסום, בכדי לפתור את הבעיה נא צור קשר עם האתר', ['/contact-us-page'], 'ליצירת קשר'); // TODO: add suggestion to register
+      return;
+    }
     
     this.dialogService.addDialog(ModalConfirmComponent, { 
       title: 'סגירת עסקה', 
@@ -416,8 +445,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy, AuthListener {
       });
   }
   
-  showInfoMessage(modalTitle, modalMessage) {
-    this.dialogService.addDialog(ModalInformComponent, { title: modalTitle, message: modalMessage });
+  showInfoMessage(modalTitle, modalMessage, urlLink?: string[], urlText?: string) {
+    this.dialogService.addDialog(ModalInformComponent, { title: modalTitle, message: modalMessage, linkUrl: urlLink, linkText: urlText });
   }
   
   getStaticMapUrl(order: DataSnapshot) {

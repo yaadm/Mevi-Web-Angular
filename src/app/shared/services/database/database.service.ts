@@ -1,5 +1,6 @@
 import { AuthListener } from '..';
-import { Injectable } from '@angular/core';
+import { callAndroid } from '../../../../assets/javascript/androidTunnel';
+import { Injectable, HostListener, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
@@ -26,6 +27,8 @@ export interface AuthListener {
 }
 
 export class Constants {
+  
+  public static get PAYMENT_PERCENTAGE(): number { return 0.08; }; // 8%
   
   public static get STATIC_MAP_HEIGHT(): number { return 200 };
   
@@ -55,9 +58,19 @@ export class DatabaseService {
   private authListeners: AuthListener[] = [];
   myNewOrdersSubscription: any;
   private allSubscriptions: Subscription[] = [];
-  
+  private token: string;
   constructor(public afAuth: AngularFireAuth, public afDb: AngularFireDatabase, public router: Router) {
 
+    
+//    window['angularComponent'].zone.run(() => {
+//      console.log('vanillaToAngularCallback() - ' );
+//   });
+    
+//    window.vanillaToAngularCallback = (uid) => {
+//      // communicate with other Angular providers
+//      console.log('vanillaToAngularCallback() - ' + uid);
+//    }
+    
     this.startListeningForUser();
   }
 
@@ -68,8 +81,6 @@ export class DatabaseService {
           if (firebaseUser) {
 
             console.log('Logged In - Partial');
-
-            this.user = firebaseUser;
 
             if (!firebaseUser.uid) {
       
@@ -83,6 +94,8 @@ export class DatabaseService {
               return promise;
             }
             
+            this.user = firebaseUser;
+            
             // User Signed In
             const userSubscription: Subscription = this.afDb.object('/users/' + firebaseUser.uid).snapshotChanges().subscribe(
               (afa: AngularFireAction<DataSnapshot>) => {
@@ -95,6 +108,12 @@ export class DatabaseService {
 
                 if (companyId && companyAddress && companyPhone) {
                   console.log('Logged In As: ' + this.currentUser.child('name').val());
+                  
+                  if (!this.token) {
+                    
+                    this.forwardToAndroidWebView(firebaseUser.uid);
+                  }
+                  
                   this.publishUserChangeToAuth(this.currentUser);
                 } else {
                   console.log('User not registered.');
@@ -121,7 +140,8 @@ export class DatabaseService {
     localStorage.setItem('isLoggedin', 'true');
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt: 'select_account'});
-    this.afAuth.auth.signInWithPopup(provider);
+    // this.afAuth.auth.signInWithPopup(provider);
+    this.afAuth.auth.signInWithRedirect(provider); // The redirect method is preferred on mobile devices.
   }
 
   logout() {
@@ -165,6 +185,14 @@ export class DatabaseService {
   subscribeToMyOrders(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
     return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).valueChanges();
+  }
+  
+  subscribeToUserOrders(uid): Observable<{}[]>  {
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('userId').equalTo(uid)).valueChanges();
+  }
+  
+  subscribeToUserPayments(uid): Promise<any>  {
+    return this.afDb.list('/payments-records/' + uid).query.once('value');
   }
   
   subscribeToUnpaidOrders(): Observable<{}[]> {
@@ -217,6 +245,14 @@ export class DatabaseService {
 
   subscribeToMyDeliveries(): Observable<{}[]>  {
     const uid = this.currentUser.child('uid').val();
+    if (!uid) {
+      
+      return new Observable<{}[]>();
+    }
+    return this.afDb.list('/all-orders', ref => ref.orderByChild('selectedBid').equalTo(uid)).valueChanges();
+  }
+  
+  subscribeToUserDeliveries(uid): Observable<{}[]>  {
     if (!uid) {
       
       return new Observable<{}[]>();
@@ -311,6 +347,28 @@ export class DatabaseService {
     return this.afDb.object('/users/' + userId).update(payload);
   }
   
+  addUserPayment(userId, payload): Promise<any[]> {
+    
+    const promises = [];
+    
+    promises.push(this.afDb.list('/payments-records/' + userId).push(payload));
+    
+    promises.push(this.afDb.object('/users/' + userId + '/debt').query.ref.transaction((current) => {
+        return (current || 0) - payload.paymentAmountInNIS;
+      }, (error, success) => {
+        
+        if (success) {
+          
+          console.log('transaction success !');
+        } else {
+          
+          console.log('transaction error: ' + error);
+        }
+      }));
+    
+    return Promise.all(promises);
+  }
+  
   getUserById(userId): Observable<AngularFireAction<DataSnapshot>> {
     return this.afDb.object('/users/' + userId).snapshotChanges();
   }
@@ -350,7 +408,11 @@ export class DatabaseService {
   }
   
   unsubscribe (subscription) {
-    subscription.unsubscribe();
+    
+    try {
+      subscription.unsubscribe();
+    } catch (e) {}
+      
     const index: number = this.allOrdersSubscription.indexOf(subscription);
     if (index !== -1) {
       this.allOrdersSubscription.splice(index, 1);
@@ -377,4 +439,69 @@ export class DatabaseService {
   resetDateToMidnight (date) {
     return date.setHours(0, 0, 0, 0);
   }
+  
+  isValidID(idNum) {
+    
+    let tot = 0;
+    const tz = idNum;
+    for (let i = 0; i < 8; i++) {
+      
+        let x = (((i % 2) + 1) * tz.charAt(i));
+        if (x > 9)  {
+          const xx = x.toString();
+          x = parseInt((xx.toString().charAt(0)) + parseInt(xx.toString().charAt(1), 10), 10);
+        }
+        tot += x;
+    }
+        
+    if ((tot + parseInt(tz.charAt(8), 10)) % 10 === 0) {
+        return true;
+    } else {
+         
+        return false;
+    }
+  }
+  
+  forwardToAndroidWebView(uid) {
+    // console.log('forwardToAndroidWebView()');
+    try {
+      callAndroid(uid);
+    } catch (e) {
+      // console.log('error CallAndroid(): ' + e);
+    }
+  }
+  
+  public onNewFCMTokenFromAndroid(token) {
+    console.log('onNewFCMToken() token=' + token);
+    
+    const uid = this.currentUser.child('uid').val();
+    
+    if (!token || !uid) {
+      console.log('onNewFCMToken() token or uid is null');
+      return;
+    }
+    
+    if (this.token === token) {
+      console.log('onNewFCMToken() token already registered');
+      return;
+    }
+    
+    this.token = token;
+    
+    this.afDb.object('/users/' + uid + '/notificationTokens').set(token);
+    this.afDb.list('/users/' + uid + '/userNotificationTokens').push(token);
+  }
+  
+  @HostListener('window:custom-event', ['$event'])
+  customEventFunction(event) {
+    console.log('customEventFunction() called event:' + event.data);
+  }
+  
+  
+  
+  
+  
 }
+
+
+

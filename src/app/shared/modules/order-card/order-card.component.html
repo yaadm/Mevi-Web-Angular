@@ -1,35 +1,35 @@
-<div class="card card-inverse card-primary">
-    <div class="card-header" style="padding: 6px">
+<div class=" card-inverse card-primary card-hover" [routerLink]="['/order-details', order.orderId]" style="cursor: pointer;">
+    <div class="card-header" style="padding: 4px">
         <div class="row">
-            <div class="col-lg-4">
-                <img class="img-fluid mx-auto d-block form-control" style='padding: 0px' [src]="getStaticMapUrl(order)" alt="Static Map" width="100%">
+            <div class="col-lg-4 v-align">
+                <img class="img-fluid mx-auto d-block" style='padding: 0px' [src]="getStaticMapUrl(order)" alt="Static Map" width="100%">
             </div>
-            <div class="col-lg-8 text-right">
+            <div class="col-lg-8 text-right v-align" style="padding: 6px">
                 <table>
                        <tbody>
                        <tr *ngIf="database.getCurrentUser() && (database.getCurrentUser().child('uid').val() == order.selectedBid || database.getCurrentUser().child('uid').val() == order.userId)">
                            <td scope="row" class="text-right"><i class="fa fa-user fw"></i>&nbsp;מזמין</td>
-                           <td>{{order.userName}}</td>
+                           <td>{{order?.userName}}</td>
                        </tr>
                        <tr>
                            <td scope="row" class="text-right"><i class="fa fa-download fw"></i>&nbsp;העמסה</td>
-                           <td>{{order.pickupLocationName}}</td>
+                           <td>{{order?.pickupLocationName}}</td>
                        </tr>
                        <tr>
                            <td scope="row" class="text-right"><i class="fa fa-upload fw"></i>&nbsp;פריקה</td>
-                           <td>{{order.destinationLocationName}}</td>
+                           <td>{{order?.destinationLocationName}}</td>
                        </tr>
                        <tr>
                            <td scope="row" class="text-right"><i class="fa fa-clock-o fw"></i>&nbsp;תאריך העמסה&nbsp;&nbsp;</td>
-                           <td>{{order.pickupDate | date: 'dd/MM/yyyy'}}</td>
+                           <td>{{order?.pickupDate | date: 'dd/MM/yyyy'}}</td>
                        </tr>
-                       <tr *ngIf="order.orderStatus == 2">
+                       <tr *ngIf="order?.orderStatus == 2">
                            <td scope="row" class="text-right"><i class="fa fa-fire fw"></i>&nbsp;סטטוס&nbsp;&nbsp;</td>
                            <td>
                            		<span>ההזמנה בוצעה בהצלחה</span>
                            </td>
                        </tr>
-                       <tr *ngIf="order.orderStatus == 3">
+                       <tr *ngIf="order?.orderStatus == 3">
                            <td scope="row" class="text-right"><i class="fa fa-fire fw"></i>&nbsp;סטטוס&nbsp;&nbsp;</td>
                            <td>
                            		<span>ההזמנה בוטלה</span>
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-    <div class="card-footer">
+    <!-- <div class="card-footer">
         <a [routerLink]="['/order-details', order.orderId]" class="card-inverse">
         	<span class="float-left">
             	<i class="fa fa-arrow-circle-left"></i>
@@ -48,5 +48,8 @@
         	<span class="float-right"> {{('View Details' | translate)}}</span>
             <div class="clearfix"></div>
         </a>
-    </div>
+    </div> -->
 </div>
+
+
+

@@ -1,12 +1,12 @@
 <div [@routerTransition] class="main-content-container">
     <app-page-header [heading]="'פרטי הזמנה'" [icon]="'fa-book'"></app-page-header>
-	<div *ngIf="currentOrder != undefined && database.getCurrentUser() != undefined">
+	<div *ngIf="currentOrder != undefined && database.getCurrentUser() != undefined && !database.getCurrentUser().child('blocked').val()">
 	
 		<div class="breadcrumb" *ngIf="database.getCurrentUser().child('appManager').val() && false"><!-- TODO: remove false  -->
 			<h6>סטטוס הזמנה</h6>
 		</div>
 	
-		<div *ngIf="currentOrder.test" style="color: red; font-size: 30sp;">
+		<div *ngIf="currentOrder?.test" style="color: red; font-size: 30sp;">
 			זו מודעת בדיקה !!!!
 		</div>
 	
@@ -16,36 +16,41 @@
 	        		<img class="img-fluid mx-auto d-block form-control" style='padding: 0px' [src]="getStaticMapUrl(currentOrder)" alt="Static Map" width="100%">
 					<br>
 					<h6>העמסה</h6>
-					<div class="form-group input-group" *ngIf="currentOrder.pickupCompanyName != undefined">
+					<div class="form-group input-group" *ngIf="currentOrder?.pickupCompanyName != undefined">
 		               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.pickupCompanyName}}</div>
+		               	<div class="form-control">{{currentOrder?.pickupCompanyName}}</div>
 					</div> 
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.pickupLocationName}}</div>
+		               	<div class="form-control"><span>{{currentOrder?.pickupLocationName}} <small *ngIf="currentOrder?.pickupAddress">({{currentOrder?.pickupAddress}})</small></span></div>
 					</div>
 					<h6>פריקה</h6>
-					<div class="form-group input-group" *ngIf="currentOrder.destinationCompanyName != undefined">
+					<div class="form-group input-group" *ngIf="currentOrder?.destinationCompanyName != undefined">
 		               	<span class="input-group-addon"><i class="fa fa-building fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.destinationCompanyName}}</div>
+		               	<div class="form-control">{{currentOrder?.destinationCompanyName}}</div>
 					</div>
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.destinationLocationName}}</div>
+		               	<div class="form-control"><span>{{currentOrder?.destinationLocationName}} <small *ngIf="currentOrder?.destinationAddress">({{currentOrder?.destinationAddress}})</small></span></div>
 					</div>
 					<h6>תאריך הובלה</h6>
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.pickupDate | date: 'dd/MM/yyyy'}}</div>
+		               	<div class="form-control">{{currentOrder?.pickupDate | date: 'dd/MM/yyyy'}}</div>
+					</div>
+					<h6>שעת הובלה מועדפת</h6>
+					<div class="form-group input-group">
+		               	<span class="input-group-addon"><i class="fa fa-bell fa-fw"></i></span>
+		               	<div class="form-control">{{currentOrder?.pickupTime | date: 'shortTime'}}</div>
 					</div>
 					<h6>מזמין</h6>
 					<div class="form-group">
 						<div class="input-group" style="margin-bottom: 0px">
 			               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-			               	<div class="form-control">{{currentOrder.userId === database.getCurrentUser().child('uid').val() || currentOrder.selectedBid === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('appManager').val() === true ? currentOrder.userName : 'חסוי'}}</div>
+			               	<div class="form-control">{{currentOrder?.userId === database.getCurrentUser().child('uid').val() || currentOrder?.selectedBid === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('appManager').val() === true ? currentOrder?.userName : 'חסוי'}}</div>
 						</div>
 						
-						<div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('appManager').val() === true">
+						<div *ngIf="currentOrder?.selectedBid === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('appManager').val() === true">
 							<div class="form-control in-bl" style='margin-bottom: 5px'>
 								<table  style="font-size: .8rem;">
 									<tr>
@@ -53,7 +58,7 @@
 											<i class="fa fa-phone fa-fw"></i>
 										</td>
 										<td>
-											<a href="{{'tel:' + currentOrder.companyPhone}}">{{currentOrder.companyPhone}}</a>
+											<a href="{{'tel:' + currentOrder?.companyPhone}}">{{currentOrder?.companyPhone}}</a>
 										</td>
 									</tr>
 									<tr>
@@ -61,7 +66,7 @@
 											<i class="fa fa-envelope fa-fw"></i>
 										</td>
 										<td>
-											<a href="{{'mailto:' + currentOrder.userEmail}}">{{currentOrder.userEmail}}</a>
+											<a href="{{'mailto:' + currentOrder?.userEmail}}">{{currentOrder?.userEmail}}</a>
 											
 										</td>
 									</tr>
@@ -73,29 +78,29 @@
 					<h6>ביטוח</h6>
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-shield fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.insurance | resolveInsurance}}</div>
+		               	<div class="form-control">{{currentOrder?.insurance | resolveInsurance}}</div>
 					</div>
 					<h6>סוג פריקה</h6>
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-upload fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.unloading | resolveUnloading}}</div>
+		               	<div class="form-control">{{currentOrder?.unloading | resolveUnloading}}</div>
 					</div>
-					<div *ngIf="currentOrder.orderType === 2">
+					<div *ngIf="currentOrder?.orderType === 2">
 						<h6>משאיות</h6>
 						<div>
 							<app-truck-card [order]="currentOrder"></app-truck-card>
 			            </div>
 					</div>
-					<div *ngIf="currentOrder.orderType === 1">
-						<h6>מוצרים ({{currentOrder.cargoList.length}})</h6>
-						<div *ngFor="let product of currentOrder.cargoList">
-							<app-product-card [productItem]="product" [productsList]="currentOrder.cargoList" [isEditable]=false></app-product-card>
+					<div *ngIf="currentOrder?.orderType === 1">
+						<h6>מוצרים ({{currentOrder?.cargoList.length}})</h6>
+						<div *ngFor="let product of currentOrder?.cargoList">
+							<app-product-card [productItem]="product" [productsList]="currentOrder?.cargoList" [isEditable]=false></app-product-card>
 			            </div>
 					</div>
-					<div *ngIf="currentOrder.note">
+					<div *ngIf="currentOrder?.note">
 						<h6>הערות</h6>
 						<div class="form-control" style="white-space: pre-line;">
-							{{currentOrder.note}}
+							{{currentOrder?.note}}
 							<br>
 						</div>
 					</div>
@@ -104,22 +109,25 @@
 			
 			<div class="col-lg-4">
 			
-				<div class="breadcrumb" *ngIf="currentOrder.duration">
+				<div class="breadcrumb" *ngIf="currentOrder?.duration">
+					
+					<!-- TODO: add text and icon that this service is brought to you by Google -->
+					
 					<h6><b>זמן נסיעה משוער</b></h6>
 					<span style="font-size: 18px;">
-						<i class="fa fa-clock-o fa-fw" style="color: #0275d8"></i> &nbsp; {{currentOrder.duration}}
+						<i class="fa fa-clock-o fa-fw" style="color: #0275d8"></i> &nbsp; {{currentOrder?.duration}}
 					</span>
 					<br>
 					<br>
 					<h6><b>מרחק נסיעה</b></h6>
 					<span style="font-size: 18px;">
-						<i class="fa fa-arrows-h fa-fw" style="color: #0275d8;"></i> &nbsp; {{currentOrder.distance}}
+						<i class="fa fa-arrows-h fa-fw" style="color: #0275d8;"></i> &nbsp; {{currentOrder?.distance}}
 					</span>
 				</div>
 				
-				<div class="breadcrumb" *ngIf="currentOrder.userId === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('uid').val() === currentOrder.selectedBid || database.getCurrentUser().child('appManager').val() === true">
-					<div *ngIf="currentOrder.selectedBid != undefined">
-						<h6>ההצעה הזוכה</h6>
+				<div class="breadcrumb" *ngIf="currentOrder?.userId === database.getCurrentUser().child('uid').val() || database.getCurrentUser().child('uid').val() === currentOrder?.selectedBid || database.getCurrentUser().child('appManager').val() === true">
+					<div *ngIf="currentOrder?.selectedBid != undefined">
+						<h6>עסקה נסגרה עם</h6>
 						<div class="form-control in-bl" style='margin-bottom: 5px'>
 							<table style="width: 100%; font-size: .8rem;">
 								<tr>
@@ -127,7 +135,7 @@
 										<i class="fa fa-user fa-fw"></i> &nbsp;
 									</td>
 									<td>
-										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}}
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('name').val()}}
 									</td>
 								</tr>
 								<tr>
@@ -135,7 +143,7 @@
 										<i class="fa fa-phone fa-fw"></i>
 									</td>
 									<td>
-										<a href="{{'tel:' + currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('companyPhone').val()}}</a>
+										<a href="{{'tel:' + currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('companyPhone').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('companyPhone').val()}}</a>
 									</td>
 								</tr>
 								<tr>
@@ -143,7 +151,7 @@
 										<i class="fa fa-envelope fa-fw"></i>
 									</td>
 									<td>
-										<a href="{{'mailto:' + currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('email').val()}}</a>
+										<a href="{{'mailto:' + currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('email').val()}}">{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('email').val()}}</a>
 									</td>
 								</tr>
 								<tr>
@@ -156,7 +164,7 @@
 										<i class="fa fa-cc-visa fa-fw"></i> &nbsp;
 									</td>
 									<td>
-										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidAmount').val()}} ש"ח
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidAmount').val()}} ש"ח
 									</td>
 								</tr>
 								<tr>
@@ -164,7 +172,7 @@
 										<i class="fa fa-calendar fa-fw"></i>
 									</td>
 									<td>
-										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupDate').val() | date: 'dd/MM/yyyy'}}
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('pickupDate').val() | date: 'dd/MM/yyyy'}}
 									</td>
 								</tr>
 								<tr>
@@ -172,7 +180,7 @@
 										<i class="fa fa-clock-o fa-fw"></i>
 									</td>
 									<td>
-										{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
+										{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('pickupTime').val() | date: 'HH:mm'}}
 									</td>
 								</tr>
 								<tr>
@@ -181,7 +189,7 @@
 										<u>אפשרויות תשלום</u>
 									</td>
 								</tr>
-								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCash').val()">
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('possiblePaymentMethods').child('paymentCash').val()">
 									<td>
 										<i class="fa fa-money fa-fw"></i>
 									</td>
@@ -189,7 +197,7 @@
 										מזומן
 									</td>
 								</tr>
-								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCredit').val()">
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('possiblePaymentMethods').child('paymentCredit').val()">
 									<td>
 										<i class="fa fa-credit-card fa-fw"></i>
 									</td>
@@ -197,7 +205,7 @@
 										אשראי
 									</td>
 								</tr>
-								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentWire').val()">
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('possiblePaymentMethods').child('paymentWire').val()">
 									<td>
 										<i class="fa fa-exchange fa-fw"></i>
 									</td>
@@ -205,7 +213,7 @@
 										העברה בנקאית
 									</td>
 								</tr>
-								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('possiblePaymentMethods').child('paymentCheck').val()">
+								<tr *ngIf="currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('possiblePaymentMethods').child('paymentCheck').val()">
 									<td>
 										<i class="fa fa-id-card-o fa-fw"></i>
 									</td>
@@ -216,7 +224,7 @@
 							</table>
 						</div>
 					</div>
-					<div *ngIf="currentOrder.selectedBid === undefined">
+					<div *ngIf="currentOrder?.selectedBid === undefined || database.getCurrentUser().child('appManager').val() === true">
 						<h6>הצעות מחיר</h6>
 						<div>
 							<div *ngIf="bidsArray.length <= 0" class="form-control" style="font-size: .8rem;">
@@ -235,7 +243,8 @@
 													<i class="fa fa-user fa-fw"></i> &nbsp;
 												</td>
 												<td>
-													חסוי
+													{{database.getCurrentUser().child('appManager').val() === true ? bidItem.bidder.name : 'חסוי'}}
+													
 												</td>
 											</tr>
 											<tr *ngIf="bidItem.bidder.rating">
@@ -316,7 +325,7 @@
 													<i class="fa fa-id-card-o fw chckedbg"></i>&nbsp; צק
 												</td>
 											</tr>
-											<tr>
+											<tr *ngIf="currentOrder?.userId === database.getCurrentUser().child('uid').val()">
 												<td colspan=2>
 													<br>
 													<button type="submit" class="btn btn-sm btn-success" (click)="acceptBid(bidItem)" [attr.disabled]="loadingAcceptBid ? '' : null">בצע עסקה</button> &nbsp; <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loadingAcceptBid"></i>
@@ -329,7 +338,7 @@
 			            </div>
 					</div>
 				</div>
-				<div class="breadcrumb" *ngIf="database.getCurrentUser().child('manager').val() === true && currentOrder.userId !== database.getCurrentUser().child('uid').val() && currentOrder.orderStatus === 0">
+				<div class="breadcrumb" *ngIf="currentOrder?.userId !== database.getCurrentUser().child('uid').val() && currentOrder?.orderStatus === 0">
 					<h6>הצעת המחיר שלי</h6>
 					<div *ngIf="myBid != undefined">
 						<div class="form-control in-bl" style='margin-bottom: 5px'>
@@ -483,67 +492,67 @@
 					<h6><small>מזהה הזמנה</small></h6> 
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-		               	<div class="form-control" style="font-size: 12px;">{{currentOrder.orderId}}</div>
+		               	<div class="form-control" style="font-size: 12px;">{{currentOrder?.orderId}}</div>
 					</div>
 					<h6><small>תאריך פרסום</small></h6> 
 					<div class="form-group input-group">
 		               	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
-		               	<div class="form-control">{{currentOrder.publishedAt | date: 'dd/MM/yyyy'}}</div>
+		               	<div class="form-control">{{currentOrder?.publishedAt | date: 'dd/MM/yyyy'}}</div>
 					</div>
 					<h6><small>סטטוס הזמנה</small></h6> 
 	        		<div>
-	        			<div class="form-group has-success" *ngIf="currentOrder.orderStatus === 0">
+	        			<div class="form-group has-success" *ngIf="currentOrder?.orderStatus === 0">
 	        				<div class="form-control form-control-success">
 		                    	הזמנה חדשה
 		                    </div>
 	        			</div>
 	                    
-	                    <div class="form-group has-success" *ngIf="currentOrder.orderStatus === 1">
+	                    <div class="form-group has-success" *ngIf="currentOrder?.orderStatus === 1">
 		                    <div class="form-control form-control-success">
 		                    	הזמנה ממתינה
 		                    </div>
 	                    </div>
-	                    <div class="form-group has-success" *ngIf="currentOrder.orderStatus === 2">
+	                    <div class="form-group has-success" *ngIf="currentOrder?.orderStatus === 2">
                     		<div class="form-control form-control-success">
 		                    	הזמנה סגורה
 		                    </div>
                     	</div>
-	                    <div *ngIf="currentOrder.orderStatus === 3">
+	                    <div *ngIf="currentOrder?.orderStatus === 3">
 	                    	<div class="form-group has-danger">
 	                    		<div class="form-control form-control-danger">
 			                    	הזמנה בוטלה
 			                    </div>
 	                    	</div>
-	                    	<div class="form-group has-danger" *ngIf="currentOrder.bidderCancellationReason == undefined && currentOrder.ownerCancellationReason == undefined">
+	                    	<div class="form-group has-danger" *ngIf="currentOrder?.bidderCancellationReason == undefined && currentOrder?.ownerCancellationReason == undefined">
 	                    		<div class="form-control form-control-danger">
 			                    	שגיאה: הזמנה בוטלה אך ללא סיבה !
 			                    </div>
 	                    	</div>
-	                    	<div class="form-control" *ngIf="currentOrder.ownerCancellationReason != undefined">
+	                    	<div class="form-control" *ngIf="currentOrder?.ownerCancellationReason != undefined">
 	                    		<small>
 		                    	{{currentOrderSnapshot.child('userName').val()}} ביטל את ההזמנה מהסיבה הבאה: <br>
-		                    	{{currentOrder.ownerCancellationReason}}
+		                    	{{currentOrder?.ownerCancellationReason}}
 		                    	</small>
 		                    </div>
-	                    	<div class="form-control form-control-danger" *ngIf="currentOrder.bidderCancellationReason != undefined">
+	                    	<div class="form-control form-control-danger" *ngIf="currentOrder?.bidderCancellationReason != undefined">
 	                    		<small>
-		                    	{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}} ביטל את ההזמנה מהסיבה הבאה: <br>
-		                    	{{currentOrder.bidderCancellationReason}}
+		                    	{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('name').val()}} ביטל את ההזמנה מהסיבה הבאה: <br>
+		                    	{{currentOrder?.bidderCancellationReason}}
 		                    	</small>
 		                    </div>
 	                    	
 	                    </div>
 	                </div>
-	                <div *ngIf="currentOrder.userId === database.getCurrentUser().child('uid').val()">
-	                	<div *ngIf="currentOrder.orderStatus === 0 || currentOrder.orderStatus === 1">
+	                <div *ngIf="currentOrder?.userId === database.getCurrentUser().child('uid').val()">
+	                	<div *ngIf="currentOrder?.orderStatus === 0 || currentOrder?.orderStatus === 1">
 	                		<h6><small>אפשרויות הזמנה</small></h6> 
 			        		<div class="form-group">
-			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 0" (click)="deleteOrder()">מחק הזמנה</button>
-			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder.orderStatus === 1" (click)="cancelOrderAsOwner()">בטל עסקה</button>
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder?.orderStatus === 0" (click)="deleteOrder()">מחק הזמנה</button>
+			                    <button type="submit" class="btn btn-danger" *ngIf="currentOrder?.orderStatus === 1" (click)="cancelOrderAsOwner()">בטל עסקה</button>
 			                </div>
 	                	</div>
 	                </div>
-	                <div *ngIf="currentOrder.selectedBid === database.getCurrentUser().child('uid').val() && currentOrder.orderStatus === 1">
+	                <div *ngIf="currentOrder?.selectedBid === database.getCurrentUser().child('uid').val() && currentOrder?.orderStatus === 1">
 	                	<h6><small>אפשרויות הזמנה</small></h6> 
 		        		<div class="form-group">
 		                    <button type="submit" class="btn btn-danger" (click)="cancelOrderAsBidder()">בטל עסקה</button>
@@ -553,13 +562,18 @@
 	                <div *ngIf="database.getCurrentUser().child('appManager').val() === true && currentOrderSnapshot.child('failedToCharge').val() === true">
 	                	<div class="form-group has-danger">
                     		<div class="form-control form-control-danger">
-		                    	חיוב אשראי נכשל ל{{currentOrderSnapshot.child('bidsList').child(currentOrder.selectedBid).child('bidder').child('name').val()}}
+		                    	חיוב אשראי נכשל ל{{currentOrderSnapshot.child('bidsList').child(currentOrder?.selectedBid).child('bidder').child('name').val()}}
 		                    </div>
                     	</div>
 	                </div>
 	                
 	                <div style="margin-top: 1rem;" *ngIf="database.getCurrentUser().child('appManager').val() === true && currentOrderSnapshot.child('needToResolveCancellation').val() === true">
 	                	<button type="submit" class="btn btn-success" (click)="resolveCancelledOrder()">פתרתי את הבעיה</button>
+	                </div>
+	                
+	                <div *ngIf="database.getCurrentUser().child('appManager').val() === true">
+	                	<h6><small>אפשרויות מנהל</small></h6> 
+	                	<button type="submit" class="btn btn-danger" (click)="deleteOrder()">מחק הזמנה</button>
 	                </div>
 				</div>
 			</div>

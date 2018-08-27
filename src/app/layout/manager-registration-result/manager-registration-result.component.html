@@ -1,0 +1,50 @@
+<div [@routerTransition] class="main-content-container">
+	<app-page-header [heading]="'הרשמת מוביל'" [icon]="'fa-desktop'"></app-page-header>
+	<div *ngIf="database.getCurrentUser() != undefined" class="jumbotron">
+		<div *ngIf="database.getCurrentUser().child('manager').val()">
+			<br>
+			<h4>מזל טוב ! אתה מעכשיו מנהל משאיות !</h4>
+			<table>
+				<tr>
+					<td>
+						<i class="fa fa-truck fa-5x" style="color: #0275d8;"></i> &nbsp; &nbsp; &nbsp;
+					</td>
+					<td>
+						אל ללתן למשאיות שלך לנוח..
+						<br>
+						מצא להם עבודה והתחל להרוויח כסף !
+					</td>
+				</tr>
+			</table>
+			<br>
+			<br>
+			<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page', 0, 0, 0, 0]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הגש הצעות מחיר</button>
+			<br>
+			<br>
+		</div>
+		<div *ngIf="!database.getCurrentUser().child('manager').val()">
+			<div *ngIf="!database.getCurrentUser().child('paymentAccessToken').val()">
+				<br>
+				<h4>הזנת האשראי נכשלה</h4>
+				<div>האשראי  לא נקלט במערכת</div>
+				<br>
+				<button type="submit" class="btn btn-success" [routerLink]="['/manager-registration-page']"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; נסה להרשם בדרך אחרת..</button>
+				<br>
+				<br>
+			</div>
+			<div *ngIf="database.getCurrentUser().child('paymentAccessToken').val()">
+				<br>
+				<h4>תודה לך על הרשמתך</h4>
+				<div><i class="fa fa-envelope"></i> נציגנו מעבדים את בקשתך ויחזרו אליך בקרוב, במייל ו\או בטלפון.</div>
+				<br>
+				<br>
+				<div>בינתיים, תוכל לצפות בהובלות הפתוחות להנאתך..</div>
+				<br>
+				<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page', 0, 0, 0, 0]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; צפה בהובלות פתוחות</button>
+				<br>
+				<br>
+			</div>
+		</div>
+	</div>
+    <app-footer-page></app-footer-page>
+</div>

@@ -1,7 +1,7 @@
 <div [@routerTransition] class="main-content-container">
-	<app-page-header [heading]="'הרשמת מוביל'" [icon]="'fa-desktop'"></app-page-header>
+	<!-- <app-page-header [heading]="'הרשמת מוביל'" [icon]="'fa-desktop'"></app-page-header> -->
 	<div *ngIf="database.getCurrentUser() != undefined">
-		<div *ngIf="database.getCurrentUser().child('manager').val() != true">
+		<div>
 			<div class="jumbotron" *ngIf="database.getCurrentUser().child('requestingManager').val() != true">
 		        <h4>הרשמת מוביל</h4>
 		        
@@ -9,8 +9,7 @@
 		        
 		        בכדי להתחיל להגיש הצעות מחיר, אנו צריכים לאמת את חשבונך. <br>
 		
-				<br>
-				<span style="font-size: 1.2rem;">לא הרווחת, לא שילמת !</span>  <br>
+				<!-- <span style="font-size: 1.2rem;">לא הרווחת, לא שילמת !</span>  <br>
 				<i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> אין דמי הרשמה!  <br>
 				<i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> אין דמי ניהול!  <br>
 				<i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> במידה והרווחתם, אתם תחוייבו ב 8% מסך העסקה. <br>
@@ -19,24 +18,65 @@
 		            <label>
 		                <input type="checkbox" value="" #checkboxAgreement> קראתי ואני מסכים ל<a [routerLink]="['/tos-page']">תנאי השימוש</a> ו<a [routerLink]="['/pp-page']">מדיניות פרטיות</a>
 		            </label>
-		        </div>
+		        </div> -->
 				<br>
-				<div *ngIf="database.getCurrentUser() != undefined" class="form-control">
-					<br>
-					<h6>במידה והרווחת, איך אתה מעוניין לשלם ?</h6>
-			        <br><br>
-					<div class="row">
+				<div *ngIf="database.getCurrentUser() != undefined">
+					<h6 class="form-control">במידה והרווחת, איך אתה מעוניין לשלם ?</h6>
+				    <div class="container" style="width: 60%; margin-left: auto; margin-right: auto;">
+				        <div class="row">
+				            <div class="col-md-6" style="padding: 1rem;">
+				                <div class="pricingTable">
+				                    <div class="pricingTable-header">
+				                        <h3 class="title">אשראי</h3>
+				                        <span class="price-value">
+				                            <span class="month">תחוייב </span>8%<span class="month"> מסך הרווחים</span>
+				                        </span>
+				                    </div>
+				                    <ul class="pricing-content">
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> ללא דמי הרשמה</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> ללא דמי ניהול</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> אפשרות להגיש הצעות מחיר</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> יומן אישי</li>
+				                        <li> </li>
+				                    </ul>
+				                    <button class="pricingTable-signup link" (click)="requestOnlinePayment()"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הזנת אשראי</button>
+				                    <div style="font-size: .6rem; padding: .5rem;">
+										* שים לב ! - חשבונך  <u>לא יחוייב</u> בהזנת כרטיס האשראי
+									</div>
+				                </div>
+				            </div>
+				            <div class="col-md-6" style="padding: 1rem;">
+				                <div class="pricingTable orange">
+				                    <div class="pricingTable-header">
+				                        <h3 class="title">אובליגו</h3>
+				                        <span class="price-value">
+				                            <span class="month">תחוייב </span>8%<span class="month"> מסך הרווחים</span>
+				                        </span>
+				                    </div>
+				                    <ul class="pricing-content">
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> ללא דמי הרשמה</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> ללא דמי ניהול</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> אפשרות להגיש הצעות מחיר</li>
+				                        <li><i class="fa fa-check-circle fa-fw" style="color: #5cb85c;"></i> יומן אישי</li>
+				                        <li> </li>
+				                    </ul>
+				                    <button class="pricingTable-signup" (click)="requestPhonePayment()"><i class="fa fa-fw fa-phone"></i>&nbsp; בקשה לנציג טלפוני</button>
+				                    <div style="font-size: .6rem; padding: .5rem; visibility: hidden;">
+										* שים לב ! - חשבונך  <u>לא יחוייב</u> בהזנת כרטיס האשראי
+									</div>
+				                </div>
+				            </div>
+				        </div>
+				    </div>
+			        
+					<!-- <div class="row">
 			        	<div class="col-lg-6" style="margin-top: 8px; margin-bottom: 8px;">
 			        		<button type="submit" class="btn btn-success" (click)="requestOnlinePayment()"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר להזנת אשראי</button>
 			        	</div>
 			        	<div class="col-lg-6">
 			        		<button type="submit" class="btn btn-warning" (click)="requestPhonePayment()"><i class="fa fa-fw fa-phone"></i>&nbsp; נציג יתקשר אלי לבקשת אשראי</button>
 			        	</div>
-			        </div>
-				</div>
-				<br>
-		        <div class="form-control" style="font-size: 1rem; padding: .5rem;">
-					* שים לב ! - חשבונך  <u>לא יחוייב</u> בהזנת כרטיס האשראי
+			        </div> -->
 				</div>
 		    </div>
 		    
@@ -62,34 +102,7 @@
 				<button type="submit" class="btn btn-success" [routerLink]="['/payment', database.getCurrentUser().child('uid').val()]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; מעבר לתשלום מאובטח</button>
 			</div>
 		</div>
-		<div *ngIf="database.getCurrentUser().child('manager').val() === true">
-			<br>
-			<br>
-			<br>
-			<h4>מזל טוב ! אתה מעכשיו מנהל משאיות !</h4>
-			<table>
-				<tr>
-					<td>
-						<i class="fa fa-truck fa-5x" style="color: #0275d8;"></i> &nbsp; &nbsp; &nbsp;
-					</td>
-					<td>
-						אל ללתן למשאיות שלך לנוח..
-						<br>
-						מצא להם עבודה והתחל להרוויח כסף !
-					</td>
-				</tr>
-			</table>
-			<br>
-			<br>
-			<button type="submit" class="btn btn-success" [routerLink]="['/open-orders-page', 0, 0, 0, 0]"><i class="fa fa-fw fa-cc-visa"></i>&nbsp; הגש הצעות מחיר</button>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-		</div>
 	</div>
+	
     <app-footer-page></app-footer-page>
 </div>

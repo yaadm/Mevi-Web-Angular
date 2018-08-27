@@ -44,6 +44,37 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     }
   }
 
+  isValidIsraeliID(input) {
+    input = String(input).trim();
+    if (input.length > 9 || input.length < 5 || isNaN(input)) {
+      return false;
+    } 
+
+    // Pad string with zeros up to 9 digits
+    input = input.length < 9 ? ("00000000" + input).slice(-9) : input;
+
+    return Array.from(input, Number)
+      .reduce((counter, digit, i) => {
+        const step = digit * ((i % 2) + 1);
+        return counter + (step > 9 ? step - 9 : step);
+      }) % 10 === 0;
+  }
+  
+  isValidPhone(input) {
+    
+    input = String(input).trim();
+    
+    if (isNaN(input)) {
+      return false;
+    }
+    
+    if (input.length < 8) {
+      return false;
+    }
+    
+    return /^\d+$/.test(input);
+  }
+  
   onSubmit() {
 
     if (!this.companyNameRef.nativeElement.value) {
@@ -52,11 +83,17 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     } else if (!this.companyIdRef.nativeElement.value) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין ח.פ \ עוסק מורשה');
       return;
+    } else if (!this.isValidIsraeliID(this.companyIdRef.nativeElement.value)) {
+      this.showInformationDialog('לא הזנת שדה חובה', 'ח.פ \ עוסק מורשה לא תקין');
+      return;
     } else if (!this.companyAddressRef.nativeElement.value) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין כתובת העסק');
       return;
     } else if (!this.companyPhoneRef.nativeElement.value) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה להזין טלפון להתקשרות');
+      return;
+    } else if (!this.isValidPhone(this.companyPhoneRef.nativeElement.value)) {
+      this.showInformationDialog('מספר טלפון לא חוקי', 'חובה להזין רק מספרים ללא רווחים');
       return;
     } else if (!this.checkboxAgreementRef.nativeElement.checked) {
       this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');

@@ -15,9 +15,7 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const nodemailer = require('nodemailer');
 var request = require('request');
-const gmailEmail = encodeURIComponent(functions.config().gmail.email);
-const gmailPassword = encodeURIComponent(functions.config().gmail.password);
-const mailTransport = nodemailer.createTransport(`smtps://${gmailEmail}:${gmailPassword}@smtp.gmail.com`);
+const mailTransport = nodemailer.createTransport('smtps://GetTruck.Objective@gmail.com:Aa123456!@smtp.gmail.com');
 const GoogleDistanceApi = require('google-distance-api');
 
 const tempUnknownAccessTokenSaving = "d8a0e2a5-0fff-4aee-8e63-7c69f9ce09c1";
@@ -37,7 +35,14 @@ exports.onCreateUser = functions.auth.user().onCreate((userRecord, context) => {
 	const email = user.email; // The email of the user.
 	const displayName = user.displayName; // The display name of the user.
 	const photoUrl = user.photoURL;
-	const creationTime = Date.now();
+	let creationTime = new Date().now();
+	let lastSignedIn = new Date().now();
+	
+	try {
+		
+		creationTime = new Date(userRecord.metadata.creationTime).getTime();
+		lastSignedIn = new Date(userRecord.metadata.lastSignInTime).getTime();
+	} catch (e) {}
 	
 	const userObject = {
 			'uid' : uid,
@@ -45,9 +50,10 @@ exports.onCreateUser = functions.auth.user().onCreate((userRecord, context) => {
 			'name' : displayName,
 			'imageUrl' : photoUrl,
 			'createdAt' : creationTime,
-			'lastSingedIn' : creationTime,
+			'lastSingedIn' : lastSignedIn,
 			'manager' : false,
 			'appManager' : false,
+			'blocked' : false,
 			'subscribedToMailingList' : true,
 			'subscribedToPushNotifications' : true
 	};
@@ -141,44 +147,6 @@ exports.onOrderChanged = functions.database.ref('/all-orders/{orderId}').onWrite
 	return true;
 });
 
-function updateDistanceForOrder (order) {
-	
-	const originsStr = order.child('pickupLat').val() + ',' + order.child('pickupLng').val();
-	const destinationsStr = order.child('destinationLat').val() + ',' + order.child('destinationLng').val();
-	
-	const options = {
-	  key: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo',
-	  origins: [originsStr],
-	  destinations: [destinationsStr],
-	  language: 'iw'
-	}
-	
-	try {
-		GoogleDistanceApi.distance(options, (err, data) => {
-		    if(err) {
-		        return console.log(err);
-		    }
-		 
-		    console.log(data);
-		    
-		    try {
-		    	const payload = {
-	    	    	'distance' : data[0].distance,
-	    	    	'duration' : data[0].duration
-	    	    }
-		    	    
-	    	    return admin.database().ref('/all-orders/' + order.child('orderId').val()).update(payload);
-		    } catch (error) {
-		    	// console.log(error);
-				console.log('could not calculate distance');
-		    }
-		});
-	} catch (error) {
-		// console.log(error);
-		console.log('could not calculate distance');
-	}
-}
-
 exports.onNewBid = functions.database.ref('/all-orders/{orderId}/bidsList/{bidId}').onWrite((change, context) => {
 
 	// Exit when the data is deleted.
@@ -236,13 +204,18 @@ exports.onAppManagerStateChange = functions.database.ref('/users/{userId}/appMan
 		return true;
 	}
 	
+	if(!change.before.exists()){
+		console.log('appManager key created');
+		return true;
+	}
+	
 	const isAppManager = change.after.val();
 	const userId = context.params.userId;
 	
 	if(isAppManager){
-		return sendNotificationsToUserById(userId, 'app-manager-state-change', '1'); // true
+		return sendNotificationsToUserById(userId, 'action_manager_request_status_changed', '1'); // true
 	} else {
-		return sendNotificationsToUserById(userId, 'app-manager-state-change', '0'); // false
+		return sendNotificationsToUserById(userId, 'action_manager_request_status_changed', '0'); // false
 	}
 
 	return true;
@@ -260,6 +233,7 @@ exports.onNewManagerRequest = functions.database.ref('/users/{userId}/requesting
 });
 
 const MANAGER_STATUS_PENDING = "0";
+
 const MANAGER_STATUS_APPROVED = "1";
 const MANAGER_STATUS_DENIED = "2";
 
@@ -302,8 +276,59 @@ exports.onNewContactUsMessage = functions.database.ref('/email-inbox/{messageId}
 		return true;
 	}
 	
-	return sendEmailToUs(change.after);
+	const promises = [];
+	
+	promises.push(sendNotificationToAppManagers("action_contact_us_request", change.after));
+	
+	return Promise.all(promises).then(function(value) {
+		
+		promises.push(admin.database().ref('/email-inbox/').child(change.after.key).remove());
+	}, function(reason) {
+		
+		console.log('Failed to send contact us email to managers');
+	});
+	
+	// return sendNotificationToAppManagers("action_contact_us_request", change.after);
+	// return sendEmailToUs(change.after);
 });
+
+function updateDistanceForOrder (order) {
+	
+	const originsStr = order.child('pickupLat').val() + ',' + order.child('pickupLng').val();
+	const destinationsStr = order.child('destinationLat').val() + ',' + order.child('destinationLng').val();
+	
+	const options = {
+	  key: 'AIzaSyCgaQcKCwyfnTTQLcZD0KjT38I6WEtY_zo',
+	  origins: [originsStr],
+	  destinations: [destinationsStr],
+	  language: 'iw'
+	}
+	
+	try {
+		GoogleDistanceApi.distance(options, (err, data) => {
+		    if(err) {
+		        return console.log(err);
+		    }
+		 
+		    console.log(data);
+		    
+		    try {
+		    	const payload = {
+	    	    	'distance' : data[0].distance,
+	    	    	'duration' : data[0].duration
+	    	    }
+		    	    
+	    	    return admin.database().ref('/all-orders/' + order.child('orderId').val()).update(payload);
+		    } catch (error) {
+		    	// console.log(error);
+				console.log('could not calculate distance');
+		    }
+		});
+	} catch (error) {
+		// console.log(error);
+		console.log('could not calculate distance');
+	}
+}
 
 function sendNotificationToManagers(action, order) {
 	console.log('sendNotificationToManagers() called');
@@ -315,7 +340,7 @@ function sendNotificationToManagers(action, order) {
 		console.log('found total of ' + managers.numChildren() + ' managers');
 		const filteredManagers = [];
 		
-		managers.forEach(function(manager, i, array) {
+		managers.forEach(function(manager) {
 			
 			if(!senderUid || manager.child('uid').val() !== senderUid){
 				
@@ -435,7 +460,7 @@ function sendEmailToUser(user, action, data) {
 			
 			var subject = 'בקשת הניהול שלך אושרה !';
 			mailOptions.subject = subject;
-			var message = name + ' שלום,<br>בקשת הניהול שלך אושרה !<br><a href="https://mevi.co.il/manager-registration-page">לחץ כאן לצפייה</a>';
+			var message = name + ' שלום,<br>בקשת הניהול שלך אושרה !<br><a href="https://mevi.co.il/manager-registration-result-page">לחץ כאן לצפייה</a>';
 			var body = generateEmail(subject, message, '', '', uid);
 			mailOptions.html = body;
 		} else {
@@ -465,7 +490,7 @@ function sendEmailToUser(user, action, data) {
 		
 		var subject = 'מישהו נרשם למנהל משאיות - נא לבדוק באפליקציה';
 		mailOptions.subject = subject;
-		var message = name + ' שלום,<br>פורסמה בקשת ניהול חדשה<br><a href="https://mevi.co.il">לחץ כאן לצפייה</a>';
+		var message = name + ' שלום,<br>פורסמה בקשת ניהול חדשה<br>שם משתמש: '+ name +'<br>אימייל: ' + email + '<br><br><a href="https://mevi.co.il">לחץ כאן לצפייה</a>';
 		var body = generateEmail(subject, message, '', '', uid);
 	    mailOptions.html = body;
 		
@@ -483,22 +508,24 @@ function sendEmailToUser(user, action, data) {
     });
 }
 
-function sendEmailToUsers(users, action, data) {
-	console.log('sendNotificationsToUsers() called');
+function sendEmailToUsersWithAction(users, action, data) {
+	console.log('sendEmailToUsersWithAction() called');
 	console.log('sending email to ' + users.length + ' users.');
 	
-	users.forEach(function(user, i, array) {
-		
+	var promises = [];
+	
+	users.forEach(function(user) {
 		const email = user.child('email').val();
 		const name = user.child('name').val();
 		const uid = user.child('uid').val();
 		const subscribedToEmails = user.child('subscribedToMailingList').val();
-
-		console.log('sending email to:' + email);
 		
 		if(!email || !action){
+			console.log('no email or action');
 			return;
 		}
+		
+		console.log('sending email to:' + email);
 		
 		const mailOptions = {
 			    from: '"Mevi" <noreply@mevi.co.il>',
@@ -561,6 +588,64 @@ function sendEmailToUsers(users, action, data) {
 			var body = generateEmail(subject, message, '', '', uid);
 		    mailOptions.html = body;
 			
+		}else if(action == "action_contact_us_request"){
+			
+			var cName = data.child('name').val();
+			var cUid = data.child('uid').val();
+			var cEmail = data.child('email').val();
+			var cPhone = data.child('phone').val();
+			var cMessage = data.child('message').val();
+			
+			/*if(!cEmail || !cMessage){
+				promises.push(admin.database().ref('/email-inbox/').child(data.key).remove());
+			}*/
+			
+			if(!cPhone){
+				cPhone = '';
+			}
+			
+			mailOptions.subject = 'צור קשר - הודעה חדשה';
+			cMessage = cMessage.replace(/(?:\r\n|\r|\n)/g, '<br />');
+			
+			var header = 'התקבלה הודעה חדשה מדף צור קשר';
+			var body = "<table>" +
+							"<tr>" +
+								"<td>" +
+									"מאת" +
+								"</td>" +
+								"<td>" +
+									cName +
+								"</td>" +
+							"</tr>" +
+							"<tr>" +
+								"<td>" +
+									"אימייל" +
+								"</td>" +
+								"<td>" +
+									cEmail +
+								"</td>" +
+							"</tr>" +
+							"<tr>" +
+								"<td>" +
+									"טלפון" +
+								"</td>" +
+								"<td>" +
+									cPhone +
+								"</td>" +
+							"</tr>" +
+							"<tr>" +
+								"<td>" +
+									"הודעה" +
+								"</td>" +
+								"<td style='width: 100%; background-color: white; padding: 16px;'>" +
+									cMessage +
+								"</td>" +
+							"</tr>" +
+						"</table>";
+			
+			var generatedHTML = generateEmail(header, body, '', '', cUid);
+			
+			mailOptions.html = generatedHTML;
 		}
 		
 		if(!mailOptions.subject){
@@ -568,13 +653,56 @@ function sendEmailToUsers(users, action, data) {
 			return;
 		}
 		
-	    return mailTransport.sendMail(mailOptions).then(() => {
+		promises.push(mailTransport.sendMail(mailOptions).then(() => {
 	      console.log('mail with action: ' + action + ' sent to: ' + email);
+	    }, (error) => {
+	      console.error('There was an error while sending the email to ' + email, error);  
 	    }).catch(error => {
 	      console.error('There was an error while sending the email to ' + email, error);  
-	    });
+	    }));
 		
 	});
+	
+	return Promise.all(promises);
+}
+
+function sendEmailToUsers(users, email) {
+	
+	console.log('sendEmailToUsers() called');
+	console.log('sending email to ' + users.numChildren() + ' users.');
+	
+	var promises = [];
+	
+	users.forEach(function(user) {
+		
+		const userEmail = user.child('email').val();
+		const name = user.child('name').val();
+		const uid = user.child('uid').val();
+		// const subscribedToEmails = user.child('subscribedToMailingList').val();
+		
+		const mailOptions = {
+			    from: '"Mevi" <noreply@mevi.co.il>',
+			    to: userEmail
+		};
+		
+	    mailOptions.html = email.html;
+	    mailOptions.subject = email.subject;
+	    
+	    if(!mailOptions.subject || !mailOptions.html){
+			console.log('not sending mail, unknown action or HTML');
+			return;
+		}
+		
+	    promises.push(mailTransport.sendMail(mailOptions).then(() => {
+	      console.log('mail with subject "' + email.subject + '" sent to: ' + userEmail);
+	    }, (error) => {
+	      console.error('There was an error while sending the email to ' + userEmail, error);  
+	    }).catch(error => {
+	      console.error('There was an error while sending the email to ' + userEmail, error);  
+	    }));
+	});
+	
+	return Promise.all(promises);
 }
 
 function sendPushToUsers(users, action, data) {
@@ -599,10 +727,18 @@ function sendPushToUsers(users, action, data) {
 		}
 		
 		
-		console.log('sending push to user = ' + childSnapshot.child('uid').val());
+		const token = childSnapshot.child('notificationTokens').val();
 		
-		notificationTokens.push(childSnapshot.child('notificationTokens').val());
-		usersSnapshot.push(childSnapshot);
+		if (token) {
+			
+			console.log('sending push to user = ' + childSnapshot.child('uid').val());
+			
+			notificationTokens.push(token);
+			usersSnapshot.push(childSnapshot);
+		} else {
+			
+			console.log('skipping push to user = ' + childSnapshot.child('uid').val() + ' :no notificationToken.');
+		}
 	});
 	
 	if(notificationTokens.length === 0){
@@ -652,7 +788,7 @@ function sendEmailToUs(emailDataRef) {
 	var message = emailDataRef.child('message').val();
 	
 	if(!email || !message){
-		return;
+		return admin.database().ref('/email-inbox/').child(emailDataRef.key).remove();
 	}
 	
 	if(!phone){
@@ -710,9 +846,7 @@ function sendEmailToUs(emailDataRef) {
     return mailTransport.sendMail(mailOptions).then(() => {
       console.log('Contact us email - sent !');
       
-      admin.database().ref('/email-inbox/').child(emailDataRef.key).remove();
-      
-      return true;
+      return admin.database().ref('/email-inbox/').child(emailDataRef.key).remove();
       
     }, error => {
     	
@@ -731,7 +865,7 @@ function sendNotificationsToUsers(users, action, data) {
 	
 	const promises = [];
 	
-	promises.push(sendEmailToUsers(users, action, data));
+	promises.push(sendEmailToUsersWithAction(users, action, data));
 	
 	promises.push(sendPushToUsers(users, action, data));
 	
@@ -760,6 +894,43 @@ function generateEmail(header, message, submessage, footer, uid){
 			"<td style='background-color: #black; text-align: center; padding: 10px;'>" +
 				"<hr>" +
 				"נשלח מאתר http://www.mevi.co.il" + " | " + "<a href='https://www.mevi.co.il/unsubscribe?uid=" + uid + "'>הסר מרשימת התפוצה</a>"
+				"<br>" +
+				"<span style='font-size: 10px; padding: 10px;'>" + 
+					footer +
+				"</span>" + 
+			"</td>" +
+		"</tr>" +
+	"</table>";
+	
+}
+
+function generateEmailWithLinkToOrder(header, message, submessage, footer, orderId){
+	
+	return "<table dir='rtl' style='width: 100%; background-color: #e9e9e9; border: 0px;'>" +
+		"<tr>" +
+			"<td style='color:white; background-color: #3F51B5; font-size: 16px; padding: 16px;'>" +
+				header +
+			"</td>" +
+		"</tr>" +
+		"<tr>" +
+			"<td style='color:black; font-size: 14px; padding: 14px;'>" +
+				message +
+			"</td>" +
+		"</tr>" +
+		"<tr>" +
+			"<td style='color:black; font-size: 12px; padding: 12px;'>" +
+				submessage +
+			"</td>" +
+		"</tr>" +
+		"<tr>" +
+			"<td style='color:black; font-size: 14px; padding: 12px;'>" +
+				'<a href="https://mevi.co.il/order-details/' + orderId + '">לחץ כאן לצפייה</a>' +
+			"</td>" +
+		"</tr>" +
+		"<tr>" +
+			"<td style='background-color: #black; text-align: center; padding: 10px;'>" +
+				"<hr>" +
+				"נשלח מאתר http://www.mevi.co.il"  +
 				"<br>" +
 				"<span style='font-size: 10px; padding: 10px;'>" + 
 					footer +
@@ -972,9 +1143,10 @@ exports.onUserPaymentMethodCompleted = functions.https.onRequest((req, res) => {
 		
 		const payload = {
 				'paymentAccessToken' : AccessToken,
-				'manager' : true,
-				'requestingManager' : false,
-				'paymentAccessTokenDate' : admin.database.ServerValue.TIMESTAMP
+//				'manager' : true,
+				'requestingManager' : true,
+				'paymentAccessTokenDate' : admin.database.ServerValue.TIMESTAMP,
+//				'managerRegistrationDate' : admin.database.ServerValue.TIMESTAMP
 		};
 		
 		return admin.database().ref('users').child(uid).update(payload).then(function () {
@@ -1121,6 +1293,8 @@ exports.startDailyCronTest = functions.https.onRequest((req, res) => {
 	
 	statisticsCron();
 	
+	sendAllContactUsEmails();
+	
 	const redirectUrl = "https://mevi.co.il";
 	return res.redirect(redirectUrl);
 });
@@ -1129,62 +1303,211 @@ exports.startDailyCronTest = functions.https.onRequest((req, res) => {
  * CRON JOBS
  */
 
-const mPaymentPercentage = 0.08;  // 8%
+const PAYMENT_PERCENTAGE = 0.08;  // 8%
+
+exports.morning_job = functions.pubsub.topic('morning-tick').onPublish((event) => {
+	console.log("daily cron strated.");
+	
+	notifyUsersAboutTommorowsActions();
+	
+	return true;
+});
 
 exports.daily_job = functions.pubsub.topic('daily-tick').onPublish((event) => {
 	console.log("daily cron strated.");
 	
-	paymentCron();
-	
-	return true;
+	return paymentCron();
 });
 
 exports.daily_job_delayed = functions.pubsub.topic('daily-tick-delayed').onPublish((event) => {
 	console.log("daily delayed cron strated.");
 	
-	statisticsCron();
+	const promises = [];
 	
-	return true;
+	promises.push(statisticsCron());
+	
+	return Promise.all(promises);;
 });
 
 function statisticsCron(){
 
 	console.log("Statistics cron strated.");
+	
+	const promises = [];
+	
+	const todayDate = new Date();
+	todayDate.setHours(0,0,0,0); // set to Midnight
+	const today = todayDate.getTime();
+	
+	const yesterdayDate = new Date();
+	yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+	
 	//statistics
-	return admin.database().ref('/all-orders').once('value').then(ordersSnapshot => {
+	promises.push(admin.database().ref('/all-orders').once('value').then(ordersSnapshot => {
 		
 		let openOrdersCount = 0;
 		let pendingnOrdersCount = 0;
 		let completedOrdersCount = 0;
+		let payedOrdersCount = 0;
+		let failedToChargeOrdersCount = 0;
+		
+		
+		let newOrdersCountThisMonth = 0;
+		let pendingnOrdersCountThisMonth = 0;
+		let completedOrdersCountThisMonth = 0;
+		let payedOrdersCountThisMonth = 0;
+		let failedToChargeOrdersCountThisMonth = 0;
 		
 		ordersSnapshot.forEach(function(childSnapshot) {
 			
-			if(childSnapshot.child('orderStatus').val() === 0){
-				openOrdersCount++;
-			} else if(childSnapshot.child('orderStatus').val() === 1){
-				pendingnOrdersCount++;
-			} else if(childSnapshot.child('orderStatus').val() === 2){
-				completedOrdersCount++;
+			if (!childSnapshot.child('test').val()) {
+				
+				if(childSnapshot.child('orderStatus').val() === ORDER_STATUS_NEW){
+					openOrdersCount++;
+				} else if(childSnapshot.child('orderStatus').val() === ORDER_STATUS_PENDING){
+					pendingnOrdersCount++;
+				} else if(childSnapshot.child('orderStatus').val() === ORDER_STATUS_COMPLETED){
+					completedOrdersCount++;
+				}
+				
+				const publishDateTime = childSnapshot.child('publishedAt').val();
+				const publishDate = new Date(publishDateTime);
+				if (todayDate.getYear() === publishDate.getYear() && todayDate.getMonth() === publishDate.getMonth()) {
+					newOrdersCountThisMonth++;
+				}
+				
+				const selectedBidDateTime = childSnapshot.child('bidSelectedDate').val();
+				if (selectedBidDateTime) {
+					const selectedBidDate = new Date(selectedBidDateTime);
+					
+					if (todayDate.getYear() === selectedBidDate.getYear() && todayDate.getMonth() === selectedBidDate.getMonth()) {
+						pendingnOrdersCountThisMonth++;
+					}
+				}
+				
+				const selectedBid = childSnapshot.child('selectedBid').val();
+				
+				if(selectedBid) {
+					
+					const selectedBidDateTime = childSnapshot.child('bidsList').child(selectedBid).child('pickupDate').val();
+					const selectedBidDate = new Date(selectedBidDateTime);
+					if (todayDate.getYear() === selectedBidDate.getYear() && todayDate.getMonth() === selectedBidDate.getMonth()) {
+						completedOrdersCountThisMonth++;
+					}
+				}
+				
+				const paymentDateTime = childSnapshot.child('paymentDate').val();
+				if (paymentDateTime) {
+					
+					payedOrdersCount++;
+					
+					const paymentDate = new Date(paymentDateTime);
+					
+					if (todayDate.getYear() === paymentDate.getYear() && todayDate.getMonth() === paymentDate.getMonth()) {
+						payedOrdersCountThisMonth++;
+					}
+				}
+				
+				const failedToChargeDateTime = childSnapshot.child('failedToChargeDate').val();
+				if (failedToChargeDateTime) {
+					
+					failedToChargeOrdersCount++;
+					
+					const failedToChargeDate = new Date(failedToChargeDateTime);
+					
+					if (todayDate.getYear() === failedToChargeDate.getYear() && todayDate.getMonth() === failedToChargeDate.getMonth()) {
+						failedToChargeOrdersCountThisMonth++;
+					}
+				}
 			}
-			
 		});
-		
-		const today = new Date().getTime();
 		
 		const payload = {
 			'openOrdersCount' : openOrdersCount,
 			'pendingOrdersCount' : pendingnOrdersCount,
 			'completedOrdersCount' : completedOrdersCount,
+			'payedOrdersCount' : payedOrdersCount,
+			'failedToChargeOrdersCount' : failedToChargeOrdersCount,
+			'newOrdersCountThisMonth' : newOrdersCountThisMonth,
+			'pendingnOrdersCountThisMonth' : pendingnOrdersCountThisMonth,
+			'completedOrdersCountThisMonth' : completedOrdersCountThisMonth,
+			'payedOrdersCountThisMonth' : payedOrdersCountThisMonth,
+			'failedToChargeOrdersCountThisMonth' : failedToChargeOrdersCountThisMonth,
 			'date' : today
 		}
 		
-		const promises = [];
+		const innerPromises = [];
 		
-		promises.push(admin.database().ref('/statistics').child('history').push(payload));
-		promises.push(admin.database().ref('/statistics').child('latest').set(payload));
+		innerPromises.push(admin.database().ref('/statistics').child('history').child(today).update(payload));
+		innerPromises.push(admin.database().ref('/statistics').child('latest').update(payload));
 		
-		return Promise.all(promises);
-	});
+		return Promise.all(innerPromises);
+	}));
+	
+	// users and managers registration counters
+	promises.push(admin.database().ref('/users').once('value').then(usersSnapshot => {
+		
+		let newUsersCountThisMonth = 0;
+		let newUsersCountYesterday = 0;
+		let newManagersCountYesterday = 0;
+		let newManagersCountThisMonth = 0;
+		
+		usersSnapshot.forEach(function(childSnapshot) {
+			
+			if (childSnapshot.child('managerRegistrationDate').exists()) {
+				const registrationDate = new Date(childSnapshot.child('managerRegistrationDate').val());
+				
+				if (registrationDate.getYear() === yesterdayDate.getYear() && 
+					registrationDate.getMonth() === yesterdayDate.getMonth() && 
+					registrationDate.getDate() === yesterdayDate.getDate()) {
+					
+					// this manager registered yesterday.
+					newManagersCountYesterday++;
+				}
+				
+				if (todayDate.getYear() === registrationDate.getYear() && todayDate.getMonth() === registrationDate.getMonth()) {
+					newManagersCountThisMonth++;
+				}
+			}
+			
+			if (childSnapshot.child('createdAt').exists()) {
+				const registrationDate = new Date(childSnapshot.child('createdAt').val());
+				yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+				
+				if (registrationDate.getYear() === yesterdayDate.getYear() && 
+					registrationDate.getMonth() === yesterdayDate.getMonth() && 
+					registrationDate.getDate() === yesterdayDate.getDate()) {
+					
+					// this user registered yesterday.
+					newUsersCountYesterday++;
+				}
+				
+				if (todayDate.getYear() === registrationDate.getYear() && todayDate.getMonth() === registrationDate.getMonth()) {
+					newUsersCountThisMonth++;
+				}
+			} else {
+				
+				console.log('Error for user [' + childSnapshot.child('uid').val() + '], no createdAt value, SHOULD NEVER HAPPEN!');
+			}
+		});
+		
+		const payload = {
+			'newUsersCountYesterday' : newUsersCountYesterday,
+			'newUsersCountThisMonth' : newUsersCountThisMonth,
+			'newManagersCountYesterday' : newManagersCountYesterday,
+			'newManagersCountThisMonth' : newManagersCountThisMonth,
+			'date' : today
+		}
+		
+		const innerPromises = [];
+		
+		innerPromises.push(admin.database().ref('/statistics').child('history').child(today).update(payload));
+		innerPromises.push(admin.database().ref('/statistics').child('latest').update(payload));
+		
+		return Promise.all(innerPromises);
+	}));
+	
+	return Promise.all(promises)
 }
 
 function paymentCron(){
@@ -1196,6 +1519,12 @@ function paymentCron(){
 
 		console.log("Pending orders fetched (" + pendingOrdersSnapshot.numChildren() + ")");
 		
+		if (pendingOrdersSnapshot.numChildren() <= 0) {
+			
+			console.log("No pending orders, finishing operation.");
+			return true;
+		}
+		
 		var promises = [];
 
 		pendingOrdersSnapshot.forEach(function(childSnapshot) {
@@ -1203,7 +1532,7 @@ function paymentCron(){
 			var key = childSnapshot.key;
 			
 			var childData = childSnapshot.val();
-			var hasPaid = childSnapshot.child('hasPaid').val();
+			// var hasPaid = childSnapshot.child('hasPaid').val();
 			var selectedBidId = childSnapshot.child('selectedBid').val();
 			
 			if(!selectedBidId){
@@ -1280,12 +1609,13 @@ function paymentCron(){
 						console.log("starting payment operation for user: " + uid + " for order: " + key);
 						
 						var paymentAccessToken = userSnapshot.child('paymentAccessToken').val();
+						var obligo = userSnapshot.child('obligo').val();
 						var isTest = orderSnapshot.child('test').val();
 						
 						if (isTest === true) {
 							
 							const bidAmount = orderSnapshot.child('bidsList').child(managerUid).child('bidAmount').val();
-							var paymentAmount = bidAmount * mPaymentPercentage;
+							var paymentAmount = bidAmount * PAYMENT_PERCENTAGE;
 							
 							paymentAmount = paymentAmount.toFixed(2); // 2 decimals after number
 							
@@ -1302,39 +1632,51 @@ function paymentCron(){
 							
 							console.log("TEST ACCOUNT | Success: account [" + uid + "] was charged [" + paymentAmount + " NIS] for order [" + key + "]");
 							
-						} else if(!paymentAccessToken){
-							console.log("Failure: paymentAccessToken is null !");
-							console.log("revoking manager permission for user: " + uid);
-
-							// TODO: send email with link to renew your credit card information
+						} else if(!paymentAccessToken && obligo && obligo > 0){
+							console.log("Has obligo of: " + obligo + " NIS");
+							const debt = userSnapshot.child('debt').val();
 							
-							const userPayload = {
-									'manager' : false,
-									'managerRequestDenialReason' : 'חיוב נדחה, נא להזין כרטיס אשראי חדש',
-									'requestingManagerDenied' : true,
-									'requestingManagerDeniedDate' : admin.database.ServerValue.TIMESTAMP,
-									'requestingManager' : false
+							console.log("Has debt of: " + debt > 0 ? debt + " NIS" : "0 NIS");
+
+							const bidAmount = orderSnapshot.child('bidsList').child(managerUid).child('bidAmount').val();
+							var paymentAmount = bidAmount * PAYMENT_PERCENTAGE;
+							
+							paymentAmount = paymentAmount.toFixed(2); // 2 decimals after number
+							
+							const debtRef = admin.database().ref('/users').child(uid).child('debt');
+							innerPromises.push(debtRef.transaction(function(current) {
+						        	return (current || 0) + paymentAmount;
+							    }));
+							
+							const debtPayload = {
+									'amount' : paymentAmount,
+									'date' : admin.database.ServerValue.TIMESTAMP,
+									'orderId' : key
 							}
-							
-							innerPromises.push(admin.database().ref('/users').child(uid).update(userPayload));
-
+							innerPromises.push(admin.database().ref('/debts-records').child(uid).push(debtPayload));
 							const orderPayload = {
-									'pendingPayment' : true,
-									'failedToCharge' : true,
-									'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
-									'failedToChargeReason' : 'paymentAccessToken is null'
+									'pendingPayment' : false,
 							}
 						
 							innerPromises.push(admin.database().ref('/all-orders/').child(key).update(orderPayload));
 							
-						} else {
+							console.log("Success: debt of [" + paymentAmount + " NIS] added to account [" + uid + "] for order [" + key + "]");
+							
+							const totalDebt = paymentAmount + debt;
+							const precentage = totalDebt / obligo;
+							if (precentage >= 0.8) {
+								console.log("user [" + uid + "] filled more than 80% of his obligo.");
+								// TODO: user filled more than 80% of his obligo.
+								// Send Warning to user and to app managers
+							}
+						} else if(paymentAccessToken) {
 							
 							//console.log("paymentAccessToken: " + paymentAccessToken);
 							
 							const bidAmount = orderSnapshot.child('bidsList').child(managerUid).child('bidAmount').val();
 							//console.log("bidAmount: " + bidAmount);
 							
-							var paymentAmount = bidAmount * mPaymentPercentage;
+							var paymentAmount = bidAmount * PAYMENT_PERCENTAGE;
 							
 							paymentAmount = paymentAmount.toFixed(2); // 2 decimals after number
 							
@@ -1401,7 +1743,8 @@ function paymentCron(){
 										
 									}*/
 									
-									var payload = undefined;
+									var orderPayload = undefined;
+									var userPayload = undefined;
 									
 									if (!error && response && response.statusCode == 200) {
 										
@@ -1420,7 +1763,7 @@ function paymentCron(){
 											const saleToken = body.SaleToken;
 											const receiptLink = body.ReceiptLink;
 											
-											payload = {
+											orderPayload = {
 												'pendingPayment' : false,
 												'paymentDate' : admin.database.ServerValue.TIMESTAMP,
 												'failedToCharge' : false,
@@ -1429,6 +1772,16 @@ function paymentCron(){
 												'paymentAmountInNIS' : paymentAmount
 											}
 											
+											userPayload = {
+												'timestamp' : admin.database.ServerValue.TIMESTAMP,
+												'receiptLink' : receiptLink,
+												'saleToken' : saleToken,
+												'paymentAmountInNIS' : paymentAmount,
+												'orderId' : key,
+												'note' : 'Server Generated - Credit Card'
+											}
+											
+											innerPromises.push(admin.database().ref('/payments-records').child(uid).push(userPayload));
 											console.log("Success: account [" + uid + "] was charged [" + paymentAmount + " NIS] for order [" + key + "]");
 											
 										} else {
@@ -1444,11 +1797,11 @@ function paymentCron(){
 												debugMessage = "none";
 											}
 
-											console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - ICredit Status: " + status + " ,DebugMessage: " + debugMessage);
+											console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - ICredit Status: " + status + " ,DebugMessage: " + debugMessage + " ,ClientMessage" , + clientMessage);
 											
 											console.log("Removing Manager permissions for user [" + uid + "]");
 											
-											payload = {
+											orderPayload = {
 													'pendingPayment' : true,
 													'failedToCharge' : true,
 													'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
@@ -1458,11 +1811,14 @@ function paymentCron(){
 											}
 											
 											const userPayload = {
-													'manager' : false,
+													// 'manager' : false,
 													'managerRequestDenialReason' : 'חיוב נדחה, נא להזין כרטיס אשראי חדש',
 													'requestingManagerDenied' : true,
 													'requestingManagerDeniedDate' : admin.database.ServerValue.TIMESTAMP,
-													'requestingManager' : false
+													'prevPaymentAccessToken' : paymentAccessToken,
+													'paymentAccessToken' : '',
+													'requestingManager' : false,
+													'orderId' : key
 											}
 											
 											innerPromises.push(admin.database().ref('/users').child(uid).update(userPayload));
@@ -1473,7 +1829,7 @@ function paymentCron(){
 										
 										console.log("Failure: account [" + uid + "] was not charged [" + paymentAmount + " NIS] for order [" + key + "] - Error: " + error);
 										
-										payload = {
+										orderPayload = {
 												'pendingPayment' : true,
 												'failedToCharge' : true,
 												'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
@@ -1481,7 +1837,7 @@ function paymentCron(){
 										}
 									}
 									
-									innerPromises.push(admin.database().ref('/all-orders/').child(key).update(payload));
+									innerPromises.push(admin.database().ref('/all-orders/').child(key).update(orderPayload));
 								});
 								
 							}catch(e){
@@ -1489,6 +1845,35 @@ function paymentCron(){
 								console.log("charing request function error: " + e.message);
 							}
 							
+						} else {
+							
+							console.log("Failure: no paymentAccessToken or obligo !");
+							console.log("revoking manager permission for user: " + uid);
+
+							// TODO: send email with link to renew your credit card information
+							
+							
+							
+							const userPayload = {
+									'manager' : false,
+									'managerRequestDenialReason' : 'חיוב נדחה, נא להזין כרטיס אשראי חדש',
+									'requestingManagerDenied' : true,
+									'requestingManagerDeniedDate' : admin.database.ServerValue.TIMESTAMP,
+									'requestingManager' : false,
+									'prevPaymentAccessToken' : paymentAccessToken,
+									'paymentAccessToken' : '',
+							}
+							
+							innerPromises.push(admin.database().ref('/users').child(uid).update(userPayload));
+
+							const orderPayload = {
+									'pendingPayment' : true,
+									'failedToCharge' : true,
+									'failedToChargeDate' : admin.database.ServerValue.TIMESTAMP,
+									'failedToChargeReason' : 'paymentAccessToken is null'
+							}
+						
+							innerPromises.push(admin.database().ref('/all-orders/').child(key).update(orderPayload));
 						}
 						
 						return Promise.all(innerPromises);
@@ -1502,5 +1887,91 @@ function paymentCron(){
 	});
 	
 }
+
+function notifyUsersAboutTommorowsActions() {
+	console.log('notifyUsersAboutTommorowsActions()');
+	return admin.database().ref('/all-orders').orderByChild('orderStatus').equalTo(ORDER_STATUS_PENDING).once('value').then(pendingOrdersSnapshot => {
+		
+		const promises = [];
+		console.log('found (' + pendingOrdersSnapshot.numChildren() + ') pending orders');
+		
+		pendingOrdersSnapshot.forEach(function(childSnapshot) {
+			
+			const orderId = childSnapshot.child('orderId').val();
+			const selectedBid = childSnapshot.child('selectedBid').val();
+			const rawPickupDate = childSnapshot.child('bidsList').child(selectedBid).child('pickupDate').val();
+			const pickupDate = new Date(rawPickupDate);
+			const now = new Date();
+			
+			const dateTomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+			
+			if (dateTomorrow.getFullYear() == pickupDate.getFullYear() && dateTomorrow.getMonth() == pickupDate.getMonth() && dateTomorrow.getDate() == pickupDate.getDate()) {
+			    // pickupDate is tomorrow
+
+				console.log('order [' + orderId + '] is due tommorow, sending emails..');
+				
+				// bidder
+				let users = [];
+				users.push(childSnapshot.child('bidsList').child(selectedBid).child('bidder').val());
+				const bidderName = childSnapshot.child('bidsList').child(selectedBid).child('bidder').child('name').val();
+				const message = 'היי ' + bidderName + ',<br><br>תזכורת:,<br>מחר (' + pickupDate.toLocaleString() + ') יש לך הובלה';
+				const subject = 'תזכורת: מחר יש לך הובלה';
+				const email = {
+						html: generateEmailWithLinkToOrder(subject, message, '', '', orderId),
+						subject: subject
+				};
+				console.log('sending email to ' + bidderName + '[' + subject + ']');
+				promises.push(sendEmailToUsers(users, email));
+				
+				// owner
+				if (childSnapshot.child('owner').exists()) {
+					
+					// not always exists.. new feature.
+					
+					users = [];
+					users.push(childSnapshot.child('owner').val());
+					const ownerName = childSnapshot.child('owner').child('name').val();
+					const bidderName = childSnapshot.child('bidsList').child(selectedBid).child('bidder').child('name').val();
+					const message = 'היי ' + ownerName + ',<br><br>תזכורת:,<br>מחר (' + pickupDate.toLocaleString() + ') יגיע אליך מוביל מחברת ' + bidderName;
+					const subject = 'תזכורת: מחר מגיע אלך מוביל';
+					const email = {
+							html: generateEmailWithLinkToOrder(subject, message, '', '', orderId),
+							subject: subject
+					};
+					console.log('sending email to ' + bidderName + '[' + subject + ']');
+					promises.push(sendEmailToUsers(users, email));
+				}
+			}
+		});
+		
+		return Promise.all(promises);
+	});
+}
+
+function sendAllContactUsEmails () {
+
+	console.log("sendAllContactUsEmails cron strated.");
+	
+	return admin.database().ref('/email-inbox').once('value').then(emailsSnapshot => {
+		
+		if (emailsSnapshot.numChildren() <= 0) {
+			
+			console.log("No stuck emails, finishing operation.");
+			return true;
+		}
+		
+		var promises = [];
+		
+		emailsSnapshot.forEach(function(childSnapshot) {
+			
+			promises.push(sendNotificationToAppManagers("action_contact_us_request", childSnapshot));
+		});
+		
+		return Promise.all(promises);
+	});
+}
+
+
+
 
 

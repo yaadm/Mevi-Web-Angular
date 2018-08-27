@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, Pipe, PipeTransform, ViewChild, ElementRef } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { DatabaseService, firebaseConfigDebug, ModalInputComponent } from '../../shared';
+import { DatabaseService, firebaseConfigDebug, ModalInputComponent, ModalConfirmComponent } from '../../shared';
 import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { AuthListener } from '../../shared/services';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAction } from 'angularfire2/database';
 import { DataSnapshot } from 'firebase/database';
+import * as firebase from 'firebase';
 import { DialogService } from 'ngx-bootstrap-modal';
 
 @Component({
@@ -251,6 +252,176 @@ export class ManageUsersComponent implements OnInit, OnDestroy, AuthListener {
           }
       });
   }
+  
+  denyManagerRequest (user) {
+    this.dialogService.addDialog(ModalInputComponent, {
+      title: 'איך הסתיימה השיחה ?',
+      message: 'מה נסגר בסוף השיחה ?'})
+      .subscribe((data) => {
+          if (data) {
+            const payload = {
+              'managerRequestDenialReason' : data,
+              'requestingManagerDenied' : true,
+              'requestingManager' : false
+            }
+            
+            this.database.updateUserData(user.uid, payload).then(_ => {
+              // on success
+              
+              this.showInfoDialog('הצלחה', 'הטיפול הסתיים');
+            }, reason => {
+              // on reject
+              this.showInfoDialog('נכשל', 'לא הצלחנו לבסיים את הטיפול, נא לנסות שוב מאוחר יותר');
+            });
+          }
+      });
+  }
+  
+  removeCreditCard(user) {
+    this.dialogService.addDialog(ModalConfirmComponent, { 
+      title: 'מחיקת פרטי אשראי', 
+      message: 'האם אתה בטוח שברצונך ללמחוק אשראי של ' + user.name + ' ?' })
+      .subscribe((isConfirmed) => {
+        
+        if (isConfirmed) {
+          
+          const payload = {
+            'paymentAccessToken' : ''
+          }
+          
+          this.database.updateUserData(user.uid, payload).then(_ => {
+            // on success
+            
+            this.showInfoDialog('הצלחה', 'אשראי נמחק');
+          }, reason => {
+            // on reject
+            this.showInfoDialog('נכשל', 'לא הצלחנו למחוק את האשראי, נא לנסות שוב מאוחר יותר');
+          });
+        }
+      });
+  }
+  
+  blockUser(user) {
+    
+    if (user.blocked) {
+      
+      this.dialogService.addDialog(ModalConfirmComponent, { 
+      title: 'ביטול חסימת משתמש', 
+      message: 'האם אתה בטוח שברצונך לאפשר את ' + user.name + ' ?' })
+      .subscribe((isConfirmed) => {
+        
+        if (isConfirmed) {
+          
+          const payload = {
+            'blocked' : false
+          }
+          
+          this.database.updateUserData(user.uid, payload).then(_ => {
+            // on success
+            
+            this.showInfoDialog('הצלחה', 'המנוי אופשר');
+          }, reason => {
+            // on reject
+            this.showInfoDialog('נכשל', 'לא הצלחנו לאפשר את המנוי, נא לנסות שוב מאוחר יותר');
+          });
+        }
+      });
+      
+    } else {
+      
+      this.dialogService.addDialog(ModalConfirmComponent, { 
+      title: 'חסימת משתמש', 
+      message: 'האם אתה בטוח שברצונך לחסום את ' + user.name + ' ?' })
+      .subscribe((isConfirmed) => {
+        
+        if (isConfirmed) {
+          
+          const payload = {
+            // 'manager' : false, // do we need to remove the manager permission ?
+            'blocked' : true
+          }
+          
+          this.database.updateUserData(user.uid, payload).then(_ => {
+            // on success
+            
+            this.showInfoDialog('הצלחה', 'המנוי נחסם');
+          }, reason => {
+            // on reject
+            this.showInfoDialog('נכשל', 'לא הצלחנו לחסום את המנוי, נא לנסות שוב מאוחר יותר');
+          });
+        }
+      });
+    }
+    
+    
+  }
+  
+  approveManagerWithObligo(user) {
+    
+    this.dialogService.addDialog(ModalInputComponent, {
+      title: 'פתיחת תיק אובליגו',
+      message: 'מה הסכום לאובליגו חודשי ? (בשקלים)',
+      subMessage: 'הסכום הקיים הינו: ' + (user.obligo ? user.obligo + ' שח' : '0 שח') })
+      .subscribe((data) => {
+          if (data) {
+            
+            const obligo: number = +data;
+            if (!Number.isInteger(obligo)) {
+              this.showInfoDialog('נכשל', 'חובה להזין מספר');
+              return;
+            }
+            
+            const payload: any = {
+              'manager' : true,
+              'obligo' : obligo,
+              'requestingManagerDenied' : false,
+              'requestingManager' : false
+            }
+            
+            // 'managerRegistrationDate' : admin.database.ServerValue.TIMESTAMP
+            if (!user.managerRegistrationDate) {
+              payload.managerRegistrationDate = firebase.database.ServerValue.TIMESTAMP;
+            }
+            
+            console.log('managerRegistrationDate: ' + JSON.stringify(payload));
+            
+            this.database.updateUserData(user.uid, payload).then(_ => {
+              // on success
+              
+              this.showInfoDialog('הצלחה', 'המנוי עכשיו מנהל');
+            }, reason => {
+              // on reject
+              this.showInfoDialog('נכשל', 'לא הצלחנו לעדכן את המנוי, נא לנסות שוב מאוחר יותר');
+            });
+          }
+      });
+  }
+  
+  approveManagerWithCredit(user) {
+    this.dialogService.addDialog(ModalConfirmComponent, { 
+      title: 'אישור מנהל משאיות', 
+      message: 'האם אתה בטוח שברצונך לאשר את ' + user.name + ' ?' })
+      .subscribe((isConfirmed) => {
+        
+        if (isConfirmed) {
+          
+          const payload = {
+             'manager' : true,
+             'requestingManagerDenied' : false,
+          }
+          
+          this.database.updateUserData(user.uid, payload).then(_ => {
+            // on success
+            
+            this.showInfoDialog('הצלחה', 'המנוי מנהל');
+          }, reason => {
+            // on reject
+            this.showInfoDialog('נכשל', 'לא הצלחנו לעדכן את המנוי, נא לנסות שוב מאוחר יותר');
+          });
+        }
+      });
+  }
+  
   
   private setupTranslation(translate: TranslateService) {
     translate.addLangs(['en', 'iw']);

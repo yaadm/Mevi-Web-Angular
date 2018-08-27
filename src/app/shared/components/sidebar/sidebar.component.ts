@@ -14,14 +14,14 @@ export class SidebarComponent implements OnInit, OnDestroy, AuthListener {
     showMenu = '';
     isDevMode: boolean;
     currentUser: DataSnapshot;
-    constructor(private databaseService: DatabaseService) {
+    constructor(private database: DatabaseService) {
       this.isDevMode = isDevMode();
     }
     ngOnInit(): void {
-      this.databaseService.subscribeToAuth(this);
+      this.database.subscribeToAuth(this);
     }
     ngOnDestroy(): void {
-      this.databaseService.unsubscribeFromAuth(this);
+      this.database.unsubscribeFromAuth(this);
     }
     onUserChanged(user: any) {
       this.currentUser = user;

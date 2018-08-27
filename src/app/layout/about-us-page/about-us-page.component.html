@@ -1,27 +1,35 @@
 <div [@routerTransition] class="main-content-container">
     <app-page-header [heading]="'עלינו'" [icon]="'fa-address-book'"></app-page-header>
 	<div class="jumbotron">
-		<h3>ש.ח.ק טימבר בע"מ</h3> 
-		<img class="img-fluid d-block form-control" style='padding: 0px; width: 500px' [src]="getStaticMapUrl()" alt="Static Map">
-		<br>
-		<table>
-			<tr>
-				<td>
-					<i class="fa fa-building fw"></i>
-				</td>
-				<td>
-					מושב משען 29
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<i class="fa fa-phone fw"></i>
-				</td>
-				<td>
-					050-6589971
-				</td>
-			</tr>
-		</table>
+		<div class="row">
+			<div class="col-lg-4">
+				<h3>ש.ח.ק טימבר בע"מ</h3> 
+				
+				<br>
+				<table>
+					<tr>
+						<td>
+							<i class="fa fa-building fw"></i>
+						</td>
+						<td>
+							מושב משען 29
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-phone fw"></i>
+						</td>
+						<td>
+							050-6589971
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="col-lg-8">
+				<img class="img-fluid d-block form-control" style='padding: 0px; width: 500px' [src]="getStaticMapUrl()" alt="Static Map">
+			</div>
+		</div>
+		
 	</div>
 	<div class="jumbotron">
 		<table>

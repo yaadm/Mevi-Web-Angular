@@ -1,8 +1,8 @@
 <div [@routerTransition] class="mh_container">
 
-	<div class="background-image" style="height: 100vh;">
+	<div class="background-image">
 	</div>
-	 <div class="container">
+	 <div class="container home-container">
 	    <div class="row">
 	        <div class="col-md-6 block" style="margin-bottom: 2rem;">
 	            <div class="circle-green block">
@@ -37,16 +37,16 @@
 	    </div>
 	</div>
 	
-	<div *ngIf="videoIsReady">
-		<div class="form-control bottom-left-video" style="padding: .2rem;" *ngIf="showYoutubeOverlay">
+	<div class="bottom-left-video">
+		<div class="form-control" style="padding: .2rem;" *ngIf="showYoutubeOverlay">
 			<div (click)="toggleOverlayVideo()">
 				<div class="btn" style="padding: 0px;">
 					<i class="fa fa-close fa-fw"></i> &nbsp;סגור 
 				</div>
 			</div>
-	    	<iframe width="420" height="236" src="https://www.youtube.com/embed/HWfVXzkt-WA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+	    	<iframe class="yt-video" src="https://www.youtube.com/embed/NkcI19t1wGc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 	    </div>
-	    <div class="form-control bottom-left-video" *ngIf="!showYoutubeOverlay">
+	    <div class="form-control" *ngIf="!showYoutubeOverlay">
 			<i class="fa fa-youtube fa-3x" (click)="toggleOverlayVideo()"></i>
 	    </div>
     </div>

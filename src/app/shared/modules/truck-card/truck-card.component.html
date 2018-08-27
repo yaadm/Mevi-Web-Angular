@@ -10,16 +10,16 @@
 						<tbody>
 							<tr>
 								<td>סוג משאית</td>
-								<td><strong>{{order.truckType | resolveTruckType}}</strong></td>
+								<td><strong>{{order?.truckType | resolveTruckType}}</strong></td>
 							</tr>
 							<tr>
 								<td>סוג נגרר</td>
-								<td><strong>{{order.truckSubType |
+								<td><strong>{{order?.truckSubType |
 										resolveTruckSubType}}</strong></td>
 							</tr>
 							<tr>
 								<td>כמות משאיות</td>
-								<td><strong>{{order.truckQuantity}}</strong></td>
+								<td><strong>{{order?.truckQuantity}}</strong></td>
 							</tr>
 						</tbody>
 					</table>

@@ -31,7 +31,11 @@
 		                <input type="text" class="form-control" placeholder="כתובת" value="{{database.getCurrentUser().child('companyAddress').val()}}" #inputCompanyAddress>
 		            </div>
 		            <button class="btn btn-primary" (click)="onSubmit()">עדכן פרטי משתמש</button>
-				</div>		
+				</div>	
+				
+				
+				<app-user-payments [userId]="this.database.getCurrentUser().child('uid').val()"></app-user-payments>
+					
 			</div>
 			<div class="col-lg-4">
 				<div class="jumbotron" *ngIf="database.getCurrentUser().child('manager').val()">

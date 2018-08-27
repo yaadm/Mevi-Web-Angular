@@ -10,7 +10,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { ChartsModule as Ng2Charts } from 'ng2-charts';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { SuggestionCardModule, FooterPageModule, PageHeaderModule } from '../../shared';
+import { SuggestionCardModule, FooterPageModule, PageHeaderModule, SharedModalModuleModule } from '../../shared';
+import { BootstrapModalModule } from 'ngx-bootstrap-modal';
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
     // for development
@@ -23,6 +24,8 @@ export function HttpLoaderFactory(http: Http) {
     HomeRoutingModule,
     HttpModule,
     SuggestionCardModule,
+    SharedModalModuleModule,
+    BootstrapModalModule,
     FooterPageModule,
     PageHeaderModule,
     Ng2Charts,

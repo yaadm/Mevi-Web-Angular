@@ -28,10 +28,10 @@ export class ManagerRegistrationComponent implements OnInit, OnDestroy {
 
   requestPhonePayment() {
     
-    if (!this.checkboxAgreementRef.nativeElement.checked) {
-      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
-      return;
-    }
+//    if (!this.checkboxAgreementRef.nativeElement.checked) {
+//      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
+//      return;
+//    }
     
     const payload = {
       'requestingManager': true
@@ -44,10 +44,10 @@ export class ManagerRegistrationComponent implements OnInit, OnDestroy {
   }
   
   requestOnlinePayment() {
-    if (!this.checkboxAgreementRef.nativeElement.checked) {
-      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
-      return;
-    }
+//    if (!this.checkboxAgreementRef.nativeElement.checked) {
+//      this.showInformationDialog('לא הזנת שדה חובה', 'חובה לאשר מדיניות פרטיות ותנאי שימוש');
+//      return;
+//    }
     
     this.router.navigate(['/payment', this.database.getCurrentUser().child('uid').val()]);
   }

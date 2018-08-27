@@ -22,6 +22,32 @@
 		        <button type="submit" class="btn btn-primary" (click)="sendMessage()">שלח הודעה</button>
 			</div>
         </div>
+        <div class="col-lg-4">
+        	<div class="jumbotron" style="padding: .5rem;">
+        		<img class="img-fluid d-block form-control" style='padding: 0px; width: 500px' [src]="getStaticMapUrl()" alt="Static Map">
+        		<br>
+	        	<table style="font-size: large;">
+					<tr>
+						<td>
+							<i class="fa fa-building fw"></i> &nbsp;
+						</td>
+						<td>
+							מושב משען 29
+						</td>
+					</tr>
+					<br>
+					<tr>
+						<td>
+							<i class="fa fa-phone fw"></i> &nbsp;
+						</td>
+						<td>
+							050-6589971
+						</td>
+					</tr>
+				</table>
+				<br>
+        	</div>
+        </div>
 	</div>
 	<app-footer-page></app-footer-page>
 </div>

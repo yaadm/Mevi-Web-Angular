@@ -7,6 +7,7 @@ const routes: Routes = [
         path: '', component: LayoutComponent,
         children: [
             { path: 'home-page', loadChildren: './home/home.module#HomeModule' },
+            { path: 'statistics-page', loadChildren: './statistics/statistics.module#StatisticsModule' },
             { path: 'create-order-page', loadChildren: './create-order/create-order.module#CreateOrderModule' },
             { path: 'order-details/:orderId', loadChildren: './order-details/order-details.module#OrderDetailsModule' },
             { path: 'my-new-orders-page', loadChildren: './my-new-orders/my-new-orders.module#MyNewOrdersModule' },
@@ -16,6 +17,7 @@ const routes: Routes = [
             { path: 'open-orders-page', loadChildren: './open-orders/open-orders.module#OpenOrdersModule' },
             { path: 'my-pending-deliveries-page', loadChildren: './my-pending-deliveries/my-pending-deliveries.module#MyPendingDeliveriesModule' },
             { path: 'my-completed-deliveries-page', loadChildren: './my-completed-deliveries/my-completed-deliveries.module#MyCompletedDeliveriesModule' },
+            { path: 'user-orders/:userId', loadChildren: './user-orders/user-orders.module#UserOrdersModule' },
             { path: 'managers-registration-requests-page', loadChildren: './managers-registration-requests/managers-registration-requests.module#ManagersRegistrationRequestsModule' },
             { path: 'manage-users-page', loadChildren: './manage-users/manage-users.module#ManageUsersModule' },
             { path: 'manage-unpaid-orders-page', loadChildren: './manage-unpaid-orders/manage-unpaid-orders.module#ManageUnpaidOrdersModule' },
@@ -25,6 +27,7 @@ const routes: Routes = [
             { path: 'payment/:userId', loadChildren: './payment/payment.module#PaymentModule' },
             { path: 'registration-page', loadChildren: './registration/registration.module#RegistrationModule' },
             { path: 'manager-registration-page', loadChildren: './manager-registration/manager-registration.module#ManagerRegistrationModule' },
+            { path: 'manager-registration-result-page', loadChildren: './manager-registration-result/manager-registration-result.module#ManagerRegistrationResultModule' },
             { path: 'tos-page', loadChildren: './tos-page/tos-page.module#TosPageModule' },
             { path: 'pp-page', loadChildren: './pp-page/pp-page.module#PpPageModule' },
             { path: 'user-profile/:userId', loadChildren: './user-profile/user-profile.module#UserProfileModule' },

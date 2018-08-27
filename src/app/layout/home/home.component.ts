@@ -1,8 +1,11 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, HostListener, NgZone } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { DatabaseService, AuthListener } from '../../shared';
+import { ModalInformComponent } from '../../shared/components/modal-inform/modal-inform.component';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { DialogService } from 'ngx-bootstrap-modal';
+import { log } from 'util';
 
 @Component({
   selector: 'app-home-page',
@@ -12,6 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
   
 export class HomeComponent implements OnInit, OnDestroy, AuthListener {
+  
   static shouldRedirectToCreateOrder = false;
   static shouldRedirectToManagerRegistration = false;
   
@@ -20,25 +24,25 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
   statistics: any;
   public sliders: Array<any> = [];
   showYoutubeOverlay = true;
-  videoIsReady = false;
   
-  constructor(private translate: TranslateService, public database: DatabaseService, public router: Router) {
+  
+  constructor(private translate: TranslateService, public database: DatabaseService, public router: Router, private dialogService: DialogService, private _ngZone: NgZone) {
     this.setupTranslation(translate);
-    this.sliders.push({
-          imagePath: 'assets/images/slider3.jpg',
-          label: 'קבל הצעות מחיר להובלות שלך',
-          text: 'כאן תוכל לקבל הצעות מחיר ולהבטיח מחיר הוגן.'
-      }, {
-          imagePath: 'assets/images/slider2.jpg',
-          label: 'מצא עבודה למשאיות שלך',
-          text: 'מצא להם עבודה והתחל להרוויח כסף !'
-      }, {
-          imagePath: 'assets/images/slider1.jpg',
-          label: 'עכשיו גם לאנדרואיד',
-          text: 'באפליקציה תוכלו לקבל הודעות בזמן אמת ולהשאר עם יד על הדופק'
-      });
+    
+    window['angularComponentRef'] = {
+      component: this, 
+      zone: _ngZone,
+      componentFn: (value) => this.callFromOutside(value), 
+    };
   }
 
+  callFromOutside(value) {
+    // this.zone.run(() => {
+      console.log('calledFromOutside ' + value);
+      this.database.onNewFCMTokenFromAndroid(value);
+    // });
+  }
+  
   toggleOverlayVideo() {
     this.showYoutubeOverlay = !this.showYoutubeOverlay;
   }
@@ -85,6 +89,12 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
     
     if (this.database.currentUser !== undefined) {
       // user logged in
+      
+      if (this.database.getCurrentUser().child('blocked').val()) {
+        this.showInfoMessage('שגיאה', 'המשתמש שלך חסום, בכדי לפתור את הבעיה נא צור קשר עם האתר', ['/contact-us-page'], 'ליצירת קשר'); // TODO: add suggestion to register
+        return;
+      }
+      
       this.router.navigate(['/create-order-page']);
     } else {
       // user not logged in
@@ -94,17 +104,28 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
     }
   }
   
+  showInfoMessage(modalTitle, modalMessage, urlLink?: string[], urlText?: string) {
+    this.dialogService.addDialog(ModalInformComponent, { title: modalTitle, message: modalMessage, linkUrl: urlLink, linkText: urlText });
+  }
+  
   onManagerRequestClicked() {
     if (this.database.currentUser !== undefined) {
       // user logged in
       
-      if (this.database.currentUser.child('manager').val() === true) {
-        // user is manager
-        this.router.navigate(['/open-orders-page', 0, 0, 0, 0]);
-      } else {
-        // user need to register as manager
-        this.router.navigate(['/manager-registration-page']);
+      if (this.database.getCurrentUser().child('blocked').val()) {
+        this.showInfoMessage('שגיאה', 'המשתמש שלך חסום, בכדי לפתור את הבעיה נא צור קשר עם האתר', ['/contact-us-page'], 'ליצירת קשר'); // TODO: add suggestion to register
+        return;
       }
+      
+      this.router.navigate(['/open-orders-page', 0, 0, 0, 0]);
+      
+//      if (this.database.currentUser.child('manager').val() === true) {
+//        // user is manager
+//        this.router.navigate(['/open-orders-page', 0, 0, 0, 0]);
+//      } else {
+//        // user need to register as manager
+//        this.router.navigate(['/manager-registration-page']);
+//      }
       
     } else {
       
@@ -122,4 +143,10 @@ export class HomeComponent implements OnInit, OnDestroy, AuthListener {
     const browserLang = translate.getBrowserLang();
     translate.use(browserLang.match(/en|iw/) ? browserLang : 'iw');
   }
+  
+  @HostListener('window:custom-event', ['$event'])
+  customEventFunction(event) {
+    console.log('customEventFunction() called event:' + event.type);
+  }
+  
 }

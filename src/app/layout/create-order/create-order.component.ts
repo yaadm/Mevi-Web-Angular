@@ -38,9 +38,11 @@ export class CreateOrderComponent implements OnInit {
   loading = false;
   public fromLatitude: number;
   public fromLongitude: number;
+  public fromAddress = '';
   public fromZoom = 12;
   public toLatitude: number;
   public toLongitude: number;
+  public toAddress = '';
   public toZoom = 12;
   public searchControl: FormControl;
   private geoCoder;
@@ -248,15 +250,12 @@ export class CreateOrderComponent implements OnInit {
 
       this.toMarkerDragEnd(this.defaultGeocoderEvent);
 
-      // set current position
-      setTimeout(() => { this.setToCurrentPosition(); }, 1000);
-      
       const autocomplete = new google.maps.places.Autocomplete(this.toSearchElementRef.nativeElement);
       autocomplete.addListener('place_changed', () => {
         this.ngZone.run(() => {
           
           const address: google.maps.places.PlaceResult = autocomplete.getPlace();
-          console.log('address:' + address.formatted_address);
+          // console.log('address:' + address.formatted_address);
           // get the place result
 
           // verify result
@@ -267,9 +266,17 @@ export class CreateOrderComponent implements OnInit {
           // set latitude, longitude and zoom
           this.toLatitude = address.geometry.location.lat();
           this.toLongitude = address.geometry.location.lng();
+          if (address.formatted_address) {
+            this.toAddress = address.formatted_address;
+          } else {
+            this.toAddress = '';
+          }
           this.toZoom = 12;
         });
       });
+    
+      // set current position
+      this.setToCurrentPosition();
   }
   
   ngOnInit() {
@@ -293,9 +300,6 @@ export class CreateOrderComponent implements OnInit {
 
       this.fromMarkerDragEnd(this.defaultGeocoderEvent);
       
-      // set current position
-      setTimeout(() => { this.setFromCurrentPosition(); }, 1000);
-      
       const autocomplete = new google.maps.places.Autocomplete(this.fromSearchElementRef.nativeElement);
       autocomplete.addListener('place_changed', () => {
         this.ngZone.run(() => {
@@ -312,10 +316,18 @@ export class CreateOrderComponent implements OnInit {
           // set latitude, longitude and zoom
           this.fromLatitude = address.geometry.location.lat();
           this.fromLongitude = address.geometry.location.lng();
+          if (address.formatted_address) {
+            this.fromAddress = address.formatted_address;
+          } else {
+            this.fromAddress = '';
+          }
           this.fromZoom = 12;
         });
       });
 
+      // set current position
+      this.setFromCurrentPosition();
+      
       this.initToMap();
       
     }, reason => {
@@ -327,6 +339,7 @@ export class CreateOrderComponent implements OnInit {
   public fromMarkerDragEnd ($event) {
     this.fromLatitude = $event.coords.lat;
     this.fromLongitude = $event.coords.lng;
+    this.fromZoom = 12;
     this.geoCoder.geocode({'location': {lat: this.fromLatitude, lng: this.fromLongitude }}, (results, status) => {
       if (status === 'OK') {
         if (results[0]) {
@@ -347,6 +360,7 @@ export class CreateOrderComponent implements OnInit {
   public toMarkerDragEnd ($event) {
     this.toLatitude = $event.coords.lat;
     this.toLongitude = $event.coords.lng;
+    this.toZoom = 12;
     this.geoCoder.geocode({'location': {lat: this.toLatitude, lng: this.toLongitude }}, (results, status) => {
       if (status === 'OK') {
         if (results[0]) {
@@ -364,7 +378,8 @@ export class CreateOrderComponent implements OnInit {
     });
   }
 
-  private setFromCurrentPosition() {
+  setFromCurrentPosition() {
+    console.log('setFromCurrentPosition()');
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
 
@@ -377,15 +392,12 @@ export class CreateOrderComponent implements OnInit {
 
         this.fromMarkerDragEnd(event);
 
-        this.fromLatitude = position.coords.latitude;
-        this.fromLongitude = position.coords.longitude;
-        this.fromZoom = 12;
-
       });
     }
   }
 
-  private setToCurrentPosition() {
+  setToCurrentPosition() {
+    console.log('setToCurrentPosition()');
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition((position) => {
 
@@ -398,9 +410,6 @@ export class CreateOrderComponent implements OnInit {
 
         this.toMarkerDragEnd(event);
 
-        this.toLatitude = position.coords.latitude;
-        this.toLongitude = position.coords.longitude;
-        this.toZoom = 12;
       });
     }
   }
@@ -559,11 +568,13 @@ export class CreateOrderComponent implements OnInit {
       'userImage' : this.database.getCurrentUser().child('imageUrl').val(),
       'userName' : this.database.getCurrentUser().child('name').val(),
       'userEmail' : this.database.getCurrentUser().child('email').val(),
+      'owner' : this.database.getCurrentUser().val(),
       'companyPhone' : this.database.getCurrentUser().child('companyPhone').val(),
       
       'pickupLat' : this.fromLatitude,
       'pickupLng' : this.fromLongitude,
       'pickupLocationName' : this.fromSearchElementRef.nativeElement.value,
+      'pickupAddress' : this.fromAddress,
       'pickupDate' : new Date(this.pickupDateRef.nativeElement.value).getTime(),
       'pickupTime' : this.getMillisFromTimeInput(this.pickupTimeRef.nativeElement.value),
       
@@ -571,6 +582,7 @@ export class CreateOrderComponent implements OnInit {
       'destinationLng' : this.toLongitude,
       'destinationLocationName' : this.toSearchElementRef.nativeElement.value,
       'destinationBusinessName' : this.toSearchElementRef.nativeElement.value,
+      'destinationAddress' : this.toAddress,
       
       'possiblePaymentMethods': possiblePaymentMethods,
       
